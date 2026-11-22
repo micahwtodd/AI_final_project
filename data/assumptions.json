@@ -173,7 +173,10 @@
   "noise_sd": 0.05,
   "score": {
     "clip_max": 1.2,
-    "breach_penalty": 10
+    "breach_penalty": 10,
+    "fallback_band_floor": 0.9,
+    "fallback_scale_pct_of_surplus": 0.03,
+    "_note": "When the benchmark does not beat doing nothing, matching it earns 0.9 and matching the better of the two earns 1.0; doing worse falls off over max(gap, 3% of surplus). Breaches the benchmark would also have had are not penalized."
   },
   "credit_tiers": {
     "a_default_ratio_to_bbb": 0.15,

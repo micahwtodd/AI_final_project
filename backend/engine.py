@@ -499,6 +499,8 @@ def play_quarter(state: GameState, action: Action | None) -> tuple[GameState, Qu
         benchmark_surplus_after=cf["benchmark"]["surplus_after"],
         capital_breach=d.capital_ratio_pct < fl["capital_ratio_pct"],
         liquidity_breach=d.liquidity_ratio_pct < fl["liquidity_ratio_pct"],
+        benchmark_capital_breach=cf["benchmark"]["capital_breach"],
+        benchmark_liquidity_breach=cf["benchmark"]["liquidity_breach"],
     )
     rec.lever_gains = lever_gains(start, traded.action, card, shock, rec.surplus_after)
     after_state.history = [*start.history, rec]
@@ -530,7 +532,10 @@ def counterfactual(start_state: GameState, card: EventCard, seed: int) -> dict:
     for name, st in (("nothing", start_state),
                      ("benchmark", apply_action(start_state, card.benchmark_action, card.offers_prt_deal))):
         after, att = apply_shock(st, shock)
-        out[name] = {"surplus_after": round(surplus(after), 4), "attribution": att.model_dump()}
+        d, fl = dashboard(after), assumptions()["floors"]
+        out[name] = {"surplus_after": round(surplus(after), 4), "attribution": att.model_dump(),
+                     "capital_breach": d.capital_ratio_pct < fl["capital_ratio_pct"],
+                     "liquidity_breach": d.liquidity_ratio_pct < fl["liquidity_ratio_pct"]}
     return out
 
 
@@ -546,11 +551,24 @@ def quarter_score(rec: QuarterRecord) -> float:
     if denom > tol:
         ratio = (you - nothing) / denom
     else:
-        # the benchmark did not beat doing nothing this quarter (e.g. a hedge gave up a gain):
-        # full marks for matching the better of the two, scaled down for doing worse
-        best = max(bench, nothing)
-        ratio = 1.0 if you >= best - tol else max(0.0, 1.0 - (best - you) / max(abs(best), tol, 1e-9))
+        # The benchmark did not beat doing nothing this quarter (e.g. a hedge gave up a small gain).
+        # Both are defensible: matching the benchmark earns the band floor (0.9), matching the better
+        # of the two earns full marks, and doing worse than both falls off over a band of a few percent
+        # of surplus instead of dropping straight to zero.
+        lo, hi = min(bench, nothing), max(bench, nothing)
+        floor = c.get("fallback_band_floor", 0.9)
+        scale = max(hi - lo, c.get("fallback_scale_pct_of_surplus", 0.03) * abs(rec.surplus_before), tol)
+        if you >= hi - tol:
+            ratio = 1.0 + max(0.0, you - hi) / scale
+        elif you >= lo - tol:
+            ratio = floor + (1.0 - floor) * (you - lo) / max(hi - lo, 1e-9)
+        else:
+            ratio = floor * max(0.0, 1.0 - (lo - you) / scale)
     return max(0.0, min(c["clip_max"], ratio))
+
+
+def penalized_breaches(r: QuarterRecord) -> int:
+    return int(r.capital_breach and not r.benchmark_capital_breach) + int(r.liquidity_breach and not r.benchmark_liquidity_breach)
 
 
 def score(history: list[QuarterRecord]) -> dict:
@@ -559,7 +577,8 @@ def score(history: list[QuarterRecord]) -> dict:
         return {"results_score": 0, "per_quarter": [], "penalties": 0}
     c = assumptions()["score"]
     per_q = [quarter_score(r) for r in history]
-    penalties = c["breach_penalty"] * sum(r.capital_breach + r.liquidity_breach for r in history)
+    # a breach the benchmark trades would also have suffered that quarter is not penalized
+    penalties = c["breach_penalty"] * sum(penalized_breaches(r) for r in history)
     raw = 100 * sum(per_q) / len(per_q) - penalties
     return {"results_score": round(max(0.0, min(100.0, raw)), 1),
             "per_quarter": [round(100 * x, 1) for x in per_q], "penalties": penalties}

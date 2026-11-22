@@ -48,3 +48,31 @@ def test_benchmark_player_earns_benchmark_badges_and_a_grade():
 
 def test_grade_cutoffs():
     assert achievements.grade_for(95) == "A+" and achievements.grade_for(70) == "B" and achievements.grade_for(10) == "F"
+
+
+# ---------------------------------------------------------------- scoring fix (benchmark below doing nothing)
+
+def _campaign(ticker: str, strategy: str):
+    from backend.calibration import load_profile
+    st = engine.build_state(load_profile(ticker), 409)
+    for q in range(1, 5):
+        st, _ = engine.play_quarter(st, engine.card_for(q).benchmark_action if strategy == "benchmark" else None)
+    return st.history
+
+
+def test_copying_the_benchmark_scores_well_for_every_company():
+    for t in ["MET", "PRU", "CRBG", "LNC", "EQH", "JXN"]:
+        hist = _campaign(t, "benchmark")
+        assert engine.score(hist)["results_score"] >= 85, t
+        assert all(engine.quarter_score(r) >= 0.9 - 1e-9 for r in hist), t
+        assert engine.score(hist)["penalties"] == 0, t  # breaches the benchmark shares are not penalized
+
+
+def test_fallback_is_graded_not_a_cliff():
+    from backend.models import Attribution, QuarterRecord, ShockVector, Action
+    base = dict(quarter=4, card_id="x", severity=1.0, shock=ShockVector(), action=Action(), attribution=Attribution(),
+                surplus_before=10.0, nothing_surplus_after=10.0, benchmark_surplus_after=9.9)
+    score = lambda after: engine.quarter_score(QuarterRecord(surplus_after=after, **base))  # noqa: E731
+    assert score(10.0) == 1.0 and abs(score(9.9) - 0.9) < 1e-9
+    assert 0.9 < score(9.95) < 1.0
+    assert 0 < score(9.8) < 0.9 and score(9.0) == 0.0

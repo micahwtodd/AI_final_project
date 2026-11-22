@@ -164,6 +164,8 @@ class QuarterRecord(BaseModel):
     benchmark_surplus_after: float | None = None
     capital_breach: bool = False
     liquidity_breach: bool = False
+    benchmark_capital_breach: bool = False  # would the benchmark trades also have breached? (no penalty then)
+    benchmark_liquidity_breach: bool = False
     lever_gains: dict[str, float] = {}  # surplus added by moving just that lever to the benchmark's setting
 
 
