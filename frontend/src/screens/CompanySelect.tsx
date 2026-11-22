@@ -5,9 +5,10 @@ import { CompanyLogo } from "../components/CompanyLogo";
 import { Dossier } from "../components/Dossier";
 import { InputsEditor } from "../components/InputsEditor";
 
-export function CompanySelect(props: { companies: Company[]; busy: boolean; onStart: (ticker: string, seed: number, overrides: Record<string, number>) => void; onDemo: () => void }) {
-  const [picked, setPicked] = useState<string | null>(null);
-  const [seed, setSeed] = useState(409);
+export function CompanySelect(props: { companies: Company[]; busy: boolean; onStart: (ticker: string, seed: number, overrides: Record<string, number>) => void;
+  initialPick?: { ticker: string; seed: number } | null; onIntro?: () => void; onDemo: () => void }) {
+  const [picked, setPicked] = useState<string | null>(props.initialPick?.ticker ?? null);
+  const [seed, setSeed] = useState(props.initialPick?.seed ?? 409);
   const chosen = props.companies.find((c) => c.ticker === picked);
   const [overrides, setOverrides] = useState<Record<string, number>>({});
   const [preview, setPreview] = useState<{ dashboard: Dashboard; inputs: GameInput[] } | null>(null);
@@ -43,6 +44,7 @@ export function CompanySelect(props: { companies: Company[]; busy: boolean; onSt
             <div className="hero-kicker">Six real insurers · real balance sheets · one brutal year</div>
             <h1>Pick your insurer.</h1>
           </div>
+          {props.onIntro && <button className="link hero-link" onClick={props.onIntro}>↺ Replay intro</button>}
           <button className="demo-btn" disabled={props.busy} onClick={props.onDemo} title="Jackson Financial with sample answers for every step">▶ Demo mode</button>
         </div>
         <ol className="rules">
@@ -92,7 +94,7 @@ export function CompanySelect(props: { companies: Company[]; busy: boolean; onSt
             Equity is shown excluding unrealized bond gains and losses (AOCI).
           </p>
           <div className="start-row approve-row">
-            <button className="primary approve-btn" disabled={props.busy || !!inputErr} onClick={() => props.onStart(chosen.ticker, seed, overrides)}>
+            <button className="gold-btn approve-btn" disabled={props.busy || !!inputErr} onClick={() => props.onStart(chosen.ticker, seed, overrides)}>
               {props.busy ? "Starting…" : `Approve dossier and run ${chosen.name} →`}
             </button>
           </div>

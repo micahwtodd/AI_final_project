@@ -53,6 +53,7 @@ class Session(BaseModel):
     feedback: list[dict] = []
     proposed_ticket: dict | None = None
     overrides: dict[str, float] = {}  # learner edits to the game inputs (Advanced options)
+    quiz_checked: dict[str, dict[str, str]] = {}  # 'pre'/'post' -> {question id: the choice that was checked}
 
 
 _SESSIONS: dict[str, Session] = {}
@@ -140,7 +141,6 @@ DOSSIER_FIELDS = [
     ("policyholder_account_balances", "Policyholder account balances", "bn"),
     ("future_policy_benefits", "Future policy benefits", "bn"), ("mrb_net", "Net market risk benefits", "bn"),
     ("separate_account_assets", "Separate-account assets", "bn"), ("guaranteed_share_of_sa", "Guaranteed share of separate accounts", "pct"),
-    ("foreign_share", "Foreign share", "pct"), ("fx_exposed_share", "Currency-exposed share of assets", "pct"),
     ("life_share_of_fpb", "Life share of future policy benefits", "pct"),
     ("net_investment_yield", "Net investment yield", "pct"),
 ]
@@ -156,7 +156,6 @@ INPUT_FIELDS: list[tuple[str, str, str, float, float]] = [  # key, label, unit, 
     ("guarantee_exposure_usd_bn", "Account value with stock-market guarantees", "bn", 0, 3000),
     ("guarantee_value_usd_bn", "Net guarantee liability (negative = asset)", "bn", -200, 200),
     ("net_investment_yield", "Net investment yield", "pct", 0, 0.15),
-    ("fx_exposed_share", "Currency-exposed share of assets", "pct", 0, 0.6),
     ("ig_aaa_share", "AAA share of investment-grade corporates", "pct", 0, 1),
     ("ig_bbb_share", "BBB share of investment-grade corporates", "pct", 0, 1),
     ("alts_beta", "Stock-market sensitivity of alternatives", "x", 0, 1.5),
@@ -423,7 +422,7 @@ def reveal_payload(s: Session, rec: QuarterRecord) -> dict:
     return {
         "quarter": rec.quarter,
         "attribution": [{"key": k, "label": engine.ATTRIBUTION_LABELS[k], "value": v}
-                        for k, v in rec.attribution.components().items()],
+                        for k, v in rec.attribution.components().items() if k != "fx" or engine.fx_enabled()],
         "total": rec.attribution.total,
         "comparison": {"you": round(you, 3), "nothing": round(nothing, 3), "benchmark": round(bench, 3)},
         "quarter_score": round(100 * engine.quarter_score(rec), 1),
@@ -536,8 +535,24 @@ def quiz_form(when: str) -> dict:
     q = _quiz_data()
     form = FORM_FOR[when]
     return {"when": when, "form": form,
-            "questions": [{k: v for k, v in item.items() if k != "answer"} for item in q["forms"][form]],
+            "questions": [{k: v for k, v in item.items() if k not in ("answer", "explain")} for item in q["forms"][form]],
             "confidence": q["confidence"]}
+
+
+def check_quiz_answer(s: Session, when: str, qid: str, choice: str) -> dict:
+    """Reveal whether one answer is right, with a short explanation. The first checked choice is locked,
+    so checking cannot be used to improve the saved score."""
+    if when not in FORM_FOR:
+        raise GameError("Unknown quiz.")
+    if when in s.quiz:
+        raise GameError("This quiz was already submitted.")
+    item = next((i for i in _quiz_data()["forms"][FORM_FOR[when]] if i["id"] == qid), None)
+    if item is None or choice not in item["options"]:
+        raise GameError("Unknown question or option.")
+    locked = s.quiz_checked.setdefault(when, {}).setdefault(qid, choice)
+    _save(s)
+    return {"id": qid, "choice": locked, "correct": locked == item["answer"], "answer": item["answer"],
+            "explain": item.get("explain", "")}
 
 
 def submit_quiz(s: Session, when: str, answers: dict[str, str], confidence: dict[str, int]) -> dict:
@@ -550,6 +565,7 @@ def submit_quiz(s: Session, when: str, answers: dict[str, str], confidence: dict
         raise GameError("The after-game quiz opens once the four quarters are played.")
     q = _quiz_data()
     items = q["forms"][FORM_FOR[when]]
+    answers = {**answers, **s.quiz_checked.get(when, {})}  # a checked answer cannot be changed afterwards
     by_concept = {i["concept"]: answers.get(i["id"]) == i["answer"] for i in items}
     correct = sum(by_concept.values())
     conf = {c["id"]: int(confidence[c["id"]]) for c in q["confidence"] if c["id"] in confidence}

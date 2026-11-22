@@ -184,5 +184,9 @@
   },
   "stock_beta": 1.0,
   "_stock_note": "Stocks held are folded into the alternatives bucket (per Micah). Each company's alternatives beta blends alternatives at 0.2 with its stocks at stock_beta.",
-  "_foreign_note": "When Seamore finds the share of business in foreign operations, 90% of those assets are assumed matched by liabilities in the same currency (local policies), so only 10% moves surplus when the dollar moves. Default foreign holdings (5%) are assumed unmatched."
+  "_foreign_note": "When Seamore finds the share of business in foreign operations, 90% of those assets are assumed matched by liabilities in the same currency (local policies), so only 10% moves surplus when the dollar moves. Default foreign holdings (5%) are assumed unmatched.",
+  "fx": {
+    "enabled": false,
+    "_note": "Foreign exchange is switched off for the target audience (Gate 1 feedback): FX exposure and the dollar's move are set to zero. The code paths remain; set enabled to true to restore them."
+  }
 }

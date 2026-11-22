@@ -67,19 +67,6 @@
       "answer": "D"
     },
     {
-      "id": "T06",
-      "agent": "actuary",
-      "concept": "surrender_charge",
-      "q": "What is the main job of a surrender charge or market value adjustment?",
-      "options": {
-        "A": "To hedge foreign exchange",
-        "B": "To protect the insurer from part of the loss when policyholders leave after rates rise",
-        "C": "To raise the crediting rate",
-        "D": "To pay brokers"
-      },
-      "answer": "B"
-    },
-    {
       "id": "T07",
       "agent": "portfolio_manager",
       "concept": "credit_spread",
@@ -158,19 +145,6 @@
       "answer": "C"
     },
     {
-      "id": "T13",
-      "agent": "trader",
-      "concept": "interest_rate_swap",
-      "q": "We receive fixed on an interest rate swap. When do we gain?",
-      "options": {
-        "A": "When rates rise",
-        "B": "When stocks rise",
-        "C": "When rates fall",
-        "D": "When the dollar rises"
-      },
-      "answer": "C"
-    },
-    {
       "id": "T14",
       "agent": "trader",
       "concept": "margin_call",
@@ -195,19 +169,6 @@
         "D": "They pay out in a market fall but cost a premium every quarter even if markets rise"
       },
       "answer": "D"
-    },
-    {
-      "id": "T16",
-      "agent": "trader",
-      "concept": "fx_hedge",
-      "q": "We hold foreign bonds and the US dollar strengthens. Without a currency hedge, what happens to those bonds' value in dollars?",
-      "options": {
-        "A": "It depends only on interest rates",
-        "B": "It rises",
-        "C": "It falls",
-        "D": "It is unchanged"
-      },
-      "answer": "C"
     },
     {
       "id": "T17",
@@ -261,5 +222,49 @@
       },
       "answer": "B"
     }
-  ]
+  ],
+  "_retired": {
+    "_note": "Retired when FX was switched off (Gate 1 feedback).",
+    "questions": [
+      {
+        "id": "T06",
+        "agent": "actuary",
+        "concept": "surrender_charge",
+        "q": "What is the main job of a surrender charge or market value adjustment?",
+        "options": {
+          "A": "To hedge foreign exchange",
+          "B": "To protect the insurer from part of the loss when policyholders leave after rates rise",
+          "C": "To raise the crediting rate",
+          "D": "To pay brokers"
+        },
+        "answer": "B"
+      },
+      {
+        "id": "T13",
+        "agent": "trader",
+        "concept": "interest_rate_swap",
+        "q": "We receive fixed on an interest rate swap. When do we gain?",
+        "options": {
+          "A": "When rates rise",
+          "B": "When stocks rise",
+          "C": "When rates fall",
+          "D": "When the dollar rises"
+        },
+        "answer": "C"
+      },
+      {
+        "id": "T16",
+        "agent": "trader",
+        "concept": "fx_hedge",
+        "q": "We hold foreign bonds and the US dollar strengthens. Without a currency hedge, what happens to those bonds' value in dollars?",
+        "options": {
+          "A": "It depends only on interest rates",
+          "B": "It rises",
+          "C": "It falls",
+          "D": "It is unchanged"
+        },
+        "answer": "C"
+      }
+    ]
+  }
 }

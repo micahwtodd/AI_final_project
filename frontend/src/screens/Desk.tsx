@@ -61,54 +61,30 @@ export function Desk(props: {
     <section className="desk">
       {g.card && <QuarterSplash id={g.id} quarter={g.card.quarter} title={g.card.title} era={g.card.era} />}
       {showGuide && <GuideBar step={guide} onNext={() => setGuide((x) => x + 1)} onHide={hideGuide} />}
-      <div className="desk-left">
+      <div className="desk-dash">
+        <div className="panel">
+          <div className="dash-head">
+            <h3>Risk dashboard</h3>
+            <DeskCat status={(preview?.after ?? g.dashboard).status.capital} />
+          </div>
+          {preview && !signed && <div className="small muted dash-note">→ shows the effect of your draft ticket</div>}
+          <Meters dashboard={g.dashboard} after={preview?.after} />
+        </div>
+      </div>
+
+      <div className="desk-mid">
         {g.card && (
           <div className={`panel wire${focus(0)}${g.card.quarter === 4 ? " boss-wire" : ""}`}>
             <div className="wire-tag">NEWS WIRE · Q{g.card.quarter}{g.card.quarter === 4 && <span className="boss-tag">⚠ BOSS ROUND · FINAL QUARTER</span>}</div>
             <h2>{g.card.title}</h2>
             <p className="wire-text">{g.card.signal_text}</p>
-            <p className="small muted">A hint, not a forecast. The market may move more, less, or not at all.</p>
           </div>
         )}
 
         <div className={focus(1).trim()}>
-        <ChatPanel onAnswered={() => { if (showGuide && guide <= 1) setGuide(2); }} gameId={g.id} chat={g.chat} mode={g.agent_mode} usage={props.usage} onUsage={props.onUsage}
+        <ChatPanel onAnswered={() => { if (showGuide && guide <= 1) setGuide(2); }} gameId={g.id} chat={g.chat} mode={g.agent_mode} demo={g.demo} usage={props.usage} onUsage={props.onUsage}
           onLoadTicket={(a) => setDraft({ ...a, accept_prt: offersPrt ? a.accept_prt : null })} />
         </div>
-
-        <div className="panel">
-          <div className="dash-head">
-            <h3>Risk dashboard {preview && !signed && <span className="muted small">(→ shows the effect of your draft ticket)</span>}</h3>
-            <DeskCat status={(preview?.after ?? g.dashboard).status.capital} />
-          </div>
-          <Meters dashboard={g.dashboard} after={preview?.after} />
-        </div>
-
-        <div className="panel">
-          <h3>Balance sheet {preview && !signed && <span className="muted small">(after your draft ticket)</span>}</h3>
-          <BalanceSheetPanel dashboard={preview?.after ?? g.dashboard} compact />
-        </div>
-
-        {g.history.length > 0 && (
-          <div className="panel">
-            <h3>Past quarters</h3>
-            <table className="table">
-              <thead>
-                <tr><th>Q</th><th>Event</th><th>Surplus change</th><th>Score</th></tr>
-              </thead>
-              <tbody>
-                {g.history.map((h) => (
-                  <tr key={h.quarter}>
-                    <td>{h.quarter}</td>
-                    <td>{h.title}</td>
-                    <td className={h.change < 0 ? "neg" : "pos"}>{h.change >= 0 ? "+" : ""}{h.change.toFixed(2)}bn</td>
-                    <td>{h.score ?? "–"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
       </div>
 
       <div className="desk-right">
@@ -181,6 +157,40 @@ export function Desk(props: {
           {!g.pending && <div className="small muted">No ticket signed yet: ending the quarter keeps your current positions.</div>}
           {g.pending && !signed && <div className="small warn">You changed the ticket after signing. Sign again to use the new trades.</div>}
         </div>
+        <div className="panel cost-box">
+          <h3>AI usage so far</h3>
+          <div className="cost-figures">
+            <div><b>{(props.usage.tokens.input + props.usage.tokens.output).toLocaleString()}</b><span>tokens</span></div>
+            <div><b>${props.usage.spend_usd.toFixed(4)}</b><span>model cost</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div className="desk-below">
+        <details className="panel bs-details">
+          <summary><h3>Balance sheet {preview && !signed && <span className="muted small">(after your draft ticket)</span>}</h3></summary>
+          <BalanceSheetPanel dashboard={preview?.after ?? g.dashboard} compact />
+        </details>
+        {g.history.length > 0 && (
+          <div className="panel">
+            <h3>Past quarters</h3>
+            <table className="table">
+              <thead>
+                <tr><th>Q</th><th>Event</th><th>Surplus change</th><th>Score</th></tr>
+              </thead>
+              <tbody>
+                {g.history.map((h) => (
+                  <tr key={h.quarter}>
+                    <td>{h.quarter}</td>
+                    <td>{h.title}</td>
+                    <td className={h.change < 0 ? "neg" : "pos"}>{h.change >= 0 ? "+" : ""}{h.change.toFixed(2)}bn</td>
+                    <td>{h.score ?? "–"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </section>
   );

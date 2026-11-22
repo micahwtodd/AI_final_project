@@ -209,30 +209,30 @@ def register_tools(agent: Agent, allowed: set[str]) -> None:
 
     @add
     async def stress_test(ctx: RunContext[Deps], rate_bp: float = 0, ig_spread_bp: float = 0,
-                          equity_pct: float = 0, fx_pct: float = 0) -> dict:
+                          equity_pct: float = 0) -> dict:
         """Hypothetical what-if on today's book: surplus change by cause for given market moves. Not a forecast."""
-        return _done(ctx, "stress_test", tools.stress_test(ctx.deps.state, rate_bp, ig_spread_bp, equity_pct, fx_pct))
+        return _done(ctx, "stress_test", tools.stress_test(ctx.deps.state, rate_bp, ig_spread_bp, equity_pct))
 
     @add
     async def preview_trade(ctx: RunContext[Deps], rate_hedge_pct: float | None = None,
                             credit_shift_pct: float | None = None, equity_hedge_pct: float | None = None,
-                            fx_hedge_pct: float | None = None, cash_buffer_pct: float | None = None,
+                            cash_buffer_pct: float | None = None,
                             collateralized: bool | None = None, dealers: int | None = None) -> dict:
         """Dashboard before and after a possible trade (unspecified levers keep current values), plus its cost."""
         act, err = _ticket(ctx, rate_hedge_pct=rate_hedge_pct, credit_shift_pct=credit_shift_pct,
-                           equity_hedge_pct=equity_hedge_pct, fx_hedge_pct=fx_hedge_pct,
+                           equity_hedge_pct=equity_hedge_pct,
                            cash_buffer_pct=cash_buffer_pct, collateralized=collateralized, dealers=dealers)
         return _done(ctx, "preview_trade", {"error": err} if err else tools.preview_trade(ctx.deps.state, act))
 
     @add
     async def propose_trade(ctx: RunContext[Deps], rationale: str, rate_hedge_pct: float | None = None,
                             credit_shift_pct: float | None = None, equity_hedge_pct: float | None = None,
-                            fx_hedge_pct: float | None = None, cash_buffer_pct: float | None = None,
+                            cash_buffer_pct: float | None = None,
                             collateralized: bool | None = None, dealers: int | None = None,
                             accept_prt: bool | None = None) -> dict:
         """Write a trade ticket for the learner to review and sign. Never executes. Use only when asked to set up a trade."""
         act, err = _ticket(ctx, rate_hedge_pct=rate_hedge_pct, credit_shift_pct=credit_shift_pct,
-                           equity_hedge_pct=equity_hedge_pct, fx_hedge_pct=fx_hedge_pct,
+                           equity_hedge_pct=equity_hedge_pct,
                            cash_buffer_pct=cash_buffer_pct, collateralized=collateralized, dealers=dealers,
                            accept_prt=accept_prt)
         if err:

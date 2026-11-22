@@ -244,6 +244,8 @@ async function call<T>(path: string, body?: unknown): Promise<T> {
 export const api = {
   health: () => call<Health>("/health"),
   companies: () => call<Company[]>("/companies"),
+  checkQuiz: (id: string, when: "pre" | "post", qid: string, choice: string) =>
+    call<{ id: string; choice: string; correct: boolean; answer: string; explain: string }>(`/quiz/${id}/${when}/check`, { qid, choice }),
   newGame: (ticker: string, seed: number, demo = false, overrides: Record<string, number> = {}) =>
     call<GameView>("/game", { ticker, seed, demo, agent_mode: "team", overrides }),
   previewCompany: (ticker: string, overrides: Record<string, number>) =>

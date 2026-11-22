@@ -224,6 +224,16 @@ def quiz_form(when: Literal["pre", "post"]) -> dict:
     return game.quiz_form(when)
 
 
+class QuizCheckBody(BaseModel):
+    qid: str
+    choice: str
+
+
+@app.post("/api/quiz/{session_id}/{when}/check")
+def quiz_check(session_id: str, when: Literal["pre", "post"], body: QuizCheckBody) -> dict:
+    return _run(game.check_quiz_answer, _session(session_id), when, body.qid, body.choice)
+
+
 @app.post("/api/quiz/{session_id}/{when}")
 def quiz_submit(session_id: str, when: Literal["pre", "post"], body: QuizBody) -> dict:
     return _run(game.submit_quiz, _session(session_id), when, body.answers, body.confidence)

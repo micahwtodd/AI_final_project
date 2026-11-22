@@ -84,7 +84,8 @@ def test_full_rate_hedge_neutralises_rates(p, bp):
 
 
 def test_full_fx_hedge_neutralises_fx():
-    s = fresh("MET")
+    # FX is switched off in play (assumptions.json); the machinery is still tested with an explicit exposure
+    s = fresh("MET").model_copy(update={"foreign_share": 0.1})
     _, unhedged = engine.apply_shock(s, ShockVector(fx_pct=10))
     _, hedged = engine.apply_shock(engine.apply_action(s, Action(fx_hedge_pct=100, cash_buffer_pct=4.5)),
                                    ShockVector(fx_pct=10))

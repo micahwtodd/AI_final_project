@@ -603,3 +603,59 @@ details.advanced > *:not(summary) { margin: 0 1rem 1rem; }
 .score-cat b { font-size: 1.1rem; color: var(--navy); }
 .score-n { flex-shrink: 0; width: 2.1rem; height: 2.1rem; border-radius: 50%; background: var(--blue); color: white; font-weight: 900;
   display: inline-flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+
+/* ---------------------------------------------------------------- gold buttons, knowledge check, checked answers */
+.gold-btn { background: #ffc72c; border: none; color: var(--navy); font-weight: 800; border-radius: 999px; padding: 0.7rem 1.4rem;
+  box-shadow: 0 4px 0 #c99700; transition: transform 0.12s, box-shadow 0.12s; }
+.gold-btn:hover:not(:disabled) { transform: translateY(-2px); border: none; }
+.gold-btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 #c99700; }
+.approve-btn.gold-btn { font-size: 1.08rem; padding: 0.85rem 1.7rem; }
+.hero-link { color: #cfe6f7; align-self: center; }
+.hero-link:hover { color: white; }
+.knowledge-actions { display: flex; gap: 0.6rem; align-items: center; }
+.knowledge-card .intro-text h2 { font-size: 1.45rem; line-height: 1.35; }
+.check-btn { border: 2px solid var(--blue); color: var(--blue); font-weight: 700; border-radius: 999px; background: white; }
+.check-btn:disabled { border-color: var(--line); color: var(--muted); }
+.quiz-option:disabled { cursor: default; opacity: 1; }
+.quiz-option.right { border-color: var(--green); background: #e6f4ea; }
+.quiz-option.right .opt-letter { background: var(--green); color: white; }
+.quiz-option.wrong { border-color: var(--red); background: #fde8eb; }
+.quiz-option.wrong .opt-letter { background: var(--red); color: white; }
+.quiz-option.dim { opacity: 0.55; }
+.quiz-explain { margin-top: 0.8rem; border-radius: 10px; padding: 0.7rem 0.9rem; line-height: 1.45; animation: pop-in 0.3s ease-out both; }
+.quiz-explain.right { background: #e6f4ea; border-left: 5px solid var(--green); }
+.quiz-explain.right b { color: var(--green); }
+.quiz-explain.wrong { background: #fde8eb; border-left: 5px solid var(--red); }
+.quiz-explain.wrong b { color: var(--red); }
+.qp.ok { background: var(--green) !important; } .qp.bad { background: var(--red) !important; }
+.conf-table th.conf-head { text-align: center; font-weight: 400; }
+.conf-head b { display: block; color: var(--navy); }
+.conf-head span { font-size: 0.7rem; color: var(--muted); }
+.conf-cell { text-align: center; }
+.conf-dot { width: 2.3rem; height: 2.3rem; padding: 0; border-radius: 50%; font-weight: 700; border: 2px solid var(--line); background: white; }
+.conf-dot.on { background: #ffc72c; border-color: #c99700; color: var(--navy); }
+@media (max-width: 640px) { .conf-head span { display: none; } .conf-dot { width: 1.9rem; height: 1.9rem; } }
+
+/* ---------------------------------------------------------------- desk: dashboard | wire + chat | ticket */
+.desk { grid-template-columns: minmax(240px, 290px) minmax(0, 1fr) 360px; }
+.desk-dash, .desk-mid, .desk-right { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
+.desk-dash .meters { grid-template-columns: 1fr; gap: 0.5rem; }
+.desk-dash .meter { padding: 0.5rem 0.65rem; }
+.dash-note { margin: -0.2rem 0 0.5rem; }
+.desk-below { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 1rem; }
+details.bs-details > summary { cursor: pointer; list-style: none; }
+details.bs-details > summary h3 { display: inline; margin: 0; }
+details.bs-details > summary::before { content: "▸ "; color: var(--steel); }
+details.bs-details[open] > summary::before { content: "▾ "; }
+details.bs-details[open] > summary { margin-bottom: 0.6rem; }
+.cost-box h3 { margin-bottom: 0.4rem; }
+.cost-figures { display: flex; gap: 1.2rem; }
+.cost-figures div { display: flex; flex-direction: column; }
+.cost-figures b { font-size: 1.25rem; color: var(--navy); font-variant-numeric: tabular-nums; }
+.cost-figures span { font-size: 0.75rem; color: var(--muted); }
+.chat-detail { margin-top: 0.8rem; border-top: 1px dashed var(--line); padding-top: 0.6rem; }
+.chat-detail > summary { cursor: pointer; font-weight: 700; color: var(--navy); font-size: 0.88rem; }
+.detail-turn { border-left: 3px solid var(--line); padding: 0.3rem 0 0.3rem 0.7rem; margin: 0.6rem 0; }
+.detail-q { font-size: 0.82rem; font-weight: 600; color: var(--steel); margin-bottom: 0.3rem; }
+@media (max-width: 1250px) { .desk { grid-template-columns: minmax(0, 1fr) 360px; } .desk-dash { grid-column: 1 / -1; } .desk-dash .meters { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); } }
+@media (max-width: 1100px) { .desk { grid-template-columns: 1fr; } }

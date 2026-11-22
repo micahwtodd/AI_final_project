@@ -2,7 +2,7 @@ import { PixelSprite } from "./PixelSprite";
 
 export const GUIDE_STEPS = [
   { title: "Read the news wire", text: "Each quarter starts with a hint about what markets might do. It is a hint, not a forecast. Read it, then press Next." },
-  { title: "Ask a colleague", text: "Click a sample question in the chat, or type your own. Vera sends it to the right specialist; you will see who did what and what it cost." },
+  { title: "Ask a colleague", text: "Type a question for your team in the chat. Vera sends it to the right specialist; open Chat detail to see who did what and what it cost." },
   { title: "Sign a trade ticket", text: "Move a slider on the right (for example, cash on hand) and watch the dashboard update. Then press “Sign trade ticket”: nothing happens until you sign." },
   { title: "End the quarter", text: "Press “End quarter Q1”. The market moves, and Vera will ask you to explain what happened." },
 ];

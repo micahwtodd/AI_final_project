@@ -91,6 +91,10 @@ def equity_holdings_exposure(s: GameState) -> float:
     return s.assets["alts"] * s.alts_beta
 
 
+def fx_enabled() -> bool:
+    return bool(assumptions().get("fx", {}).get("enabled", True))
+
+
 def foreign_assets(s: GameState) -> float:
     return s.foreign_share * sum(v for b, v in s.assets.items() if b != "cash")
 
@@ -139,7 +143,7 @@ def build_state(profile: CompanyProfile, seed: int) -> GameState:
         guarantee_exposure=profile.guarantee_exposure_usd_bn,
         guarantee_value=profile.guarantee_value_usd_bn,
         market_rate=a["market"]["base_rate"], asset_yields=yields,
-        portfolio_yield=profile.net_investment_yield, foreign_share=profile.fx_exposed_share if profile.fx_exposed_share is not None else profile.foreign_share,
+        portfolio_yield=profile.net_investment_yield, foreign_share=(profile.fx_exposed_share if profile.fx_exposed_share is not None else profile.foreign_share) if fx_enabled() else 0.0,
         action=Action(cash_buffer_pct=round(cash_pct, 1), collateralized=False, dealers=1),
         ig_aaa_share=profile.ig_aaa_share if profile.ig_aaa_share is not None else a["defaults_when_untagged"]["aaa_share_of_ig"],
         alts_beta=profile.alts_beta,
@@ -312,6 +316,8 @@ def realize_shock(card: EventCard, seed: int) -> tuple[float, ShockVector]:
             out[k] = round(1 + (v - 1) * sev * (1 + rng.gauss(0, a["noise_sd"])), 3)
         else:
             out[k] = round(v * sev * (1 + rng.gauss(0, a["noise_sd"])), 2)
+    if not fx_enabled():
+        out["fx_pct"] = 0.0  # the random draw above still happens, so other moves are unchanged
     return sev, ShockVector(**out)
 
 

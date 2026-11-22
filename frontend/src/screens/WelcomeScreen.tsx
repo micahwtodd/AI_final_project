@@ -50,7 +50,7 @@ const SLIDES: Slide[] = [
       <Face name="bonnie_neutral" who="Bonnie Yields" role="Portfolio Manager"
         line="Understands fixed-income assets: bonds, credit quality, and where the yield comes from." />
       <Face name="swap_neutral" who="Swap Dogg" role="Trader"
-        line="Understands derivatives: swaps, options and currency forwards, and the dealers on the other side." />
+        line="Understands derivatives: interest rate swaps, stock-market options, and the dealers on the other side." />
     </div>,
     art: null,
   },

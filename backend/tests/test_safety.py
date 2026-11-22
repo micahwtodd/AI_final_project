@@ -92,10 +92,10 @@ def test_saved_safety_lab_evidence_is_complete():
     lab = json.loads(p.read_text(encoding="utf-8"))
     a = lab["attacks"]
     assert a["attacks_blocked"] == a["attacks_total"] and a["clean_passed"] == a["clean_total"]
-    assert lab["teaching"]["total"] == 20 and len(lab["examiner"]["rows"]) == 8
+    assert lab["teaching"]["total"] == 17 and len(lab["examiner"]["rows"]) == 8
 
 
-def test_teaching_check_has_twenty_questions_with_valid_keys():
+def test_teaching_check_has_seventeen_questions_with_valid_keys():  # 3 FX questions retired
     qs = json.loads((REPO_DIR / "data" / "teaching_check.json").read_text(encoding="utf-8"))["questions"]
-    assert len(qs) == 20 and all(q["answer"] in q["options"] for q in qs)
+    assert len(qs) == 17 and all(q["answer"] in q["options"] for q in qs)
     assert {q["agent"] for q in qs} <= set(agents.PROMPT_FILES)

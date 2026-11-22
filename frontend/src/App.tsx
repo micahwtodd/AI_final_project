@@ -12,6 +12,7 @@ import { TraceScreen } from "./screens/TraceScreen";
 import { UnderTheHood } from "./components/UnderTheHood";
 import { GlossaryContext, type Glossary } from "./components/Term";
 import { WelcomeScreen } from "./screens/WelcomeScreen";
+import { KnowledgeIntro } from "./screens/KnowledgeIntro";
 import { CountUp } from "./components/Fx";
 import { StreakChips } from "./components/Badges";
 import { useSoundSwitch } from "./sound";
@@ -26,7 +27,8 @@ type Screen =
   | { name: "safety"; back: Screen }
   | { name: "trace"; game: GameView; back: Screen }
   | { name: "experiments"; back: Screen }
-  | { name: "quiz"; game: GameView; when: "pre" | "post" };
+  | { name: "quiz"; game: GameView; when: "pre" | "post" }
+  | { name: "knowledge"; game: GameView };
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>({ name: "welcome" });
@@ -35,6 +37,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [glossary, setGlossary] = useState<Glossary>({});
+  const [lastPick, setLastPick] = useState<{ ticker: string; seed: number } | null>(null);  // so Back returns to the same company
 
   // Each new screen opens at the top, so the headline is the first thing the learner sees.
   useEffect(() => { window.scrollTo(0, 0); }, [screen.name]);
@@ -128,15 +131,24 @@ export default function App() {
           <CompanySelect
             companies={companies}
             busy={busy}
+            initialPick={lastPick}
+            onIntro={() => setScreen({ name: "welcome" })}
             onStart={async (ticker, seed, overrides) => {
+              setLastPick({ ticker, seed });
               const g = await run(() => api.newGame(ticker, seed, false, overrides));
-              if (g) setScreen({ name: "quiz", game: g, when: "pre" });
+              if (g) setScreen({ name: "knowledge", game: g });
             }}
             onDemo={async () => {
               const g = await run(() => api.newGame("JXN", 409, true));
-              if (g) setScreen({ name: "quiz", game: g, when: "pre" });
+              if (g) setScreen({ name: "knowledge", game: g });
             }}
           />
+        )}
+        {screen.name === "knowledge" && (
+          <KnowledgeIntro company={screen.game.company}
+            onTake={() => setScreen({ name: "quiz", game: screen.game, when: "pre" })}
+            onSkip={() => setScreen({ name: "desk", game: screen.game })}
+            onBack={() => setScreen({ name: "select" })} />
         )}
         {screen.name === "desk" && (
           <Desk
@@ -200,6 +212,7 @@ export default function App() {
             company={screen.game.company}
             demo={screen.game.demo}
             onSkip={() => setScreen({ name: "desk", game: screen.game })}
+            onBack={screen.when === "pre" ? () => setScreen({ name: "knowledge", game: screen.game }) : undefined}
             onDone={async () => {
               const g = screen.game;
               if (screen.when === "pre") {

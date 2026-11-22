@@ -8,6 +8,7 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
+from backend import engine
 from backend.main import app
 
 client = TestClient(app)
@@ -85,3 +86,37 @@ def test_quiz_has_five_questions_and_five_ratings():
     for when in ("pre", "post"):
         f = client.get(f"/api/quiz/{when}").json()
         assert len(f["questions"]) == 5 and len(f["confidence"]) == 5
+
+
+# ---------------------------------------------------------------- Knowledge Check answers; FX switched off
+
+def test_quiz_form_hides_answers_and_explanations():
+    for item in client.get("/api/quiz/pre").json()["questions"]:
+        assert "answer" not in item and "explain" not in item
+
+
+def test_check_answer_explains_and_locks_the_choice():
+    gid = client.post("/api/game", json={"ticker": "JXN", "seed": 409}).json()["id"]
+    q = client.get("/api/quiz/pre").json()["questions"][0]
+    wrong = next(k for k in q["options"] if k != "B")  # A1's answer is B
+    r = client.post(f"/api/quiz/{gid}/pre/check", json={"qid": q["id"], "choice": wrong}).json()
+    assert r["correct"] is False and r["answer"] == "B" and r["explain"]
+    again = client.post(f"/api/quiz/{gid}/pre/check", json={"qid": q["id"], "choice": "B"}).json()
+    assert again["choice"] == wrong  # the first checked choice is locked
+    form = client.get("/api/quiz/pre").json()
+    answers = {x["id"]: "B" for x in form["questions"]}  # tries to switch A1 to the right answer
+    res = client.post(f"/api/quiz/{gid}/pre", json={"answers": answers, "confidence": {c["id"]: 3 for c in form["confidence"]}}).json()
+    assert res["by_concept"]["duration_gap"] is False
+
+
+def test_fx_is_switched_off_everywhere():
+    from backend.calibration import load_profile
+    for t in ["MET", "PRU", "JXN"]:
+        st = engine.build_state(load_profile(t), 409)
+        assert st.foreign_share == 0 and engine.dashboard(st).fx_exposure_usd_bn == 0
+    for q in range(1, 5):
+        _, shock = engine.realize_shock(engine.card_for(q), 409)
+        assert shock.fx_pct == 0
+        assert engine.card_for(q).benchmark_action.fx_hedge_pct == 0
+    jxn = next(c for c in client.get("/api/companies").json() if c["ticker"] == "JXN")
+    assert not any("fx" in r["key"] or "foreign" in r["key"] for r in jxn["inputs"] + jxn["dossier"])

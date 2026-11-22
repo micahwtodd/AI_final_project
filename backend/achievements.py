@@ -84,7 +84,7 @@ def report_card(s, results: float, understanding: float) -> dict:
     breaches = sum(r.capital_breach + r.liquidity_breach for r in hist)
     acts = [r.action for r in hist]
     n = max(1, len(acts))
-    avg_hedge = sum((a.rate_hedge_pct / 1.2 + a.equity_hedge_pct + a.fx_hedge_pct) / 3 for a in acts) / n
+    avg_hedge = sum((a.rate_hedge_pct / 1.2 + a.equity_hedge_pct) / 2 for a in acts) / n  # FX is switched off
     if results >= 85 and understanding >= 85:
         title, why = "Risk Whisperer", "Strong results and you could explain every one of them."
     elif breaches and avg_hedge < 25:

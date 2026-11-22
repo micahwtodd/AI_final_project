@@ -105,14 +105,6 @@
       "label": "Put option",
       "plain": "Insurance against a market fall: it pays out if stocks drop below a set level. It costs a premium every quarter whether or not it pays."
     },
-    "fx_hedge": {
-      "label": "Currency hedge",
-      "plain": "A trade that offsets losses on foreign assets when the dollar strengthens. It costs a little every quarter."
-    },
-    "forward_contract": {
-      "label": "Forward contract",
-      "plain": "An agreement to exchange currencies later at a rate fixed today. Used to lock in the dollar value of foreign assets."
-    },
     "counterparty_risk": {
       "label": "Counterparty risk",
       "plain": "The risk that the bank on the other side of a hedge fails and does not pay what it owes."

@@ -118,6 +118,7 @@ export function ChatPanel(props: {
   onUsage: (u: Partial<Usage>) => void;
   onLoadTicket: (a: Action) => void;
   onAnswered?: () => void;
+  demo?: boolean;
 }) {
   const [turns, setTurns] = useState<Turn[]>(() => fromHistory(props.chat));
   const [mode, setMode] = useState<AgentMode>(props.mode);
@@ -152,12 +153,8 @@ export function ChatPanel(props: {
     setText("");
     setBusy(true);
     const lead = mode === "solo" ? "solo" : to === "team" ? "cro" : to;
-    let idx = -1;
-    setTurns((t) => {
-      idx = t.length + 1;
-      return [...t, { role: "user", text: msg, trace: [], subs: [] },
-        { role: "agent", text: "", agent: lead, agentName: CAST[lead].name, trace: [], subs: [], pending: true }];
-    });
+    setTurns((t) => [...t, { role: "user", text: msg, trace: [], subs: [] },
+      { role: "agent", text: "", agent: lead, agentName: CAST[lead].name, trace: [], subs: [], pending: true }]);
     setOpenTrace(null);
     const update = (fn: (t: Turn) => Turn) => setTurns((all) => all.map((t, i) => (i === all.length - 1 ? fn(t) : t)));
     try {
@@ -176,7 +173,6 @@ export function ChatPanel(props: {
       update((t) => ({ ...t, text: `Connection problem: ${err instanceof Error ? err.message : String(err)}`, pending: false }));
     } finally {
       setBusy(false);
-      setOpenTrace(idx);
       props.onAnswered?.();
     }
   }
@@ -215,7 +211,7 @@ export function ChatPanel(props: {
       )}
       {blocked && <div className="banner warn-banner">Budget cap reached: the AI colleagues are offline for this session. The game continues.</div>}
       <div className="chat-log">
-        {turns.length === 0 && <div className="muted small">Ask anything about this company's risks. Every number in a reply comes from the engine's tools; you can see each tool call and which colleague made it.</div>}
+        {turns.length === 0 && <div className="muted small">Type your own question about this company's risks. Every number in a reply comes from the engine's tools; open Chat detail below to see who did what.</div>}
         {turns.map((t, i) => (
           <div key={i} className={`msg ${t.role}`} style={t.role === "agent" ? { borderLeftColor: CAST[t.agent ?? "system"]?.color } : undefined}>
             {t.role === "agent" && (
@@ -224,42 +220,8 @@ export function ChatPanel(props: {
                 {t.agentName ?? "Colleague"}
               </div>
             )}
-            {t.subs.length > 0 && (
-              <div className="subs">
-                {t.subs.map((s, k) => (
-                  <div key={k} className="sub-msg sub-in" style={{ borderLeftColor: CAST[s.agent]?.color }}>
-                    <div className="msg-name" style={{ color: CAST[s.agent]?.color }}>
-                      {spriteFor(s.agent) && <PixelSprite name={spriteFor(s.agent)!} size={22} className="msg-face arrive" />}
-                      {s.agent_name}
-                    </div>
-                    <div className="msg-text">{s.text}</div>
-                  </div>
-                ))}
-              </div>
-            )}
             <div className="msg-text">{t.pending && !t.text ? <TypingLine t={t} /> : t.text}</div>
             {t.role === "agent" && !t.pending && <Reactions t={t} />}
-            {t.role === "agent" && t.trace.length > 0 && (
-              <div className="trace">
-                <button className="link" onClick={() => setOpenTrace(openTrace === i ? null : i)}>
-                  {openTrace === i || t.pending ? "▾" : "▸"} {delegations(t) ? `${delegations(t)} delegations · ` : ""}
-                  {t.trace.filter((e) => e.type === "tool_call" && !String(e.detail.tool).startsWith("ask_")).length} tool calls ·{" "}
-                  {t.trace.filter((e) => e.type === "spend").length} model calls · $
-                  {t.trace.reduce((s, e) => s + (e.type === "spend" ? e.cost_usd : 0), 0).toFixed(5)}
-                </button>
-                {(openTrace === i || t.pending) && <ul className="trace-list">{t.trace.map((e, k) => <TraceLine key={k} e={e} />)}</ul>}
-              </div>
-            )}
-            {t.role === "agent" && !t.pending && t.runId && t.agent !== "system" && (
-              <button className="link flag-btn" disabled={t.flagged}
-                onClick={async () => {
-                  const note = window.prompt("What seems wrong in this reply? (optional)") ?? "";
-                  await api.flag(t.runId!, props.gameId, note, t.text).catch(() => undefined);
-                  setTurns((all) => all.map((x, k) => (k === i ? { ...x, flagged: true } : x)));
-                }}>
-                {t.flagged ? "⚑ Flagged for review, thank you" : "⚑ This seems wrong"}
-              </button>
-            )}
             {t.ticket && (
               <div className="proposed">
                 <b>Proposed ticket</b> <span className="small muted">{t.ticket.by}: {t.ticket.rationale}</span>
@@ -270,13 +232,60 @@ export function ChatPanel(props: {
         ))}
         <div ref={endRef} />
       </div>
-      <div className="samples">
-        {SAMPLES.map((s) => <button key={s} className="chip" disabled={busy} onClick={() => send(s)}>{s}</button>)}
-      </div>
+      {props.demo && (
+        <div className="samples">
+          <span className="small muted">Demo questions:</span>
+          {SAMPLES.map((s) => <button key={s} className="chip" disabled={busy} onClick={() => send(s)}>{s}</button>)}
+        </div>
+      )}
       <form className="ask-row" onSubmit={(e) => { e.preventDefault(); send(text); }}>
         <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask about rates, credit, liquidity, hedges…" maxLength={2000} aria-label="Question for your colleagues" />
         <button className="primary" disabled={busy || !text.trim()}>{busy ? "Thinking…" : "Ask"}</button>
       </form>
+      {turns.some((t) => t.role === "agent" && (t.trace.length > 0 || t.subs.length > 0)) && (
+        <details className="chat-detail">
+          <summary>Show chat detail <span className="muted small">· specialist answers, tool calls and costs</span></summary>
+          {turns.map((t, i) => t.role !== "agent" || (t.trace.length === 0 && t.subs.length === 0) ? null : (
+            <div key={i} className="detail-turn">
+              <div className="detail-q">Q: {turns[i - 1]?.role === "user" ? turns[i - 1].text : "(question)"}</div>
+              {t.subs.length > 0 && (
+                <div className="subs">
+                  {t.subs.map((s, k) => (
+                    <div key={k} className="sub-msg" style={{ borderLeftColor: CAST[s.agent]?.color }}>
+                      <div className="msg-name" style={{ color: CAST[s.agent]?.color }}>
+                        {spriteFor(s.agent) && <PixelSprite name={spriteFor(s.agent)!} size={22} className="msg-face" />}
+                        {s.agent_name}
+                      </div>
+                      <div className="msg-text">{s.text}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {t.trace.length > 0 && (
+                <div className="trace">
+                  <button className="link" onClick={() => setOpenTrace(openTrace === i ? null : i)}>
+                    {openTrace === i ? "▾" : "▸"} {delegations(t) ? `${delegations(t)} delegations · ` : ""}
+                    {t.trace.filter((e) => e.type === "tool_call" && !String(e.detail.tool).startsWith("ask_")).length} tool calls ·{" "}
+                    {t.trace.filter((e) => e.type === "spend").length} model calls · $
+                    {t.trace.reduce((s, e) => s + (e.type === "spend" ? e.cost_usd : 0), 0).toFixed(5)}
+                  </button>
+                  {openTrace === i && <ul className="trace-list">{t.trace.map((e, k) => <TraceLine key={k} e={e} />)}</ul>}
+                </div>
+              )}
+              {!t.pending && t.runId && t.agent !== "system" && (
+                <button className="link flag-btn" disabled={t.flagged}
+                  onClick={async () => {
+                    const note = window.prompt("What seems wrong in this reply? (optional)") ?? "";
+                    await api.flag(t.runId!, props.gameId, note, t.text).catch(() => undefined);
+                    setTurns((all) => all.map((x, k) => (k === i ? { ...x, flagged: true } : x)));
+                  }}>
+                  {t.flagged ? "⚑ Flagged for review, thank you" : "⚑ This reply seems wrong"}
+                </button>
+              )}
+            </div>
+          ))}
+        </details>
+      )}
     </div>
   );
 }

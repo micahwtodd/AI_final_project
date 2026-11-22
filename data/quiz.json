@@ -19,7 +19,8 @@
           "C": "It rises",
           "D": "It depends only on stock prices"
         },
-        "answer": "B"
+        "answer": "B",
+        "explain": "Falling rates raise the value of both assets and liabilities, but the longer side rises more. Here that is the liabilities, so they grow faster than the assets and surplus falls."
       },
       {
         "id": "A2",
@@ -31,7 +32,8 @@
           "C": "More policyholders cash out (surrender), so we need cash",
           "D": "Fewer policyholders cash out"
         },
-        "answer": "C"
+        "answer": "C",
+        "explain": "When new annuities pay more, some policyholders cash out to switch. Surrenders rise, and the insurer needs cash on hand to pay them without selling bonds at a loss."
       },
       {
         "id": "A3",
@@ -43,7 +45,8 @@
           "C": "We have a permanent loss on every bond",
           "D": "We have no loss at all"
         },
-        "answer": "B"
+        "answer": "B",
+        "explain": "Wider spreads push bond prices down, but if the issuers keep paying, the bonds still pay back in full at maturity, so much of the drop reverses over time. Only a default is a permanent loss."
       },
       {
         "id": "A6",
@@ -55,7 +58,8 @@
           "C": "Nothing, guarantees ignore markets",
           "D": "The guarantees cost us less"
         },
-        "answer": "A"
+        "answer": "A",
+        "explain": "The guarantees promise policyholders a minimum value. When stocks fall, their accounts drop toward or below that minimum, so the insurer is more likely to pay out: the guarantees cost more."
       },
       {
         "id": "A7",
@@ -67,7 +71,8 @@
           "C": "Bank failures never cause losses",
           "D": "When we used one bank and took no collateral"
         },
-        "answer": "A"
+        "answer": "A",
+        "explain": "Daily collateral means the bank has already handed over most of what it owes, and spreading hedges across several banks means no single failure is large. Together they keep the loss small."
       }
     ],
     "B": [
@@ -81,7 +86,8 @@
           "C": "Rates rising",
           "D": "Both equally"
         },
-        "answer": "B"
+        "answer": "B",
+        "explain": "Liabilities (10 years) are more rate-sensitive than assets (6 years). When rates fall, liabilities rise in value more than assets, so surplus falls."
       },
       {
         "id": "B2",
@@ -93,7 +99,8 @@
           "C": "They tend to fall: staying is attractive",
           "D": "They are forced to zero by law"
         },
-        "answer": "C"
+        "answer": "C",
+        "explain": "If our annuities pay more than new products, policyholders gain nothing by leaving. Staying is attractive, so surrenders tend to fall."
       },
       {
         "id": "B3",
@@ -105,7 +112,8 @@
           "C": "None of them",
           "D": "A government bond price change"
         },
-        "answer": "B"
+        "answer": "B",
+        "explain": "A price drop from wider spreads can reverse if the issuer keeps paying. A default is different: the money that is not repaid is gone for good."
       },
       {
         "id": "B6",
@@ -117,7 +125,8 @@
           "C": "To raise yield",
           "D": "To offset the extra cost of guarantees when stocks fall"
         },
-        "answer": "D"
+        "answer": "D",
+        "explain": "When stocks fall, guarantees get more expensive. Put options gain value when stocks fall, so they offset that extra cost. They are insurance, and they cost a premium."
       },
       {
         "id": "B7",
@@ -129,7 +138,8 @@
           "C": "The bank pays us",
           "D": "We must post cash collateral now, even though the loss is only on paper"
         },
-        "answer": "D"
+        "answer": "D",
+        "explain": "With daily collateral, whoever is losing on the swap posts cash every day. Our swaps lost value, so we must post cash now, even though nothing has been realized yet. That is a liquidity need."
       }
     ]
   },

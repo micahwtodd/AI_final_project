@@ -36,12 +36,6 @@ export const LEVERS = {
     help: "Protects this % of the guarantees you owe policyholders if markets fall. Costs a premium every quarter.",
     min: 0, max: 100, step: 10, unit: "%",
   },
-  fx_hedge_pct: {
-    term: "forward_contract",
-    label: "Currency protection (forwards)",
-    help: "Locks in today's exchange rate on this % of foreign assets. Costs a little each quarter.",
-    min: 0, max: 100, step: 10, unit: "%",
-  },
   cash_buffer_pct: {
     term: "forced_selling",
     label: "Cash on hand",

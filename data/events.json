@@ -8,7 +8,7 @@
       "era": "Echoes 2022",
       "signal_text": "WIRE: Consumer prices ran hotter than forecast for a third straight month. Some economists say the central bank is 'behind the curve'; others expect inflation to fade on its own.",
       "headline": "CENTRAL BANK HIKES AGAIN; BOND YIELDS SURGE",
-      "narrative": "Rates jumped across the curve in a matter of weeks. Annuity buyers can now get a better rate at a competitor, and some policyholders are surrendering to move their money. Stocks sold off and the dollar strengthened.",
+      "narrative": "Rates jumped across the curve in a matter of weeks. Annuity buyers can now get a better rate at a competitor, and some policyholders are surrendering to move their money. Stocks sold off.",
       "primary_risk": "interest_rate",
       "secondary_risks": [
         "liquidity",
@@ -27,7 +27,7 @@
         "rate_hedge_pct": 20,
         "credit_shift_pct": 0,
         "equity_hedge_pct": 50,
-        "fx_hedge_pct": 60,
+        "fx_hedge_pct": 0,
         "cash_buffer_pct": 7,
         "collateralized": true,
         "dealers": 3
@@ -39,21 +39,21 @@
         "margin_call",
         "liquidity_ratio"
       ],
-      "source_note": "Stylized on 2022: US 10-year Treasury yield rose roughly 2.3 percentage points over the year, with the S&P 500 down about 19% and the dollar index up about 8%. The quarter here compresses part of that move. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it.",
+      "source_note": "Stylized on 2022: US 10-year Treasury yield rose roughly 2.3 percentage points over the year, with the S&P 500 down about 19%. The quarter here compresses part of that move. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it.",
       "sample_answer": "Interest rates jumped. Our liabilities and guarantees are more rate-sensitive than our assets, so their value fell more than our bonds did, which lifted surplus. Stocks fell too, which made the market guarantees more expensive. Stock-market insurance would have softened that."
     },
     {
-      "id": "fx_shock",
+      "id": "pension_deal",
       "quarter": 2,
-      "title": "King Dollar",
-      "era": "Echoes the 2022 dollar surge",
-      "signal_text": "WIRE: Overseas central banks are holding rates steady while the US keeps tightening. Currency strategists are split on whether the dollar's rally has room to run. Separately, a large manufacturer is shopping its pension plan to insurers.",
-      "headline": "DOLLAR HITS 20-YEAR HIGH AS FOREIGN CURRENCIES SLIDE",
-      "narrative": "The dollar rose sharply against the yen, euro and pound. Foreign-currency bonds and overseas subsidiaries are worth less in dollars. Rates edged higher and stocks drifted lower.",
-      "primary_risk": "fx",
+      "title": "The Pension Deal",
+      "era": "Echoes the 2012 GM and Verizon pension transfers",
+      "signal_text": "WIRE: A large manufacturer is shopping its pension plan to insurers. Bond yields are edging higher and stocks are drifting; most strategists expect a quiet quarter.",
+      "headline": "MANUFACTURER HANDS PENSION PLAN TO AN INSURER; MARKETS DRIFT",
+      "narrative": "A quiet quarter for markets: rates edged higher and stocks drifted lower. The big decision was on your desk. Taking on a company's pension plan brings in premium and long, predictable payments to retirees, but it uses capital and lengthens the liabilities your assets have to match.",
+      "primary_risk": "growth_vs_capital",
       "secondary_risks": [
-        "growth_vs_capital",
-        "interest_rate"
+        "interest_rate",
+        "equity"
       ],
       "base_shock": {
         "rate_bp": 20,
@@ -63,26 +63,25 @@
         "fx_pct": 9,
         "lapse_mult": 1.0
       },
-      "lesson": "Foreign assets lose value in dollars when the dollar strengthens. Hedging with forwards locks in the exchange rate but costs money every quarter, so most insurers hedge a large share, not all. A pension deal brings premium and long liabilities: it grows the business but uses capital and lengthens the liabilities you have to match.",
+      "lesson": "Quiet quarters are when growth decisions get made. A pension deal brings premium and long liabilities: it grows the business but uses capital and lengthens the liabilities you have to match, so it widens the rate mismatch unless you add rate protection.",
       "benchmark_action": {
         "rate_hedge_pct": 70,
         "credit_shift_pct": 0,
         "equity_hedge_pct": 50,
-        "fx_hedge_pct": 80,
+        "fx_hedge_pct": 0,
         "cash_buffer_pct": 5,
         "collateralized": true,
         "dealers": 3,
         "accept_prt": true
       },
       "glossary_terms": [
-        "fx_hedge",
-        "forward_contract",
         "pension_risk_transfer",
-        "capital_ratio"
+        "capital_ratio",
+        "duration_gap"
       ],
-      "source_note": "Stylized on 2022, when the US dollar index rose to its highest level in about 20 years and the yen fell roughly 25% against the dollar at its weakest. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it.",
+      "source_note": "Stylized on 2012, when General Motors and Verizon transferred large parts of their pension obligations to Prudential, starting a wave of pension risk transfer deals. Market moves this quarter are modest by design.",
       "offers_prt_deal": true,
-      "sample_answer": "Rates rose a little again, and because our liabilities are longer than our assets that helped surplus slightly. The stronger dollar cut the value of our foreign assets. Currency protection would have helped with that part."
+      "sample_answer": "Rates rose a little, and because our liabilities are longer than our assets that helped surplus slightly. Stocks drifted lower, which nudged up the stock-market guarantees. The pension deal adds long liabilities, so it uses capital and widens the rate mismatch; more rate protection would offset that."
     },
     {
       "id": "credit_crunch",
@@ -115,7 +114,7 @@
         "rate_hedge_pct": 90,
         "credit_shift_pct": 30,
         "equity_hedge_pct": 80,
-        "fx_hedge_pct": 80,
+        "fx_hedge_pct": 0,
         "cash_buffer_pct": 6,
         "collateralized": true,
         "dealers": 3
@@ -157,7 +156,7 @@
         "rate_hedge_pct": 90,
         "credit_shift_pct": 30,
         "equity_hedge_pct": 80,
-        "fx_hedge_pct": 80,
+        "fx_hedge_pct": 0,
         "cash_buffer_pct": 6,
         "collateralized": true,
         "dealers": 3

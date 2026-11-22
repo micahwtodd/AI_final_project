@@ -44,7 +44,6 @@ def get_risk_dashboard(s: GameState) -> dict:
         "duration_gap_years": d.duration_gap_years,
         "surplus_change_if_rates_fall_1bp_usd_mn": d.net_dv01_usd_mn,
         "equity_exposure_usd_bn_per_100pct_fall": d.net_equity_exposure_usd_bn,
-        "unhedged_foreign_assets_usd_bn": d.fx_exposure_usd_bn,
         "uncollateralized_dealer_exposure_usd_bn": d.counterparty_exposure_usd_bn,
         "status": d.status, "quarter": min(s.quarter, 4),
     }
@@ -185,13 +184,12 @@ def get_hedge_costs(s: GameState) -> dict:
     gap = engine.asset_dv01(s) - engine.liability_dv01(s)
     return {
         "current": {"rate_hedge_pct": s.action.rate_hedge_pct, "equity_hedge_pct": s.action.equity_hedge_pct,
-                    "fx_hedge_pct": s.action.fx_hedge_pct, "collateralized": s.action.collateralized,
+                    "collateralized": s.action.collateralized,
                     "dealers": s.action.dealers,
                     "hedge_cost_this_quarter_usd_bn": _r(engine.quarterly_hedge_cost(s, s.action), 4)},
         "cost_per_quarter_of_each_extra_10pct_usd_bn": {
             "rate_hedge": _r(abs(gap) * 0.10 * hc["swap_per_dv01"], 4),
             "equity_puts": _r(engine.guarantee_equity_sensitivity(s) * 0.10 * hc["put_premium"], 4),
-            "fx_forwards": _r(engine.foreign_assets(s) * 0.10 * hc["fx_forward"], 4),
         },
         "three_dealers_extra_cost_usd_bn": _r(engine.total_assets(s) * hc["three_dealers"], 4),
         "daily_collateral_extra_cost_usd_bn": _r(engine.total_assets(s) * hc["collateral_ops"], 4),
@@ -202,7 +200,7 @@ def get_hedge_costs(s: GameState) -> dict:
 def preview_trade(s: GameState, action: Action) -> dict:
     p = engine.preview_action(s, action)
     keys = ["surplus_usd_bn", "capital_ratio_pct", "liquidity_ratio_pct", "duration_gap_years",
-            "net_dv01_usd_mn", "net_equity_exposure_usd_bn", "fx_exposure_usd_bn"]
+            "net_dv01_usd_mn", "net_equity_exposure_usd_bn"]
     return {"before": {k: p["before"][k] for k in keys}, "after": {k: p["after"][k] for k in keys},
             "hedge_cost_per_quarter_usd_bn": p["hedge_cost_per_quarter_usd_bn"],
             "carry_per_quarter_usd_bn": p["carry_per_quarter_usd_bn"]}
@@ -213,9 +211,12 @@ def stress_test(s: GameState, rate_bp: float = 0, ig_spread_bp: float = 0, equit
     from backend.models import ShockVector
     _, att = engine.apply_shock(s, ShockVector(rate_bp=rate_bp, ig_spread_bp=ig_spread_bp,
                                                hy_spread_bp=ig_spread_bp * 2.5, equity_pct=equity_pct, fx_pct=fx_pct))
-    comps = {k: _r(v, 3) for k, v in att.components().items() if k not in ("carry", "hedge_cost")}
-    return {"scenario": {"rate_bp": rate_bp, "ig_spread_bp": ig_spread_bp, "high_yield_spread_bp": ig_spread_bp * 2.5,
-                         "equity_pct": equity_pct, "usd_pct": fx_pct},
+    hidden = ("carry", "hedge_cost") if engine.fx_enabled() else ("carry", "hedge_cost", "fx")
+    comps = {k: _r(v, 3) for k, v in att.components().items() if k not in hidden}
+    scenario = {"rate_bp": rate_bp, "ig_spread_bp": ig_spread_bp, "high_yield_spread_bp": ig_spread_bp * 2.5, "equity_pct": equity_pct}
+    if engine.fx_enabled():
+        scenario["usd_pct"] = fx_pct
+    return {"scenario": scenario,
             "surplus_change_by_cause_usd_bn": comps, "surplus_change_usd_bn": _r(sum(comps.values()), 3),
             "note": "Hypothetical what-if on today's book. Not this quarter's shock."}
 
