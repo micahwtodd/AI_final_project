@@ -500,9 +500,27 @@ def play_quarter(state: GameState, action: Action | None) -> tuple[GameState, Qu
         capital_breach=d.capital_ratio_pct < fl["capital_ratio_pct"],
         liquidity_breach=d.liquidity_ratio_pct < fl["liquidity_ratio_pct"],
     )
+    rec.lever_gains = lever_gains(start, traded.action, card, shock, rec.surplus_after)
     after_state.history = [*start.history, rec]
     after_state.quarter = start.quarter + 1
     return after_state, rec
+
+
+LEVERS = ["rate_hedge_pct", "credit_shift_pct", "equity_hedge_pct", "fx_hedge_pct", "cash_buffer_pct",
+          "collateralized", "dealers"]
+
+
+def lever_gains(start: GameState, action: Action, card: EventCard, shock: ShockVector, actual_after: float) -> dict:
+    """For each lever, the surplus the learner would have had with only that lever at the benchmark's setting."""
+    bench = card.benchmark_action
+    out = {}
+    for k in LEVERS:
+        if getattr(action, k) == getattr(bench, k):
+            continue
+        alt = action.model_copy(update={k: getattr(bench, k)})
+        after, _ = apply_shock(apply_action(start, alt, card.offers_prt_deal), shock)
+        out[k] = round(surplus(after) - actual_after, 4)
+    return out
 
 
 def counterfactual(start_state: GameState, card: EventCard, seed: int) -> dict:
@@ -565,22 +583,60 @@ def answer_key(rec: QuarterRecord) -> dict:
     nothing = rec.nothing_surplus_after - rec.surplus_before
     bench = rec.benchmark_surplus_after - rec.surplus_before
     sh = rec.shock
+    if sh.rate_bp and comps["rates"]:
+        longer = "liabilities" if (sh.rate_bp < 0) == (comps["rates"] < 0) else "assets"
+        shorter = "assets" if longer == "liabilities" else "liabilities"
+        rate_why = (f"the {longer} are more rate-sensitive (longer duration) than the {shorter}, so "
+                    f"{'falling' if sh.rate_bp < 0 else 'rising'} rates {'hurt' if comps['rates'] < 0 else 'helped'} surplus")
+    else:
+        rate_why = "rates barely moved"
     facts = {
-        "rates": f"Rates moved {sh.rate_bp:+.0f}bp; assets and liabilities have different durations, so surplus changed by {comps['rates']:+.2f}bn from rates (including swaps and guarantees).",
-        "credit_spreads": f"Investment-grade spreads moved {sh.ig_spread_bp:+.0f}bp and high-yield {sh.hy_spread_bp:+.0f}bp, lowering bond prices; liabilities do not move with spreads.",
+        "rates": f"Rates moved {sh.rate_bp:+.0f}bp; {rate_why}: {comps['rates']:+.2f}bn from rates, including swaps and guarantees.",
+        "credit_spreads": f"Investment-grade spreads moved {sh.ig_spread_bp:+.0f}bp and high-yield {sh.hy_spread_bp:+.0f}bp, lowering bond prices; liabilities absorb most but not all of that, so surplus changed by {comps['credit_spreads']:+.2f}bn.",
         "defaults": f"Defaults and credit losses cost {comps['defaults']:+.2f}bn: a permanent loss, unlike spread moves.",
-        "equity": f"Stocks moved {sh.equity_pct:+.1f}%; equity holdings and variable annuity guarantees changed by {comps['equity']:+.2f}bn net of any puts.",
-        "fx": f"The dollar moved {sh.fx_pct:+.1f}%; foreign assets net of forwards changed by {comps['fx']:+.2f}bn.",
-        "liquidity": f"Surrenders and forced sales cost {comps['liquidity']:+.2f}bn (surrender multiple {sh.lapse_mult:.2f}).",
-        "counterparty": f"A dealer default cost {comps['counterparty']:+.2f}bn of hedge value.",
+        "equity": f"Stocks moved {sh.equity_pct:+.1f}%; alternatives (incl. stocks) and the stock-market guarantees changed surplus by {comps['equity']:+.2f}bn, net of any puts.",
+        "fx": f"The dollar moved {sh.fx_pct:+.1f}%; foreign assets net of currency hedges changed by {comps['fx']:+.2f}bn.",
+        "liquidity": f"Surrenders ran at {sh.lapse_mult:.2f}x normal; paying them and any forced selling cost {comps['liquidity']:+.2f}bn.",
+        "counterparty": f"A dealer default cost {comps['counterparty']:+.2f}bn of hedge value owed without collateral.",
     }
     return {
         "main_driver": main[0],
         "main_driver_label": ATTRIBUTION_LABELS[main[0]],
+        "main_driver_usd_bn": round(main[1], 3),
         "mechanism_facts": [facts[main[0]]],
         "second_factor": second[0],
         "second_factor_label": ATTRIBUTION_LABELS[second[0]],
+        "second_factor_usd_bn": round(second[1], 3),
+        "second_factor_fact": facts[second[0]],
         "hedge_effect_usd_bn": round(you - nothing, 3),
         "benchmark_change_usd_bn": round(bench - you, 3),
         "surplus_change_usd_bn": round(you, 3),
+        "improvement_facts": improvement_facts(rec),
     }
+
+
+LEVER_LABELS = {
+    "rate_hedge_pct": "rate protection (swaps)", "credit_shift_pct": "moving risky bonds to government bonds",
+    "equity_hedge_pct": "stock-market insurance (puts)", "fx_hedge_pct": "currency protection",
+    "cash_buffer_pct": "cash on hand",
+}
+
+
+def _lever_setting(k: str, a: Action) -> str:
+    v = getattr(a, k)
+    if k == "collateralized":
+        return "daily collateral on" if v else "no collateral"
+    if k == "dealers":
+        return f"{v} dealer{'s' if v == 3 else ''}"
+    return f"{v:g}%"
+
+
+def improvement_facts(rec: QuarterRecord) -> list[str]:
+    """The levers that would have helped most this quarter, each moved alone to the benchmark's setting."""
+    bench = card_for(rec.quarter).benchmark_action
+    tol = max(0.005, 0.002 * abs(rec.surplus_before))
+    helpful = sorted(((g, k) for k, g in rec.lever_gains.items() if g > tol), reverse=True)
+    labels = {**LEVER_LABELS, "collateralized": "counterparty collateral", "dealers": "number of dealers"}
+    out = [f"{labels[k]}: you had {_lever_setting(k, rec.action)}, the benchmark {_lever_setting(k, bench)}; "
+           f"that change alone would have added {g:+.2f}bn" for g, k in helpful[:2]]
+    return out or ["no single lever change would have helped much this quarter: your trades held up"]

@@ -222,3 +222,23 @@ button.link { background: none; border: none; padding: 0; color: var(--steel); f
 .sub-msg { background: white; border: 1px solid var(--line); border-left: 4px solid var(--steel); border-radius: 8px; padding: 0.45rem 0.6rem; font-size: 0.86rem; }
 .tr-agent { font-weight: 700; margin-right: 0.25rem; }
 .tr-deleg { color: var(--navy); }
+
+/* explain-back */
+.first-try { background: var(--panel-2); border-radius: 8px; padding: 0.6rem 0.7rem; margin-bottom: 0.6rem; }
+.cro-feedback { margin: 0.2rem 0 0.4rem; line-height: 1.5; }
+.flag { color: var(--red); font-weight: 600; margin: 0.3rem 0; }
+.examiner { border-top: 4px solid var(--navy); }
+.examiner-head { display: flex; gap: 1rem; justify-content: space-between; align-items: flex-start; }
+.understanding-chip { text-align: center; background: var(--panel-2); border-radius: 10px; padding: 0.6rem 1rem; min-width: 170px; }
+.u-points { font-size: 2.2rem; font-weight: 800; color: var(--navy); line-height: 1.1; }
+.u-points span { font-size: 1rem; color: var(--muted); }
+.checks { list-style: none; padding: 0; margin: 0.6rem 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem 1rem; }
+.checks li { font-size: 0.9rem; }
+.tick { display: inline-flex; width: 18px; height: 18px; border-radius: 50%; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; margin-right: 0.35rem; color: white; }
+.tick.yes { background: var(--green); }
+.tick.no { background: var(--red); }
+.misconceptions { margin-top: 0.5rem; color: #7a4d00; background: #fff4e0; border-radius: 6px; padding: 0.4rem 0.6rem; }
+.center-text { text-align: center; margin-bottom: 0.6rem; }
+.curve { display: flex; justify-content: center; gap: 1.2rem; height: 120px; align-items: flex-end; margin-top: 0.8rem; }
+.curve-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 42px; }
+.curve-bar { width: 28px; background: var(--blue); border-radius: 4px 4px 0 0; }

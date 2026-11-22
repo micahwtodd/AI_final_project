@@ -14,9 +14,9 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from backend import engine
+from backend import audit, engine
 from backend.calibration import DISPLAY_NAMES, load_profile
-from backend.env import REPO_DIR
+from backend.env import REPO_DIR, redact
 from backend.models import Action, CompanyProfile, GameState, QuarterRecord
 
 SESSIONS_DIR = REPO_DIR / "output" / "sessions"
@@ -37,7 +37,9 @@ class Session(BaseModel):
     state: GameState  # the book at the start of the current quarter (after the last shock)
     pending: Action | None = None  # signed ticket for this quarter
     last_record: QuarterRecord | None = None
-    explanations: dict[int, dict] = {}
+    explanations: dict[int, dict] = {}  # final explain-back result per quarter (presence = revealed)
+    explain_attempts: dict[int, list[dict]] = {}  # each attempt: text, checks, follow_up, marker
+    understanding: dict[int, dict] = {}  # Understanding points per quarter, summed in code
     timings: dict[str, float] = {}
     # AI usage and budget (Project 3)
     budget_cap_usd: float = 0.25
@@ -221,21 +223,72 @@ def advance(s: Session) -> dict:
     }
 
 
-def explain(s: Session, text: str, not_sure: bool = False) -> dict:
-    """Project 2: record the explanation and reveal. Project 5 adds the examiner's marking."""
+MIN_WORDS = 15
+
+
+async def explain(s: Session, text: str, not_sure: bool = False) -> dict:
+    """Explain-back (plan 5.4). Attempt 1, an optional second try if the main driver was missed,
+    or "I'm not sure" (a walkthrough, no points). The breakdown is revealed only at the end."""
+    from backend import examiner
+
     _require(s, "explain")
     rec = s.last_record
-    s.explanations[rec.quarter] = {"text": text, "not_sure": not_sure, "ts": time.time()}
+    q = rec.quarter
+    key = engine.answer_key(rec)
+    attempts = s.explain_attempts.setdefault(q, [])
+    text = (text or "").strip()[:2000]
+    if not not_sure and len(text.split()) < MIN_WORDS:
+        raise GameError(f"Please write at least {MIN_WORDS} words, or choose \"I'm not sure\".")
+
+    mode = "walkthrough" if not_sure else "mark"
+    attempt = len(attempts) + 1
+    flagged = examiner.instruction_attempt(text) if text else False
+    review, marker = None, "ai"
+    try:
+        review = await examiner.review_with_ai(s, rec, key, text, mode, attempt, attempts)
+    except Exception as e:  # provider failure: fall back, never block the game
+        audit.event(s.id, "examiner", q, "examiner", "error", {"message": redact(f"{type(e).__name__}: {e}")[:300]})
+    if review is None:
+        review, marker = examiner.review_with_keywords(key, text, mode, attempt), "keywords"
+    review.instruction_attempt = review.instruction_attempt or flagged
+    if review.instruction_attempt:
+        audit.event(s.id, "examiner", q, "examiner", "blocked",
+                    {"reason": "instruction_attempt", "message": "Learner text tried to instruct the grader; only the content was marked."})
+
+    if not not_sure:
+        attempts.append({"text": text, "checks": review.checks.model_dump(), "follow_up": review.follow_up,
+                         "marker": marker, "instruction_attempt": review.instruction_attempt, "ts": time.time()})
+    audit.event(s.id, "examiner", q, "examiner", "reply",
+                {"mode": mode, "attempt": attempt, "checks": review.checks.model_dump(), "marker": marker,
+                 "instruction_attempt": review.instruction_attempt})
+
+    # a second try is allowed once, only when the main driver was missed
+    if mode == "mark" and attempt == 1 and not review.checks.main_driver:
+        _save(s)
+        return {"final": False, "attempt": 1, "review": review.model_dump(), "marker": marker,
+                "question": review.follow_up or "Look again at the market moves. Which one hit us hardest, and why?"}
+
+    pts = examiner.quarter_points(attempts, not_sure)
+    s.understanding[q] = {**pts, "not_sure": not_sure, "attempts": len(attempts)}
+    s.explanations[q] = {"text": text, "not_sure": not_sure, "ts": time.time(), "review": review.model_dump(),
+                         "marker": marker}
     s.phase = "finished" if s.state.quarter > 4 else "position"
     if s.phase == "finished":
         s.timings["finished"] = time.time()
     _save(s)
-    return reveal_payload(s, rec)
+    return {"final": True, **reveal_payload(s, rec)}
+
+
+def understanding_score(s: Session) -> dict:
+    per_q = {q: round(v["points"], 1) for q, v in sorted(s.understanding.items())}
+    avg = round(sum(per_q.values()) / len(per_q), 1) if per_q else 0.0
+    return {"understanding_score": avg, "per_quarter": per_q}
 
 
 def reveal_payload(s: Session, rec: QuarterRecord) -> dict:
     card = engine.card_for(rec.quarter)
     key = engine.answer_key(rec)
+    exp = s.explanations.get(rec.quarter, {})
     you = rec.surplus_after - rec.surplus_before
     nothing = rec.nothing_surplus_after - rec.surplus_before
     bench = rec.benchmark_surplus_after - rec.surplus_before
@@ -250,6 +303,10 @@ def reveal_payload(s: Session, rec: QuarterRecord) -> dict:
         "debrief_text": quarter_debrief(rec),
         "lesson": card.lesson, "benchmark_action": card.benchmark_action.model_dump(exclude_none=True),
         "your_action": rec.action.model_dump(exclude_none=True), "source_note": card.source_note,
+        "improvement_facts": key["improvement_facts"],
+        "review": exp.get("review"), "marker": exp.get("marker"), "not_sure": exp.get("not_sure", False),
+        "attempts": s.explain_attempts.get(rec.quarter, []),
+        "understanding": s.understanding.get(rec.quarter),
         "finished": s.phase == "finished",
         "view": view(s),
     }
@@ -312,6 +369,7 @@ def debrief(s: Session) -> dict:
     if sc["penalties"]:
         text.append(f"{sc['penalties']} points were deducted for ending quarters below the capital or liquidity floor.")
     return {
+        **{f"understanding_{k}" if k == "per_quarter" else k: v for k, v in understanding_score(s).items()},
         "results_score": sc["results_score"], "per_quarter": sc["per_quarter"], "penalties": sc["penalties"],
         "start_surplus": round(start, 3), "end_surplus": round(end, 3),
         "nothing_end_surplus": round(nothing_end, 3), "benchmark_end_surplus": round(bench_end, 3),

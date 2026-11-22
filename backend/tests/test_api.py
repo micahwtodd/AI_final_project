@@ -34,7 +34,12 @@ def test_full_game_end_to_end():
         assert "attribution" not in shock  # breakdown hidden until the explanation
         assert client.post(f"/api/game/{gid}/advance").status_code == 409  # cannot skip explaining
 
-        rev = client.post(f"/api/game/{gid}/explain", json={"text": "Rates fell and spreads widened."}).json()
+        long_text = ("Interest rates and credit spreads moved, and because our liabilities are longer than our assets "
+                     "surplus changed; our hedges and cash buffer helped a little this quarter.")
+        rev = client.post(f"/api/game/{gid}/explain", json={"text": long_text}).json()
+        if not rev["final"]:  # main driver missed: one more try
+            rev = client.post(f"/api/game/{gid}/explain", json={"text": long_text + " Stocks and the dollar also moved."}).json()
+        assert rev["final"] and rev["understanding"] is not None
         assert abs(sum(a["value"] for a in rev["attribution"]) - rev["total"]) < 1e-3
         assert set(rev["comparison"]) == {"you", "nothing", "benchmark"}
         assert rev["debrief_text"] and rev["lesson"]

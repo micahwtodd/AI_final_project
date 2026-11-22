@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, type Company, type Debrief, type GameView, type Health, type Reveal, type Shock, type Usage } from "./api";
+import { api, type Company, type Debrief, type GameView, type Health, type Reveal, type Review, type Shock, type Usage } from "./api";
 import { UsageMeter } from "./components/UsageMeter";
 import { CompanySelect } from "./screens/CompanySelect";
 import { Desk } from "./screens/Desk";
@@ -10,7 +10,7 @@ import { DebriefScreen } from "./screens/DebriefScreen";
 type Screen =
   | { name: "select" }
   | { name: "desk"; game: GameView }
-  | { name: "shock"; game: GameView; shock: Shock }
+  | { name: "shock"; game: GameView; shock: Shock; firstTry: { review: Review; question: string } | null }
   | { name: "reveal"; reveal: Reveal; shock: Shock }
   | { name: "debrief"; game: GameView; debrief: Debrief };
 
@@ -97,18 +97,23 @@ export default function App() {
             busy={busy}
             run={run}
             onUpdate={(g) => setScreen({ name: "desk", game: g })}
-            onShock={(shock) => setScreen({ name: "shock", game: screen.game, shock })}
+            onShock={(shock) => setScreen({ name: "shock", game: screen.game, shock, firstTry: null })}
             usage={usage ?? screen.game.usage}
             onUsage={mergeUsage}
           />
         )}
         {screen.name === "shock" && (
           <ShockScreen
+            key={`${screen.shock.quarter}-${screen.firstTry ? 2 : 1}`}
             shock={screen.shock}
             busy={busy}
+            firstTry={screen.firstTry}
             onSubmit={async (text, notSure) => {
               const r = await run(() => api.explain(screen.game.id, text, notSure));
-              if (r) setScreen({ name: "reveal", reveal: r, shock: screen.shock });
+              api.usage(screen.game.id).then(setUsage).catch(() => undefined); // the examiner may have spent
+              if (!r) return;
+              if (r.final) setScreen({ name: "reveal", reveal: r, shock: screen.shock });
+              else setScreen({ ...screen, firstTry: { review: r.review, question: r.question } });
             }}
           />
         )}

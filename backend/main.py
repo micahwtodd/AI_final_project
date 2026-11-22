@@ -111,8 +111,12 @@ def advance(session_id: str) -> dict:
 
 
 @app.post("/api/game/{session_id}/explain")
-def explain(session_id: str, body: ExplainBody) -> dict:
-    return _run(game.explain, _session(session_id), body.text, body.not_sure)
+async def explain(session_id: str, body: ExplainBody) -> dict:
+    """Examiner review. Returns {final: false, question} for a second try, or the full reveal when final."""
+    try:
+        return await game.explain(_session(session_id), body.text, body.not_sure)
+    except game.GameError as e:
+        raise HTTPException(409, str(e))
 
 
 @app.get("/api/game/{session_id}/debrief")

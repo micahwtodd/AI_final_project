@@ -10,6 +10,7 @@ before a run and after every model response, in every agent.
 from __future__ import annotations
 
 import asyncio
+import os
 import secrets
 import time
 from dataclasses import dataclass, field
@@ -42,6 +43,11 @@ AGENT_NAMES = {
     "system": "System",
 }
 WORKERS = ("actuary", "portfolio_manager", "trader")
+
+
+def ai_available() -> bool:
+    """True when a key is configured and AI is not switched off (tests set RISK_DESK_OFFLINE=1)."""
+    return load_env().key_found and not os.environ.get("RISK_DESK_OFFLINE")
 
 
 def make_model() -> OpenAIResponsesModel:
@@ -372,7 +378,7 @@ async def ask(session, message: str, queue: asyncio.Queue, save: Callable[[Any],
     reply_text, terms = None, []
 
     try:
-        if not load_env().key_found:
+        if not ai_available():
             run.stopped = "no_key"
             emit("system", "blocked", {"reason": "no_key", "message": OFFLINE_TEXT})
         else:

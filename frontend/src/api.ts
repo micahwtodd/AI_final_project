@@ -157,11 +157,27 @@ export type Reveal = {
   benchmark_action: Partial<Action>;
   your_action: Partial<Action>;
   source_note: string;
+  improvement_facts: string[];
+  main_driver: string;
+  second_factor: string;
+  review: Review | null;
+  marker: "ai" | "keywords" | null;
+  not_sure: boolean;
+  attempts: { text: string; checks: Checks }[];
+  understanding: { points: number; by_check: Record<string, number>; not_sure: boolean; attempts: number } | null;
   finished: boolean;
   view: GameView;
 };
 
+export type Checks = { main_driver: boolean; mechanism: boolean; second_factor: boolean; improvement: boolean };
+export type Review = { checks: Checks; misconceptions: string[]; follow_up: string | null; reply_text: string; instruction_attempt: boolean };
+export type ExplainResult =
+  | ({ final: true } & Reveal)
+  | { final: false; attempt: number; review: Review; marker: string; question: string };
+
 export type Debrief = {
+  understanding_score: number;
+  understanding_per_quarter: Record<string, number>;
   results_score: number;
   per_quarter: number[];
   penalties: number;
@@ -204,7 +220,7 @@ export const api = {
   preview: (id: string, action: Action) => call<Preview>(`/game/${id}/preview`, { action }),
   commit: (id: string, actions: Action) => call<{ view: GameView; after: Dashboard }>(`/game/${id}/commit`, { actions }),
   advance: (id: string) => call<Shock>(`/game/${id}/advance`, {}),
-  explain: (id: string, text: string, not_sure: boolean) => call<Reveal>(`/game/${id}/explain`, { text, not_sure }),
+  explain: (id: string, text: string, not_sure: boolean) => call<ExplainResult>(`/game/${id}/explain`, { text, not_sure }),
   debrief: (id: string) => call<Debrief>(`/game/${id}/debrief`),
   usage: (id: string) => call<Usage>(`/usage/${id}`),
   setBudget: (id: string, cap_usd: number) => call<Usage>(`/budget/${id}`, { cap_usd }),

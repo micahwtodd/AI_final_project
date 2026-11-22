@@ -1,12 +1,18 @@
 import { useState } from "react";
-import type { Shock } from "../api";
+import type { Review, Shock } from "../api";
 import { fmtMove, fmtSigned } from "../labels";
 import { Meters } from "../components/Meters";
 
-export function ShockScreen(props: { shock: Shock; busy: boolean; onSubmit: (text: string, notSure: boolean) => void }) {
+export function ShockScreen(props: {
+  shock: Shock;
+  busy: boolean;
+  firstTry: { review: Review; question: string } | null;
+  onSubmit: (text: string, notSure: boolean) => void;
+}) {
   const s = props.shock;
   const [text, setText] = useState("");
   const words = text.trim().split(/\s+/).filter(Boolean).length;
+  const second = props.firstTry !== null;
 
   return (
     <section className="shock">
@@ -34,16 +40,28 @@ export function ShockScreen(props: { shock: Shock; busy: boolean; onSubmit: (tex
         <div className="panel cro">
           <div className="cro-name">Dr. Amara Okafor · Chief Risk Officer</div>
           <p className="cro-question">“{s.question}”</p>
+          {second && (
+            <div className="first-try">
+              <div className="small muted">Your first answer:</div>
+              <p className="cro-feedback">{props.firstTry!.review.reply_text}</p>
+              {props.firstTry!.review.instruction_attempt && (
+                <div className="flag small">⚑ Your answer tried to instruct the grader. Only the finance content is marked.</div>
+              )}
+              <p className="cro-question">“{props.firstTry!.question}”</p>
+              <div className="small muted">Second try: checks you earn now count half.</div>
+            </div>
+          )}
           <textarea rows={5} value={text} onChange={(e) => setText(e.target.value)}
-            placeholder="Two to four sentences: what moved, why it hurt or helped this company, and what your trades did." />
+            placeholder={second ? "Try again: what moved most, and why did it hurt or help this company?"
+              : "Two to four sentences: what moved, why it hurt or helped this company, and what your trades did."} />
           <div className="explain-row">
             <span className="small muted">{words} words {words < 15 && "(15 minimum)"}</span>
             <button className="ghost" disabled={props.busy} onClick={() => props.onSubmit("", true)}>I'm not sure</button>
-            <button className="primary" disabled={props.busy || words < 15} onClick={() => props.onSubmit(text, false)}>
-              Submit explanation
+            <button className="primary" disabled={props.busy || words < 15} onClick={() => { props.onSubmit(text, false); setText(""); }}>
+              {props.busy ? <span className="spinner" aria-label="marking" /> : second ? "Submit second try" : "Submit explanation"}
             </button>
           </div>
-          <p className="small muted">The breakdown by cause stays hidden until you explain.</p>
+          <p className="small muted">The breakdown by cause stays hidden until you explain. Amara marks four things: the main driver, why it moved surplus, the second factor, and what your trades did or could have done.</p>
         </div>
       </div>
 
