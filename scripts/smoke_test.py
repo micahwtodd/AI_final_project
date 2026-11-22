@@ -20,6 +20,7 @@ from backend.pricing import cost_usd  # noqa: E402
 
 
 def main() -> int:
+    sys.stdout.reconfigure(encoding="utf-8")  # Windows consoles default to cp1252
     status = load_env()
     print(f"Key found: {status.key_found}  provider: {status.provider}  "
           f"name: {status.key_name}  source: {status.key_source}")
@@ -38,7 +39,7 @@ def main() -> int:
         print(f"\nCall failed: {type(e).__name__}: {redact(e)}")
         return 1
     elapsed = time.perf_counter() - t0
-    u = result.usage()
+    u = result.usage
 
     print(f"\nModel: {MODEL_NAME}   latency: {elapsed:.2f}s")
     print(f"Reply: {result.output}\n")
