@@ -1,0 +1,15 @@
+{
+ "ticker": "EQH",
+ "accession": "0001333986-26-000012",
+ "url": "https://www.sec.gov/Archives/edgar/data/1333986/000133398626000012/eqh-20251231.htm",
+ "chunks": [
+  {
+   "chunk_id": 299,
+   "text": " by NAIC rating:\nAFS Fixed Maturities\n| NAIC Designation | Rating Agency Equivalent |\nAmortized\nCost\nAllowance for Credit Losses\nGross\nUnrealized\nGains\nGross\nUnrealized\nLosses\nFair Value\n(in millions)\n| As of December 31, 2025 |\n| 1................................ | Aaa, Aa, A |\n56,880\n3,896\n53,497\n| Investment grade |\n80,368\n5,780\n75,481\n| 4................................ | B |\n| 6................................ | Ca, C |\n| Total Fixed Maturities |\n81,816\n5,850\n76,871\n| As of December 31, 2024: |\n| 2................................ | Baa | 26,255 | \u2014 | 147 | 3,043 | 23,359 |\n| 3................................ | Ba | 810 | \u2014 | 5 | 38 | 777 |\n| 5................................ | Caa | 187 | 1 | 3 | 13 | 176 |\n| Below investment grade | 1,681 | 2 | 16 | 59 | 1,636 |\nMortgage Loans"
+  },
+  {
+   "chunk_id": 723,
+   "text": "N INVESTMENTS IN RELATED PARTIES\nAS OF DECEMBER 31, 2025\n| Cost (1) |\nFair Value\nCarrying\nValue\n(in millions)\n| Fixed maturities, AFS: |\n| U.S. government, agencies and authorities |\n5,040\n3,737\n3,737\n| Foreign governments |\n| All other corporate bonds |\n40,320\n37,522\n37,522\n| Asset-backed |\n15,978\n16,058\n16,058\n| Redeemable preferred stocks |\n| Fixed maturities, at fair value using the fair value option |\n3,001\n2,943\n2,943\n| Policy loans |\n1,862\n1,958\n1,862\n| Trading securities |\n1,457\n1,572\n1,572\n| Total Investments |\n125,587\n120,339\n121,004\n______________\n(1)Cost for fixed maturities represents original cost, reduced by repayments and write-downs and adjusted for amortization of premiums or accretion of discount; cost for equity securities represents original cost reduced by write-downs; cost for other limited partnership interests represents original cost adjusted for equity in earnings and reduced by distributions.\n(2)Carrying value for mortgage loans on real estate represents original cost adjusted for amortization of premiums or accretion of discount and reduced by credit loss allowance. Includes mortgage loans carried at fair value using the fair value option of $50 million.\nTable of Contents\nEQUITABLE HOLDINGS, INC.\nSCHEDULE II\nBalance Sheets (Parent Company)\nDecember 31, 2025 and 2024\n| December 31,\n| 2025 | 2024\n(in millions, except share amounts)\n| ASSETS |"
+  }
+ ]
+}

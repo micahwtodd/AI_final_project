@@ -1,0 +1,15 @@
+{
+ "ticker": "LNC",
+ "accession": "0000059558-26-000016",
+ "url": "https://www.sec.gov/Archives/edgar/data/59558/000005955826000016/lnc-20251231.htm",
+ "chunks": [
+  {
+   "chunk_id": 316,
+   "text": "448 | 100.0 | % | $ | 97,369 | $ | 87,111 | 100.0 | %\n| Total securities below investment grade |\n| as a percentage of total fixed maturity |\n| AFS securities | 3.1 | % | 3.3 | % | 3.1 | % | 3.4 | % |\n(1) Based upon the rating designations determined and provided by the National Association of Insurance Commissioners (the \u201cNAIC\u201d) or the major credit rating agencies (Fitch Ratings (\u201cFitch\u201d), Moody\u2019s Investors Service (\u201cMoody\u2019s\u201d) and S&P Global Ratings (\u201cS&P\u201d)). For securities where the ratings assigned by the major credit rating agencies are not equivalent, the second lowest rating assigned is used. For those securities where ratings by the major credit rating agencies are not available, which does not represent a significant amount of our total fixed maturity AFS securities, we base the ratings disclosed upon internal ratings. The average credit quality of our total fixed maturity AFS securities portfolio was of December 31, 2025."
+  },
+  {
+   "chunk_id": 519,
+   "text": "-complete recognition threshold\u201d). | January 1, 2028 | We are evaluating the impact of this ASU to the consolidated financial statements.\nTable of Contents\n3. Investments\nFixed Maturity AFS Securities\nThe amortized cost, gross unrealized gains and losses, allowance for credit losses and fair value of fixed maturity AFS securities (in millions) were as follows:\n| As of December 31, 2025\n| Amortized Cost | Gross Unrealized | Allowance for Credit Losses | Fair Value\n| Gains | Losses |\n| Fixed maturity AFS securities: |\n| U.S. government bonds | 892 | 9 | 32 | \u2013 | 869 |\n| Foreign government bonds | 261 | 16 | 51 | \u2013 | 226 |\n| CMBS | 2,586 | 15 | 99 | \u2013 | 2,502 |\n| Hybrid and redeemable preferred securities | 242 | 21 | 7 | 1 | 255 |\n| As of December 31, 2024\n| Amortized Cost | Gross Unrealized | Allowance for Credit Losses | Fair Value\n| Gains | Losses |\n| Fixed maturity AFS securities: |\n| U.S. government bonds | 429 | 3 | 41 | \u2013 | 391 |\n| Foreign government bonds | 282 | 11 | 56 | \u2013 | 237 |\n| CMBS | 1,817 | 4 | 156 | \u2013 | 1,665 |\n| Hybrid and redeemable preferred securities | 241 | 25 | 11 | 1 | 254 |\nThe amortized cost and fair value of fixed maturity AFS securities by contractual maturities (in millions) as of December 31, 2025, were as follows:\n| Amortized Cost | Fair Value\n| Due in one year or less | $ | 4,407 | $ | 4,366 |"
+  }
+ ]
+}

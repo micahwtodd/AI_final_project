@@ -64,7 +64,8 @@ def get_tagged_facts(ticker: str) -> dict[str, FieldSource]:
     return out
 
 
-def build_profile(ticker: str) -> CompanyProfile:
+def build_profile(ticker: str, text: dict | None = None, rejections: list | None = None,
+                  sanitizer: dict | None = None) -> CompanyProfile:
     a = load_assumptions()["defaults_when_untagged"]
     f = get_tagged_facts(ticker)
     k = edgar.latest_10k(ticker)
@@ -89,8 +90,40 @@ def build_profile(ticker: str) -> CompanyProfile:
                           f"untagged; {a['mortgage_share_of_invested']:.0%} of invested assets")
     else:
         mortgage = v["mortgage_loans"]
-    govt_share = assume("govt_share_of_bonds", a["govt_share_of_bonds"], "credit split not tagged; Sam reads it from the filing in Project 6")
-    hy_share = assume("below_ig_share_of_bonds", a["below_ig_share_of_bonds"], "credit split not tagged; Sam reads it from the filing in Project 6")
+    text = text or {}
+
+    def from_text_or_default(name: str, default: float, note: str) -> float:
+        if name in text:
+            t = text[name]
+            fields[name] = FieldSource(value=round(t["value"], 4), source="filing_text", citation=t["citation"],
+                                       note=t.get("note") or "read by Sam from the 10-K; validated against the quoted text")
+            return t["value"]
+        return assume(name, default, note)
+
+    govt_share = from_text_or_default("govt_share_of_bonds", a["govt_share_of_bonds"],
+                                      "not found in the filing text; labelled default")
+    hy_share = from_text_or_default("below_ig_share_of_bonds", a["below_ig_share_of_bonds"],
+                                    "not found in the filing text; labelled default")
+    ig_bbb_share = ig_aaa_share = None
+    if "bbb_share_of_bonds" in text:
+        corp_ig = max(0.05, 1 - govt_share - hy_share)
+        ig_bbb_share = min(0.8, max(0.1, text["bbb_share_of_bonds"]["value"] / corp_ig))
+        fields["bbb_share_of_bonds"] = FieldSource(value=round(text["bbb_share_of_bonds"]["value"], 4), source="filing_text",
+                                                   citation=text["bbb_share_of_bonds"]["citation"],
+                                                   note="BBB share of fixed maturities, read by Sam")
+        derive("ig_bbb_share", ig_bbb_share, "BBB share of investment-grade corporates = BBB / (bonds - government - junk)")
+        ig_aaa_share = derive("ig_aaa_share", min(a["aaa_share_of_ig"], (1 - ig_bbb_share) * 0.36),
+                              "AAA share of investment-grade corporates: default proportion of the non-BBB part")
+    else:
+        assume("ig_bbb_share", a["bbb_share_of_ig"], "not found in the filing text; labelled default")
+    reference = {}
+    for name, label in (("rate_sensitivity", "Disclosed change in value for +100bp (USD bn)"),
+                        ("guaranteed_account_value", "Account value with guaranteed minimum benefits (USD bn)")):
+        if name in text:
+            reference[name] = FieldSource(value=round(text[name]["value"], 3), source="filing_text",
+                                          citation=text[name]["citation"],
+                                          note=f"{label}. Shown for reference; companies disclose this differently, "
+                                               "so the engine keeps its labelled assumption.")
     residual = invested - (bonds + mortgage + v["equity_securities"] + v["other_invested"] + v["cash"])
     derive("residual_invested", residual,
            "policy loans, short-term and other invested assets not tagged separately; treated as investment-grade fixed income")
@@ -138,7 +171,14 @@ def build_profile(ticker: str) -> CompanyProfile:
 
     guar_share = assume("guaranteed_share_of_sa", a["guaranteed_share_of_separate_accounts"],
                         "share of separate-account value carrying guarantees; not tagged")
-    foreign = assume("foreign_share", a["foreign_share"], "not tagged; Sam reads it from the filing in Project 6")
+    foreign = from_text_or_default("foreign_share", a["foreign_share"], "not found in the filing text; labelled default")
+    if "foreign_share" in text:
+        match = a["foreign_ops_currency_match"]
+        fx_exposed = derive("fx_exposed_share", foreign * (1 - match),
+                            f"foreign operations' assets back local-currency policies; {match:.0%} assumed matched, "
+                            "so only the rest moves with the dollar")
+    else:
+        fx_exposed = derive("fx_exposed_share", foreign, "default foreign holdings, assumed unmatched by foreign liabilities")
     nii_yield = derive("net_investment_yield", v["net_investment_income"] / invested if invested else 0.045,
                        "net investment income / invested assets")
 
@@ -152,7 +192,10 @@ def build_profile(ticker: str) -> CompanyProfile:
         separate_account_assets_usd_bn=round(v["separate_account_assets"], 2),
         alts_beta=round(alts_beta, 4),
         equity_to_assets=round(surplus / invested, 4), net_investment_yield=round(nii_yield, 4),
-        rate_sensitivity=None, foreign_share=foreign, fields=fields,
+        rate_sensitivity=None, foreign_share=foreign, fx_exposed_share=round(fx_exposed, 4), fields=fields,
+        ig_bbb_share=round(ig_bbb_share, 4) if ig_bbb_share is not None else None,
+        ig_aaa_share=round(ig_aaa_share, 4) if ig_aaa_share is not None else None,
+        reference=reference, rejections=rejections or [], sanitizer=sanitizer or {},
     )
 
 

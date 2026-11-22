@@ -242,3 +242,20 @@ button.link { background: none; border: none; padding: 0; color: var(--steel); f
 .curve { display: flex; justify-content: center; gap: 1.2rem; height: 120px; align-items: flex-end; margin-top: 0.8rem; }
 .curve-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 42px; }
 .curve-bar { width: 28px; background: var(--blue); border-radius: 4px 4px 0 0; }
+
+/* dossier */
+.dossier-box { margin-top: 1rem; border-top: 1px solid var(--line); padding-top: 0.8rem; }
+.dossier-intro { display: flex; gap: 0.8rem; align-items: flex-start; margin-bottom: 0.6rem; }
+.sam-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--steel); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; }
+.badge-row { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.35rem; }
+.badge { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 0.1rem 0.45rem; border-radius: 4px; letter-spacing: 0.02em; }
+.b-tagged { background: #e3eefa; color: #0b3d7a; }
+.b-text { background: #e4f4e8; color: #1e6b33; }
+.b-derived { background: #eef0f3; color: #4a5260; }
+.b-assume { background: #fff1d6; color: #7a4d00; }
+.dossier-table { max-width: 760px; }
+.dossier-table tr.clickable { cursor: pointer; }
+.dossier-table tr.clickable:hover { background: var(--panel-2); }
+.cite-row td { background: var(--panel-2); }
+.reference { margin: 0.6rem 0; }
+.reference ul { margin: 0.2rem 0; padding-left: 1.1rem; }

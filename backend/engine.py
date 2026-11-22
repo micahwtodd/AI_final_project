@@ -139,11 +139,11 @@ def build_state(profile: CompanyProfile, seed: int) -> GameState:
         guarantee_exposure=profile.guarantee_exposure_usd_bn,
         guarantee_value=profile.guarantee_value_usd_bn,
         market_rate=a["market"]["base_rate"], asset_yields=yields,
-        portfolio_yield=profile.net_investment_yield, foreign_share=profile.foreign_share,
+        portfolio_yield=profile.net_investment_yield, foreign_share=profile.fx_exposed_share if profile.fx_exposed_share is not None else profile.foreign_share,
         action=Action(cash_buffer_pct=round(cash_pct, 1), collateralized=False, dealers=1),
-        ig_aaa_share=a["defaults_when_untagged"]["aaa_share_of_ig"],
+        ig_aaa_share=profile.ig_aaa_share if profile.ig_aaa_share is not None else a["defaults_when_untagged"]["aaa_share_of_ig"],
         alts_beta=profile.alts_beta,
-        ig_bbb_share=a["defaults_when_untagged"]["bbb_share_of_ig"],
+        ig_bbb_share=profile.ig_bbb_share if profile.ig_bbb_share is not None else a["defaults_when_untagged"]["bbb_share_of_ig"],
     )
     # scale liability durations so the starting unhedged gap is near the target (bounded)
     sg = a["starting_gap"]

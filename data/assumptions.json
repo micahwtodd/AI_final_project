@@ -101,7 +101,8 @@
     "life_share_of_future_policy_benefits": 0.5,
     "guaranteed_share_of_separate_accounts": 0.5,
     "foreign_share": 0.05,
-    "other_liability_floor_share": 0.05
+    "other_liability_floor_share": 0.05,
+    "foreign_ops_currency_match": 0.9
   },
   "market": {
     "base_rate": 0.042,
@@ -179,5 +180,6 @@
     "_note": "Investment-grade corporates are split into AAA (no credit losses), A (credit losses at 15% of the BBB rate) and BBB (the card's ig_loss_pct). Shares of the IG bucket are defaults until Sam reads the credit-quality table in Project 6."
   },
   "stock_beta": 1.0,
-  "_stock_note": "Stocks held are folded into the alternatives bucket (per Micah). Each company's alternatives beta blends alternatives at 0.2 with its stocks at stock_beta."
+  "_stock_note": "Stocks held are folded into the alternatives bucket (per Micah). Each company's alternatives beta blends alternatives at 0.2 with its stocks at stock_beta.",
+  "_foreign_note": "When Sam finds the share of business in foreign operations, 90% of those assets are assumed matched by liabilities in the same currency (local policies), so only 10% moves surplus when the dollar moves. Default foreign holdings (5%) are assumed unmatched."
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Company } from "../api";
 import { BalanceSheetPanel } from "../components/BalanceSheet";
 import { CompanyLogo } from "../components/CompanyLogo";
+import { Dossier } from "../components/Dossier";
 
 export function CompanySelect(props: { companies: Company[]; busy: boolean; onStart: (ticker: string, seed: number) => void }) {
   const [picked, setPicked] = useState<string | null>(null);
@@ -57,6 +58,7 @@ export function CompanySelect(props: { companies: Company[]; busy: boolean; onSt
             left out, except the stock-market guarantees written on them: ${chosen.guarantee_exposure_usd_bn.toFixed(0)}bn of
             account value carries a guarantee. Equity is shown excluding unrealized bond gains and losses (AOCI).
           </p>
+          <Dossier company={chosen} />
           <div className="start-row">
             <label>
               Seed{" "}
@@ -64,7 +66,7 @@ export function CompanySelect(props: { companies: Company[]; busy: boolean; onSt
             </label>
             <span className="small muted">Same seed, same market shocks: runs can be compared.</span>
             <button className="primary" disabled={props.busy} onClick={() => props.onStart(chosen.ticker, seed)}>
-              {props.busy ? "Starting…" : `Start with ${chosen.ticker}`}
+              {props.busy ? "Starting…" : `Approve dossier and start with ${chosen.ticker}`}
             </button>
           </div>
         </div>

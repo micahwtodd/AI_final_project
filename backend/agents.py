@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import asyncio
 import os
+
+os.environ.setdefault("PYDANTIC_AI_NO_BANNER", "1")
 import secrets
 import time
 from dataclasses import dataclass, field

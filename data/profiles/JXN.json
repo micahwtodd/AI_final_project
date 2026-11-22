@@ -6,8 +6,8 @@
   "invested_assets_usd_bn": 74.94,
   "surplus_usd_bn": 12.42,
   "asset_mix": {
-    "govt": 0.0947216,
-    "ig_corp": 0.603899,
+    "govt": 0.0400988,
+    "ig_corp": 0.6585218,
     "below_ig": 0.0442034,
     "mortgage": 0.1362611,
     "alts": 0.0447976,
@@ -27,6 +27,9 @@
   "net_investment_yield": 0.042,
   "rate_sensitivity": null,
   "foreign_share": 0.05,
+  "fx_exposed_share": 0.05,
+  "ig_bbb_share": null,
+  "ig_aaa_share": null,
   "fields": {
     "investments": {
       "value": 69.233,
@@ -125,16 +128,22 @@
       "note": "Investments + cash and cash equivalents"
     },
     "govt_share_of_bonds": {
-      "value": 0.15,
-      "source": "assumption",
-      "citation": "",
-      "note": "credit split not tagged; Sam reads it from the filing in Project 6"
+      "value": 0.0635,
+      "source": "filing_text",
+      "citation": "10-K text, chunk 423: \"| U.S. government securities | $ | 3,854 | $ | — | $ | 2 | $ | 851 | $ | 3,005 |\"",
+      "note": "read by Sam from the 10-K; validated against the quoted text"
     },
     "below_ig_share_of_bonds": {
       "value": 0.07,
       "source": "assumption",
       "citation": "",
-      "note": "credit split not tagged; Sam reads it from the filing in Project 6"
+      "note": "not found in the filing text; labelled default"
+    },
+    "ig_bbb_share": {
+      "value": 0.45,
+      "source": "assumption",
+      "citation": "",
+      "note": "not found in the filing text; labelled default"
     },
     "residual_invested": {
       "value": 8.344,
@@ -182,7 +191,13 @@
       "value": 0.05,
       "source": "assumption",
       "citation": "",
-      "note": "not tagged; Sam reads it from the filing in Project 6"
+      "note": "not found in the filing text; labelled default"
+    },
+    "fx_exposed_share": {
+      "value": 0.05,
+      "source": "derived",
+      "citation": "",
+      "note": "default foreign holdings, assumed unmatched by foreign liabilities"
     },
     "net_investment_yield": {
       "value": 0.042,
@@ -190,5 +205,54 @@
       "citation": "",
       "note": "net investment income / invested assets"
     }
+  },
+  "reference": {
+    "rate_sensitivity": {
+      "value": -2.83,
+      "source": "filing_text",
+      "citation": "10-K text, chunk 366: \"| Total | $ | (2,830) | $ | (225) | $ | 3,410 |\"",
+      "note": "Disclosed change in value for +100bp (USD bn). Shown for reference; companies disclose this differently, so the engine keeps its labelled assumption."
+    }
+  },
+  "rejections": [
+    {
+      "field": "below_ig_bonds",
+      "value": 6.5,
+      "unit": "pct",
+      "chunk_id": 421,
+      "quote": "| Investment Rating | 2025 | 2024\n| Below investment grade | 6.5% | 7.0%",
+      "reason": "quote not found word-for-word in the chunk"
+    },
+    {
+      "field": "bbb_bonds",
+      "value": 40.9,
+      "unit": "pct",
+      "chunk_id": 421,
+      "quote": "| Investment Rating | 2025 | 2024\n| BBB | 40.9% | 38.8%",
+      "reason": "quote not found word-for-word in the chunk"
+    },
+    {
+      "field": "guaranteed_account_value",
+      "value": 174293.0,
+      "unit": "usd_mn",
+      "chunk_id": 204,
+      "quote": "| 2025 | 2024\n| Account Value | Benefit Base | Account Value | Benefit Base\n| GMWB for Life | 174,293 | 174,976 | 171,745 | 181,379 |",
+      "reason": "quote not found word-for-word in the chunk"
+    },
+    {
+      "field": "guaranteed_account_value",
+      "value": 1138.0,
+      "unit": "usd_mn",
+      "chunk_id": 204,
+      "quote": "| 2025 | 2024\n| Account Value | Benefit Base | Account Value | Benefit Base\n| GMIB (1)\n| 1,138 | 1,396 | 1,218 | 1,561 |",
+      "reason": "quote not found word-for-word in the chunk"
+    }
+  ],
+  "sanitizer": {
+    "hidden_elements": 12679,
+    "comments": 3,
+    "zero_width_chars": 0,
+    "chunks": 680,
+    "quarantined": 0
   }
 }

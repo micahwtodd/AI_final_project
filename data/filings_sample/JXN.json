@@ -1,0 +1,15 @@
+{
+ "ticker": "JXN",
+ "accession": "0001822993-26-000022",
+ "url": "https://www.sec.gov/Archives/edgar/data/1822993/000182299326000022/jxn-20251231.htm",
+ "chunks": [
+  {
+   "chunk_id": 366,
+   "text": "ted fair value of our derivative instruments due to a 10% increase and decrease in equity prices (dollars in millions):\n| Interest Rate Sensitivity\n| Notional | Weighted | Impact of | Fair | Impact of\n| Amount | Average Term | +100 bps | Value | -100 bps\n| (Years) | Change | Change\n| December 31, 2025 |\n| Swaps | $ | 3,864 | 4.88 | $ | 107 | $ | 19 | $ | (118) |\n| Bond Forwards | 8,143 | 0.85 | (1,249) | 83 | 1,489 |\n| December 31, 2024 |\n| Interest Rate Futures | 20,592 | 0.25 | (2,603) | \u2014 | 3,154 |\n| Total | $ | (2,830) | $ | (225) | $ | 3,410 |\n| Equity Sensitivity\n| Notional | Weighted | Impact of | Fair | Impact of\n| Amount | Average Term | +10% | Value | -10%\n| (Years) | Change | Change\n| December 31, 2025 |\n| Put Options | $ | 16,500 | 0.24 | $ | (95) | $ | 114 | $ | 395 |\n| Total Return Swaps | 3,544 | 1.93 | (322) | (21) | 337 |\n| December 31, 2024 |\n| Equity Futures | 33,104 | 1.29 | (583) | \u2014 | 583 |\n| Total | $ | (854) | $ | 116 | $ | 1,072 |\nItem 8. Financial Statements and Supplementary Data\nReport of Independent Registered Public Accounting Firm (KPMG LLP, Minneapolis, MN, Auditor Firm ID: 185)\nConsolidated Balance Sheets as of December 31, 2025 and 2024\nConsolidated Income Statements for the years ended December 31, 2025, 2024 and 2023\nConsolidated Statements of Comprehensive Income (Loss) for the years ended December 31, 2025, 2024 and 2023"
+  },
+  {
+   "chunk_id": 423,
+   "text": "fair value option, were as follows (in millions):\n| Allowance | Gross | Gross |\n| Amortized | for | Unrealized | Unrealized | Fair\n| December 31, 2025 |\nCost (1)\n| Credit Loss | Gains | Losses | Value\n| U.S. government securities | $ | 3,854 | $ | \u2014 | $ | 2 | $ | 851 | $ | 3,005 |\n| Public utilities | 6,529 | \u2014 | 75 | 458 | 6,146 |\n| Residential mortgage-backed | 445 | 4 | 24 | 23 | 442 |\n| Other asset-backed securities | 5,491 | 7 | 34 | 130 | 5,388 |\n| Allowance | Gross | Gross |\n| Amortized | for | Unrealized | Unrealized | Fair\n| December 31, 2024 |\nCost (1)\n| Credit Loss | Gains | Losses | Value\n| U.S. government securities | $ | 4,120 | $ | \u2014 | $ | 1 | $ | 962 | $ | 3,159 |\n| Public utilities | 5,716 | \u2014 | 29 | 589 | 5,156 |\n| Residential mortgage-backed | 374 | 6 | 14 | 44 | 338 |\n| Other asset-backed securities | 4,243 | 25 | 11 | 196 | 4,033 |\nThe amortized cost, ACL, gross unrealized gains and losses, and fair value of debt securities at December 31, 2025, by contractual maturity, are shown below (in millions). Actual maturities may differ from contractual maturities where securities can be called or prepaid with or without early redemption penalties.\n| Allowance | Gross | Gross |\n| for | Unrealized | Unrealized |\n| Credit Loss | Gains | Losses |\n| Due in 1 year or less | $ | 1,415 | $ | \u2014 | $ | 2 | $ | 5 | $ | 1,412 |"
+  }
+ ]
+}

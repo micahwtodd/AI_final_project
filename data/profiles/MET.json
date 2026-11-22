@@ -27,6 +27,9 @@
   "net_investment_yield": 0.0456,
   "rate_sensitivity": null,
   "foreign_share": 0.05,
+  "fx_exposed_share": 0.05,
+  "ig_bbb_share": 0.3526,
+  "ig_aaa_share": 0.2,
   "fields": {
     "investments": {
       "value": 472.178,
@@ -128,13 +131,31 @@
       "value": 0.15,
       "source": "assumption",
       "citation": "",
-      "note": "credit split not tagged; Sam reads it from the filing in Project 6"
+      "note": "not found in the filing text; labelled default"
     },
     "below_ig_share_of_bonds": {
       "value": 0.07,
       "source": "assumption",
       "citation": "",
-      "note": "credit split not tagged; Sam reads it from the filing in Project 6"
+      "note": "not found in the filing text; labelled default"
+    },
+    "bbb_share_of_bonds": {
+      "value": 0.275,
+      "source": "filing_text",
+      "citation": "10-K text, chunk 341: \"| 68.5 | % | 27.5 | % | 2.8 | % | 1.1 | % | 0.1 | % | — | % | 100.0 | %\"",
+      "note": "BBB share of fixed maturities, read by Sam"
+    },
+    "ig_bbb_share": {
+      "value": 0.3526,
+      "source": "derived",
+      "citation": "",
+      "note": "BBB share of investment-grade corporates = BBB / (bonds - government - junk)"
+    },
+    "ig_aaa_share": {
+      "value": 0.2,
+      "source": "derived",
+      "citation": "",
+      "note": "AAA share of investment-grade corporates: default proportion of the non-BBB part"
     },
     "residual_invested": {
       "value": 54.464,
@@ -182,7 +203,13 @@
       "value": 0.05,
       "source": "assumption",
       "citation": "",
-      "note": "not tagged; Sam reads it from the filing in Project 6"
+      "note": "not found in the filing text; labelled default"
+    },
+    "fx_exposed_share": {
+      "value": 0.05,
+      "source": "derived",
+      "citation": "",
+      "note": "default foreign holdings, assumed unmatched by foreign liabilities"
     },
     "net_investment_yield": {
       "value": 0.0456,
@@ -190,5 +217,38 @@
       "citation": "",
       "note": "net investment income / invested assets"
     }
+  },
+  "reference": {
+    "rate_sensitivity": {
+      "value": -7.554,
+      "source": "filing_text",
+      "citation": "10-K text, chunk 451: \"| Net Change | $ | (7,554) | $ | (1,953) | $ | (76) |\"",
+      "note": "Disclosed change in value for +100bp (USD bn). Shown for reference; companies disclose this differently, so the engine keeps its labelled assumption."
+    }
+  },
+  "rejections": [
+    {
+      "field": "govt_bonds",
+      "value": 33350.0,
+      "unit": "usd_mn",
+      "chunk_id": 341,
+      "quote": "| NAIC Designation | 1 | 2 | 3 | 4 | 5 | 6 | ... | U.S. government and agency | 32,982 | 368 | — | — | — | — | 33,350 |",
+      "reason": "quote not found word-for-word in the chunk"
+    },
+    {
+      "field": "govt_bonds",
+      "value": 39895.0,
+      "unit": "usd_mn",
+      "chunk_id": 341,
+      "quote": "| NAIC Designation | 1 | 2 | 3 | 4 | 5 | 6 | ... | Foreign government | 31,927 | 5,078 | 1,529 | 1,302 | 46 | 13 | 39,895 |",
+      "reason": "quote not found word-for-word in the chunk"
+    }
+  ],
+  "sanitizer": {
+    "hidden_elements": 25729,
+    "comments": 3,
+    "zero_width_chars": 0,
+    "chunks": 1005,
+    "quarantined": 0
   }
 }

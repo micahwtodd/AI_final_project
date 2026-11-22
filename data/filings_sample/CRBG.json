@@ -1,0 +1,15 @@
+{
+ "ticker": "CRBG",
+ "accession": "0001889539-26-000022",
+ "url": "https://www.sec.gov/Archives/edgar/data/1889539/000188953926000022/crbg-20251231.htm",
+ "chunks": [
+  {
+   "chunk_id": 75,
+   "text": "Association of Insurance Commissioners (\u201cNAIC\u201d) Designation, at fair value, for our insurance operating subsidiaries excluding the Fortitude Re funds withheld assets:\n| December 31, 2025\n(in millions)\nFair Value\nPercent of Total\n| NAIC 1 | $ | 98,454 | 56%\n| NAIC 2 | 71,341 | 40%\n| NAIC 3 | 5,380 | 3%\n| NAIC 4 | 2,484 | 1%\n| NAIC 5 and 6 | 646 | \u2014%\nTotal*\n| $ | 178,305 | 100%\n* Excludes approximately $53 million of consolidated investment entities and $1.3 billion of eliminations primarily related to the consolidated investment entities and the insurance operating subsidiaries at December 31, 2025.\nThe following table presents the fixed maturity security portfolio categorized by composite Corebridge credit rating (as described below), at fair value for our insurance operating subsidiaries excluding the Fortitude Re funds withheld assets:\n(in millions)\n| AAA/AA/A | BBB | Total Investment Grade | BB | B | CCC and Lower |\nTotal Below Investment Grade\n| Total\n| December 31, 2025 |\n| Other fixed maturity securities | $ | 53,740 | $ | 60,617 | $ | 114,357 | $ | 4,758 | $ | 2,291 | $ | 495 | $ | 7,544 | $ | 121,901\nMortgage-backed, asset-backed and collateralized\n| 43,026 | 10,340 | 53,366 | 527 | 281 | 2,230 | 3,038 | 56,404\n| Total fixed maturities* | $ | 96,766 | $ | 70,957 | $ | 167,723 | $ | 5,285 | $ | 2,572 | $ | 2,725 | $ | 10,582 | $ | 178,305"
+  },
+  {
+   "chunk_id": 876,
+   "text": "ed Balance Sheets. Certain of these and the VIE structures above also include commitments for funding from related parties of and $0.6 billion at December 31, 2025 and December 31, 2024, respectively.\nFor additional information related to VIEs and other investments, see Notes 5 and 8.\nCorebridge | 2025 Form 10-K 244\nTABLE OF CONTENTS\nSchedules | Schedule I\nSummary of Investments \u2013 Other than Investments in Related Parties\n| Schedule I\n| December 31, 2025 | Amount at\nwhich shown in\nthe Balance Sheet\n| (in millions) |\nCost(a)\nFair Value\n| Fixed maturities: |\n| U.S. government and government sponsored entities | $ | 1,847 | $ | 1,529 | $ | 1,529\n| Obligations of states, municipalities and political subdivisions | 5,180 | 4,520 | 4,520\n| Non-U.S. governments | 5,096 | 4,562 | 4,562\n| Public utilities | 23,547 | 20,922 | 20,922\n| All other corporate debt securities | 113,811 | 104,063 | 104,063\n| Mortgage-backed, asset-backed and collateralized | 59,774 | 59,192 | 59,192\n| Total fixed maturity securities | 209,255 | 194,788 | 194,788\n| Equity securities and mutual funds: |\n| Common stock: |\n| Public utilities | 19 | 19 | 19\n| Industrial, miscellaneous and all other | 6 | 6 | 6\n| Total common stock | 25 | 25 | 25\n| Preferred stock | 54 | 54 | 54\n| Total equity securities and mutual funds | 79 | 79 | 79\n| Mortgage and other loans receivable, net of allowance |"
+  }
+ ]
+}

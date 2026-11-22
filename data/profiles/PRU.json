@@ -6,9 +6,9 @@
   "invested_assets_usd_bn": 490.23,
   "surplus_usd_bn": 35.52,
   "asset_mix": {
-    "govt": 0.1059676,
-    "ig_corp": 0.5963142,
-    "below_ig": 0.0494515,
+    "govt": 0.140513,
+    "ig_corp": 0.5777345,
+    "below_ig": 0.0334858,
     "mortgage": 0.13,
     "alts": 0.0780571,
     "cash": 0.0402096
@@ -26,7 +26,10 @@
   "equity_to_assets": 0.0724,
   "net_investment_yield": 0.0438,
   "rate_sensitivity": null,
-  "foreign_share": 0.05,
+  "foreign_share": 0.39,
+  "fx_exposed_share": 0.039,
+  "ig_bbb_share": null,
+  "ig_aaa_share": null,
   "fields": {
     "investments": {
       "value": 470.519,
@@ -125,16 +128,22 @@
       "note": "Investments + cash and cash equivalents"
     },
     "govt_share_of_bonds": {
-      "value": 0.15,
-      "source": "assumption",
-      "citation": "",
-      "note": "credit split not tagged; Sam reads it from the filing in Project 6"
+      "value": 0.1989,
+      "source": "filing_text",
+      "citation": "10-K text, chunk 411: \"| U.S. Government | 22,520 | 655 | 4,382 | 0 | 18,793 | 21,451 | 584 | 4,499 | 0 | 17,536 |\" + 10-K text, chunk 410: \"| Foreign government(2) | 61,928 | 474 | 12,324 | 0 | 50,078 | 62,880 | 1,828 | 7,801 | 0 | 56,907 |\"",
+      "note": "read by Sam from the 10-K; validated against the quoted text"
     },
     "below_ig_share_of_bonds": {
-      "value": 0.07,
+      "value": 0.0474,
+      "source": "filing_text",
+      "citation": "10-K text, chunk 417: \"securities considered below investment grade based on low issue composite ratings total $16,427 million, or 5% of the total fixed maturities\"",
+      "note": "read by Sam from the 10-K; validated against the quoted text"
+    },
+    "ig_bbb_share": {
+      "value": 0.45,
       "source": "assumption",
       "citation": "",
-      "note": "credit split not tagged; Sam reads it from the filing in Project 6"
+      "note": "not found in the filing text; labelled default"
     },
     "residual_invested": {
       "value": 22.199,
@@ -179,10 +188,16 @@
       "note": "share of separate-account value carrying guarantees; not tagged"
     },
     "foreign_share": {
-      "value": 0.05,
-      "source": "assumption",
+      "value": 0.39,
+      "source": "filing_text",
+      "citation": "10-K text, chunk 397: \"As of December 31, 2025 and 2024, 39% and 42%, respectively, of our general account investments attributable to PFI excluding the Closed Block division and Funds Withheld related t\"",
+      "note": "read by Sam from the 10-K; validated against the quoted text"
+    },
+    "fx_exposed_share": {
+      "value": 0.039,
+      "source": "derived",
       "citation": "",
-      "note": "not tagged; Sam reads it from the filing in Project 6"
+      "note": "foreign operations' assets back local-currency policies; 90% assumed matched, so only the rest moves with the dollar"
     },
     "net_investment_yield": {
       "value": 0.0438,
@@ -190,5 +205,21 @@
       "citation": "",
       "note": "net investment income / invested assets"
     }
+  },
+  "reference": {
+    "rate_sensitivity": {
+      "value": -2.476,
+      "source": "filing_text",
+      "citation": "10-K text, chunk 462: \"| Net estimated potential loss | $ | (2,476) | $ | (2,641) |\"",
+      "note": "Disclosed change in value for +100bp (USD bn). Shown for reference; companies disclose this differently, so the engine keeps its labelled assumption."
+    }
+  },
+  "rejections": [],
+  "sanitizer": {
+    "hidden_elements": 25705,
+    "comments": 3,
+    "zero_width_chars": 0,
+    "chunks": 1025,
+    "quarantined": 0
   }
 }

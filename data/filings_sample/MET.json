@@ -1,0 +1,15 @@
+{
+ "ticker": "MET",
+ "accession": "0001099219-26-000013",
+ "url": "https://www.sec.gov/Archives/edgar/data/1099219/000109921926000013/met-20251231.htm",
+ "chunks": [
+  {
+   "chunk_id": 341,
+   "text": "\nDefault | Total\nEstimated\nFair Value\n| NAIC Designation | 1 | 2 | 3 | 4 | 5 | 6 |\n| (Dollars in millions)\n| December 31, 2025 |\n| Foreign corporate | 19,541 | 35,132 | 3,038 | 470 | 71 | 8 | 58,260 |\n| Foreign government | 30,069 | 6,679 | 1,828 | 1,398 | 34 | 20 | 40,028 |\n| ABS & CLO | 17,455 | 2,944 | 285 | 41 | 31 | 1 | 20,757 |\n| CMBS | 8,778 | 107 | \u2014 | \u2014 | 21 | 16 | 8,922 |\nPercentage of total\n| 68.5 | % | 27.5 | % | 2.8 | % | 1.1 | % | 0.1 | % | \u2014 | % | 100.0 | %\nTotal fixed maturity securities AFS\n| $ | 216,992 | $ | 86,561 | $ | 8,479 | $ | 3,475 | $ | 329 | $ | 95 | $ | 315,931 |\n| U.S. corporate | $ | 40,319 | $ | 33,271 | $ | 3,458 | $ | 1,282 | $ | 222 | $ | 32 | $ | 78,584 |\n| Foreign government | 31,927 | 5,078 | 1,529 | 1,302 | 46 | 13 | 39,895 |\n| U.S. government and agency | 32,982 | 368 | \u2014 | \u2014 | \u2014 | \u2014 | 33,350 |\n| Municipals | 9,557 | 183 | 22 | \u2014 | \u2014 | \u2014 | 9,762 |\n| Total fixed maturity securities AFS, excluding Reinsurance activity | $ | 192,099 | $ | 74,345 | $ | 8,680 | $ | 3,035 | $ | 425 | $ | 68 | $ | 278,652 |\nReinsurance activity\n| 1,592 | 783 | 10 | \u2014 | 6 | \u2014 | 2,391 |\nTable of Contents\nU.S. and Foreign Corporate Fixed Maturity Securities AFS"
+  },
+  {
+   "chunk_id": 451,
+   "text": "rengthening of the U.S. dollar against foreign currencies, and a 10% decrease in equity prices. The potential losses in estimated fair value presented are for non-trading securities.\nTable of Contents\nThe table below provides additional detail regarding the potential gain (loss) from changes in estimated fair value at:\n| December 31, 2025\n| Interest Rate Risk | Foreign Currency Exchange Rate Risk | Equity Market Risk\n| Notional\nAmount | Estimated\nFair\nValue (1) | Assuming a\n100 bps\nIncrease\nin Interest Rates (2) | Assuming a\n10% Appreciation in the U.S. Dollar (3) | Assuming a\n10% Decrease\nin Equity\nPrices (4)\n| (In millions)\n| Assets |\n| Mortgage loans | $ | 82,933 | (1,952) | (693) | \u2014 |\n| Total assets | $ | (25,910) | $ | (9,581) | $ | (171) |\n| Future policy benefits | $ | 208,855 | $ | 12,290 | $ | 3,442 | $ | (1) |\n| Market risk benefits | $ | 2,406 | 692 | 20 | (309) |\n| Other | $ | 34,996 | 1,971 | 131 | 16 |\n| Derivative Instruments |\n| Foreign currency exchange rate | $ | 78,952 | $ | 535 | (70) | 847 | \u2014 |\n| Equity market | $ | 20,142 | $ | 30 | (29) | (7) | 389 |\n| Net Change | $ | (7,554) | $ | (1,953) | $ | (76) |\n| Increase/(Decrease) | $ | 747 | $ | (205) | $ | 29 |\n__________________"
+  }
+ ]
+}

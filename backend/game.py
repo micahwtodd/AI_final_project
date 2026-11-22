@@ -118,7 +118,38 @@ def _profile_summary(p: CompanyProfile) -> dict:
             "equity_to_assets": p.equity_to_assets, "asset_mix": p.asset_mix,
             "liability_mix": p.liability_mix, "guarantee_exposure_usd_bn": p.guarantee_exposure_usd_bn,
             "separate_account_assets_usd_bn": p.separate_account_assets_usd_bn,
+            "accession": p.accession, "foreign_share": p.foreign_share,
+            "dossier": dossier(p), "reference": {k: v.model_dump() for k, v in p.reference.items()},
+            "rejections": p.rejections, "sanitizer": p.sanitizer,
             "dashboard": engine.dashboard(engine.build_state(p, DEFAULT_SEED)).model_dump()}
+
+
+DOSSIER_FIELDS = [
+    ("invested_assets", "Invested assets (incl. cash)", "bn"), ("surplus", "Surplus (equity excl. AOCI)", "bn"),
+    ("total_equity", "Stockholders' equity", "bn"), ("aoci", "AOCI (unrealized gains/losses)", "bn"),
+    ("bonds_afs", "Fixed maturities (AFS)", "bn"), ("mortgage_loans", "Mortgage loans", "bn"),
+    ("other_invested", "Other invested assets", "bn"), ("equity_securities", "Stocks held", "bn"),
+    ("cash", "Cash and equivalents", "bn"), ("govt_share_of_bonds", "Government share of bonds", "pct"),
+    ("below_ig_share_of_bonds", "Below-investment-grade share of bonds", "pct"),
+    ("bbb_share_of_bonds", "BBB share of bonds", "pct"), ("ig_bbb_share", "BBB share of IG corporates", "pct"),
+    ("policyholder_account_balances", "Policyholder account balances", "bn"),
+    ("future_policy_benefits", "Future policy benefits", "bn"), ("mrb_net", "Net market risk benefits", "bn"),
+    ("separate_account_assets", "Separate-account assets", "bn"), ("guaranteed_share_of_sa", "Guaranteed share of separate accounts", "pct"),
+    ("foreign_share", "Foreign share", "pct"), ("fx_exposed_share", "Currency-exposed share of assets", "pct"),
+    ("life_share_of_fpb", "Life share of future policy benefits", "pct"),
+    ("net_investment_yield", "Net investment yield", "pct"),
+]
+
+
+def dossier(p: CompanyProfile) -> list[dict]:
+    rows = []
+    for key, label, unit in DOSSIER_FIELDS:
+        fs = p.fields.get(key)
+        if fs is None or fs.value is None:
+            continue
+        rows.append({"key": key, "label": label, "unit": unit, "value": fs.value, "source": fs.source,
+                     "citation": fs.citation, "note": fs.note})
+    return rows
 
 
 def view(s: Session) -> dict:

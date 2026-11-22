@@ -207,6 +207,6 @@ def spa(path: str):
     if path and target.is_file():
         return FileResponse(target)
     index = DIST / "index.html"
-    if index.is_file():
-        return FileResponse(index)
+    if index.is_file():  # never cache the page itself, so a rebuilt bundle is always picked up
+        return FileResponse(index, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
     return {"message": "Frontend not built yet. Run: cd frontend && npm install && npm run build"}

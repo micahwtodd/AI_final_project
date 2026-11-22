@@ -41,7 +41,18 @@ export type Company = {
   liability_mix: Record<string, number>;
   guarantee_exposure_usd_bn: number;
   separate_account_assets_usd_bn: number;
+  accession: string;
+  foreign_share: number;
+  dossier: DossierRow[];
+  reference: Record<string, { value: number; source: string; citation: string; note: string }>;
+  rejections: { field: string; reason: string; quote?: string }[];
+  sanitizer: { hidden_elements?: number; comments?: number; zero_width_chars?: number; chunks?: number; quarantined?: number };
   dashboard: Dashboard;
+};
+
+export type DossierRow = {
+  key: string; label: string; unit: "bn" | "pct"; value: number;
+  source: "tagged" | "filing_text" | "assumption" | "derived"; citation: string; note: string;
 };
 
 export type Card = {

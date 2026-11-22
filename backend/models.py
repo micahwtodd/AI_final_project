@@ -52,7 +52,14 @@ class CompanyProfile(BaseModel):
     net_investment_yield: float
     rate_sensitivity: float | None = Field(None, description="Disclosed surplus change for +100bp, $bn")
     foreign_share: float
+    fx_exposed_share: float | None = Field(None, description="Share of invested assets exposed to currency moves "
+                                                             "(foreign assets not matched by same-currency liabilities)")
+    ig_bbb_share: float | None = Field(None, description="Share of investment-grade corporates rated BBB")
+    ig_aaa_share: float | None = Field(None, description="Share of investment-grade corporates rated AAA")
     fields: dict[str, FieldSource] = {}
+    reference: dict[str, FieldSource] = Field(default_factory=dict, description="Disclosed for reference; not used by the engine")
+    rejections: list[dict] = Field(default_factory=list)
+    sanitizer: dict = Field(default_factory=dict)
 
 
 # ---------- market shocks and event cards ----------
