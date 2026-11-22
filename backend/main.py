@@ -22,6 +22,8 @@ def health() -> dict:
     return {
         "ok": True,
         "key_found": status.key_found,
+        "provider": status.provider,
+        "key_name": status.key_name,
         "key_source": status.key_source,
         "model": MODEL_NAME,
     }

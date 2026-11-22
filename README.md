@@ -13,4 +13,4 @@ pip install -r requirements.txt
 python run.py                     -> http://localhost:8000
 ```
 
-Put `PORTKEY_API_KEY=...` in `.env` in this folder or one folder up.
+Put `PORTKEY_API_KEY=...` or `OPENAI_API_KEY=...` in `.env` in this folder or one folder up.

@@ -15,9 +15,9 @@ HOST, PORT = "127.0.0.1", 8000
 def main() -> None:
     status = load_env()
     if status.key_found:
-        print(f"PORTKEY_API_KEY found ({status.key_source}).")
+        print(f"{status.key_name} found ({status.key_source}); using {status.provider}.")
     else:
-        print("PORTKEY_API_KEY not found. The game runs, but the AI colleagues are offline.")
+        print("No PORTKEY_API_KEY or OPENAI_API_KEY found. The game runs, but the AI colleagues are offline.")
     url = f"http://localhost:{PORT}"
     print(f"Opening {url}  (Ctrl+C to stop)")
     threading.Timer(1.5, lambda: webbrowser.open(url)).start()

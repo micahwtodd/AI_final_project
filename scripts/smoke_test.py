@@ -1,6 +1,7 @@
-"""Project 0 smoke test: one gpt-6-luna call through Portkey, printing reported usage.
+"""Project 0 smoke test: one gpt-6-luna call (Portkey, or OpenAI if no Portkey key),
+printing reported usage.
 
-Run from the repo folder:  python scripts/portkey_smoke.py
+Run from the repo folder:  python scripts/smoke_test.py
 """
 
 from __future__ import annotations
@@ -20,9 +21,10 @@ from backend.pricing import cost_usd  # noqa: E402
 
 def main() -> int:
     status = load_env()
-    print(f"Key found: {status.key_found}  (source: {status.key_source})")
+    print(f"Key found: {status.key_found}  provider: {status.provider}  "
+          f"name: {status.key_name}  source: {status.key_source}")
     if not status.key_found:
-        print("Create .env with PORTKEY_API_KEY=... in this folder or one folder up.")
+        print("Create .env with PORTKEY_API_KEY=... or OPENAI_API_KEY=... here or one folder up.")
         return 1
 
     agent = Agent(make_model(), instructions="You are a terse assistant. Reply in one sentence.")
