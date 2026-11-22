@@ -16,9 +16,9 @@
       ],
       "base_shock": {
         "rate_bp": 85,
-        "ig_spread_bp": 25,
-        "hy_spread_bp": 85,
-        "equity_pct": -9,
+        "ig_spread_bp": 29,
+        "hy_spread_bp": 98,
+        "equity_pct": -10.35,
         "fx_pct": 4.5,
         "lapse_mult": 1.6
       },
@@ -39,7 +39,7 @@
         "margin_call",
         "liquidity_ratio"
       ],
-      "source_note": "Stylized on 2022: US 10-year Treasury yield rose roughly 2.3 percentage points over the year, with the S&P 500 down about 19%. The quarter here compresses part of that move. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it.",
+      "source_note": "Stylized on 2022: US 10-year Treasury yield rose roughly 2.3 percentage points over the year, with the S&P 500 down about 19%. The quarter here compresses part of that move. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode for rates; spreads, credit losses and stocks run about 15% larger (re-tuned when currency risk was removed). A typical draw (1.0x) is about 70 to 80% of the episode.",
       "sample_answer": "Interest rates jumped. Our liabilities and guarantees are more rate-sensitive than our assets, so their value fell more than our bonds did, which lifted surplus. Stocks fell too, which made the market guarantees more expensive. Stock-market insurance would have softened that."
     },
     {
@@ -57,9 +57,9 @@
       ],
       "base_shock": {
         "rate_bp": 20,
-        "ig_spread_bp": 8,
-        "hy_spread_bp": 20,
-        "equity_pct": -3,
+        "ig_spread_bp": 9,
+        "hy_spread_bp": 23,
+        "equity_pct": -3.45,
         "fx_pct": 9,
         "lapse_mult": 1.0
       },
@@ -99,12 +99,12 @@
       ],
       "base_shock": {
         "rate_bp": -95,
-        "ig_spread_bp": 180,
-        "hy_spread_bp": 500,
-        "ig_loss_pct": 0.35,
-        "hy_default_pct": 3,
-        "mortgage_loss_pct": 0.7,
-        "equity_pct": -16,
+        "ig_spread_bp": 207,
+        "hy_spread_bp": 575,
+        "ig_loss_pct": 0.402,
+        "hy_default_pct": 3.45,
+        "mortgage_loss_pct": 0.805,
+        "equity_pct": -18.4,
         "fx_pct": 5.5,
         "lapse_mult": 1.15,
         "stress_liquidity": true
@@ -126,7 +126,7 @@
         "forced_selling",
         "put_option"
       ],
-      "source_note": "Stylized on Q4 2008: 10-year Treasury yields fell about 1.6 points, investment-grade spreads widened to roughly 6 points and high-yield spreads to about 20 points at the peak, and the S&P 500 fell about 22% in the quarter. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it.",
+      "source_note": "Stylized on Q4 2008: 10-year Treasury yields fell about 1.6 points, investment-grade spreads widened to roughly 6 points and high-yield spreads to about 20 points at the peak, and the S&P 500 fell about 22% in the quarter. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode for rates; spreads, credit losses and stocks run about 15% larger (re-tuned when currency risk was removed). A typical draw (1.0x) is about 70 to 80% of the episode.",
       "sample_answer": "Rates fell sharply. Our liabilities and guarantees are longer than our assets, so they rose in value more than our bonds, which hurt surplus. Stocks crashed too, raising the guarantees. More rate protection with swaps would have helped most."
     },
     {
@@ -144,9 +144,9 @@
       ],
       "base_shock": {
         "rate_bp": -30,
-        "ig_spread_bp": 60,
-        "hy_spread_bp": 150,
-        "equity_pct": -7,
+        "ig_spread_bp": 69,
+        "hy_spread_bp": 172,
+        "equity_pct": -8.05,
         "fx_pct": 0,
         "lapse_mult": 1.1,
         "dealer_default": true
@@ -167,8 +167,8 @@
         "isda_csa",
         "replacement_cost"
       ],
-      "source_note": "Stylized on Lehman Brothers' bankruptcy in September 2008, when counterparties with uncollateralized derivatives faced losses and had to replace hedges in a volatile market. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it.",
-      "sample_answer": "Rates fell again, and with liabilities longer than assets that hurt surplus. Stocks dropped as well, which raised the guarantees. Because our hedges were small, the dealer failure itself cost us little."
+      "source_note": "Stylized on Lehman Brothers' bankruptcy in September 2008, when counterparties with uncollateralized derivatives faced losses and had to replace hedges in a volatile market. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode for rates; spreads, credit losses and stocks run about 15% larger (re-tuned when currency risk was removed). A typical draw (1.0x) is about 70 to 80% of the episode.",
+      "sample_answer": "Stocks dropped, which raised the cost of the stock-market guarantees we owe: that was the biggest hit. Rates fell again too, and with liabilities longer than assets that hurt surplus. Because our hedges were small, the dealer failure itself cost us little; daily collateral would have protected larger hedges."
     }
   ]
 }

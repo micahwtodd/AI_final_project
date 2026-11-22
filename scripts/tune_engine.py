@@ -21,7 +21,7 @@ from backend import engine  # noqa: E402
 from backend.calibration import load_all_profiles  # noqa: E402
 from backend.models import Action  # noqa: E402
 
-MAX = Action(rate_hedge_pct=120, credit_shift_pct=30, equity_hedge_pct=100, fx_hedge_pct=100,
+MAX = Action(rate_hedge_pct=120, credit_shift_pct=30, equity_hedge_pct=100,
              cash_buffer_pct=15, collateralized=True, dealers=3, accept_prt=False)
 
 
@@ -31,7 +31,6 @@ def single_levers(start_cash: float) -> dict[str, Action]:
         "rate only": Action(**{**base, "rate_hedge_pct": 80}),
         "credit only": Action(**{**base, "credit_shift_pct": 20}),
         "equity only": Action(**{**base, "equity_hedge_pct": 60}),
-        "fx only": Action(**{**base, "fx_hedge_pct": 80}),
         "cash only": Action(**{**base, "cash_buffer_pct": 8}),
     }
 
