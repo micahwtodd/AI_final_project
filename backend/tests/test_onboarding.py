@@ -42,7 +42,7 @@ def test_sprite_sheet_shape():
     data = json.loads((ROOT / "frontend/src/sprites/sprites.json").read_text(encoding="utf-8"))
     assert len(data["palette"]) == 16
     sprites = data["sprites"]
-    for who in ["amara", "walt", "priya", "teo", "sam"]:
+    for who in ["vera", "morty", "bonnie", "swap", "seamore"]:
         for mood in ["neutral", "pleased", "concerned"]:
             rows = sprites[f"{who}_{mood}"]
             assert len(rows) == len(rows[0]) and len({len(r) for r in rows}) == 1

@@ -131,19 +131,19 @@
       "value": 0.0313,
       "source": "filing_text",
       "citation": "10-K text, chunk 876: \"| U.S. government and government sponsored entities | $ | 1,847 | $ | 1,529 | $ | 1,529\" + 10-K text, chunk 876: \"| Non-U.S. governments | 5,096 | 4,562 | 4,562\"",
-      "note": "read by Sam from the 10-K; validated against the quoted text"
+      "note": "read by Seamore from the 10-K; validated against the quoted text"
     },
     "below_ig_share_of_bonds": {
       "value": 0.0543,
       "source": "filing_text",
       "citation": "10-K text, chunk 75: \"| Total fixed maturities* | $ | 96,766 | $ | 70,957 | $ | 167,723 | $ | 5,285 | $ | 2,572 | $ | 2,725 | $ | 10,582 | $ | 178,305\"",
-      "note": "read by Sam from the 10-K; validated against the quoted text"
+      "note": "read by Seamore from the 10-K; validated against the quoted text"
     },
     "bbb_share_of_bonds": {
       "value": 0.3643,
       "source": "filing_text",
       "citation": "10-K text, chunk 75: \"| Total fixed maturities* | $ | 96,766 | $ | 70,957 | $ | 167,723 | $ | 5,285 | $ | 2,572 | $ | 2,725 | $ | 10,582 | $ | 178,305\"",
-      "note": "BBB share of fixed maturities, read by Sam"
+      "note": "BBB share of fixed maturities, read by Seamore"
     },
     "ig_bbb_share": {
       "value": 0.3984,
@@ -179,7 +179,7 @@
       "value": 0.5,
       "source": "assumption",
       "citation": "",
-      "note": "life vs pension split not tagged; Sam reads segment mix in Project 6"
+      "note": "life vs pension split not tagged; Seamore reads segment mix in Project 6"
     },
     "mrb_net": {
       "value": 4.917,

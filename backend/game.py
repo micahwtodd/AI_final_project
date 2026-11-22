@@ -147,7 +147,7 @@ DOSSIER_FIELDS = [
 
 
 # ---------------------------------------------------------------- editable game inputs
-# The figures the engine actually runs on (derived by Sam and code from the 10-K). The learner may
+# The figures the engine actually runs on (derived by Seamore and code from the 10-K). The learner may
 # override them under "Advanced options"; mixes are re-scaled to sum to 100%.
 
 INPUT_FIELDS: list[tuple[str, str, str, float, float]] = [  # key, label, unit, min, max

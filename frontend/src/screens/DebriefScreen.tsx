@@ -27,7 +27,7 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
         </div>
         <div className="panel center">
           <div className="big-score">{d.understanding_score.toFixed(0)}<span>/100</span></div>
-          <div><b>Understanding score</b>: how well you explained each quarter to Amara</div>
+          <div><b>Understanding score</b>: how well you explained each quarter to Vera</div>
           <div className="curve" aria-label="Understanding by quarter">
             {[1, 2, 3, 4].map((q) => {
               const v = d.understanding_per_quarter[String(q)] ?? 0;

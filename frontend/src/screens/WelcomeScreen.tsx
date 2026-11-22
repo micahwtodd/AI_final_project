@@ -16,32 +16,49 @@ const Face = (p: { name: string; who: string; role: string; line: string }) => (
 const SLIDES: Slide[] = [
   {
     kicker: "The job", title: "You just got hired.",
-    body: <>You're the new junior risk analyst at a real US life insurer. You have <b>four quarters</b>. The markets
-      will not be kind. Keep the company standing.</>,
+    body: <>Welcome aboard! You're the new junior risk analyst at a real US life insurer. You have <b>four quarters</b> to
+      keep the company standing… but the markets will not be kind.</>,
     art: <PixelSprite name="cat_alert" size={150} title="Convexity the office cat, on alert" />,
   },
   {
-    kicker: "Your boss", title: "Dr. Amara Okafor, Chief Risk Officer",
-    body: <>She runs the desk, sends your questions to the right expert, and after every market shock she asks
-      you one thing: <b>“Walk me through why.”</b></>,
+    kicker: "How this works", title: "Assets − liabilities = equity.",
+    body: <>
+      <p>Your company has <b>assets</b> (money you have or are owed), and <b>liabilities</b> (money you owe to others).
+        <b> Equity</b> is what is left over. Each component has different sensitivities to financial market risks.</p>
+      <p>You must navigate the company through tumultuous markets: success is measured by <b>how much equity you preserve
+        and grow</b>. Most importantly, you'll have to explain your decisions to the Chief Risk Officer (CRO) based on
+        feedback from your elite team of experts.</p>
+      <p className="intro-note">The underlying data is based on real financials. These simulations will teach you how
+        different companies have different exposures.</p>
+    </>,
+    art: <PixelSprite name="cat_nap" size={150} title="Convexity the office cat, napping" />,
+  },
+  {
+    kicker: "Your boss", title: "Vera Atrisk, Chief Risk Officer",
+    body: <>Vera runs the organization, sends your questions to the right expert, and will ask you to explain your
+      decisions after every market shock.</>,
     art: <div className="intro-moods">
-      <PixelSprite name="amara_pleased" size={96} title="Amara, pleased" />
-      <PixelSprite name="amara_concerned" size={96} title="Amara, concerned" />
+      <PixelSprite name="vera_pleased" size={96} title="Vera, pleased" />
+      <PixelSprite name="vera_concerned" size={96} title="Vera, concerned" />
     </div>,
   },
   {
     kicker: "Your team", title: "Three specialists. Three opinions.",
     body: <div className="intro-team">
-      <Face name="walt_neutral" who="Walt" role="Actuary" line="Policyholders, surrenders and guarantees." />
-      <Face name="priya_neutral" who="Priya" role="Portfolio Manager" line="Bonds, credit and where the yield comes from." />
-      <Face name="teo_neutral" who="Teo" role="Trader" line="Swaps, puts, forwards, and the dealers behind them." />
+      <Face name="morty_neutral" who="Morty Tables" role="Actuary"
+        line="An expert in policyholder liabilities: what you owe, when policyholders cash out, and the guarantees you've promised." />
+      <Face name="bonnie_neutral" who="Bonnie Yields" role="Portfolio Manager"
+        line="Understands fixed-income assets: bonds, credit quality, and where the yield comes from." />
+      <Face name="swap_neutral" who="Swap Dogg" role="Trader"
+        line="Understands derivatives: swaps, options and currency forwards, and the dealers on the other side." />
     </div>,
     art: null,
   },
   {
-    kicker: "Behind the scenes", title: "Sam built your balance sheet. The cat watches it.",
+    kicker: "Behind the scenes", title: "Seamore read the 10-K. The cat watches the results.",
     body: <div className="intro-team">
-      <Face name="sam_neutral" who="Sam" role="Calibration Analyst" line="Read the company's annual report and cited every number." />
+      <Face name="seamore_neutral" who="Seamore Tenkays" role="Calibration Analyst"
+        line="Read the company's latest 10-K annual report and cited every number. These are real financial metrics!" />
       <div className="intro-person">
         <div className="intro-cats">
           <PixelSprite name="cat_nap" size={56} title="napping" />
@@ -55,24 +72,25 @@ const SLIDES: Slide[] = [
     art: null,
   },
   {
-    kicker: "Each quarter", title: "Read. Ask. Trade. Survive. Explain.",
+    kicker: "How to play", title: "Read. Ask. Trade. Survive. Explain.",
     body: <ol className="intro-steps">
       <li><b>Read the wire</b> for a hint of what's coming.</li>
       <li><b>Ask your team</b> anything.</li>
       <li><b>Sign a trade ticket:</b> hedge, de-risk or hold cash.</li>
       <li><b>The market hits.</b></li>
-      <li><b>Explain it to Amara</b> to score points.</li>
+      <li><b>Explain it to Vera</b> to score points.</li>
     </ol>,
     art: null,
   },
   {
-    kicker: "How to win", title: "Two scores. No free lunch.",
-    body: <>
-      <p><b>Results:</b> beat doing nothing and get close to the expert benchmark.</p>
-      <p><b>Understanding:</b> explain what really happened, in your own words.</p>
-      <p className="intro-warn">Every hedge costs money. Hedge everything and you lose anyway.</p>
-    </>,
-    art: <PixelSprite name="amara_pleased" size={150} title="Dr. Amara Okafor" />,
+    kicker: "How to win", title: "Scoring has two categories.",
+    body: <div className="score-cats">
+      <div className="score-cat"><span className="score-n">1</span>
+        <div><b>Results</b><div>Beat doing nothing and get close to the expert's benchmark.</div></div></div>
+      <div className="score-cat"><span className="score-n">2</span>
+        <div><b>The Executive Summary</b><div>Explain what really happened in your own words, and Vera will critique you.</div></div></div>
+    </div>,
+    art: <PixelSprite name="vera_pleased" size={150} title="Vera Atrisk" />,
   },
 ];
 
@@ -101,9 +119,9 @@ export function WelcomeScreen(props: { onDone: () => void }) {
       <section className="welcome">
         <div className="welcome-card">
           <div className="welcome-cast">
-            {["walt", "priya", "amara", "teo", "sam"].map((w, k) => (
+            {["morty", "bonnie", "vera", "swap", "seamore"].map((w, k) => (
               <span key={w} className="bob" style={{ animationDelay: `${k * 0.15}s` }}>
-                <PixelSprite name={`${w}_${stage === "too-bad" ? "concerned" : "pleased"}`} size={w === "amara" ? 96 : 72} />
+                <PixelSprite name={`${w}_${stage === "too-bad" ? "concerned" : "pleased"}`} size={w === "vera" ? 96 : 72} />
               </span>
             ))}
           </div>

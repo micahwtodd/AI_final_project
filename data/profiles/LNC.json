@@ -131,13 +131,13 @@
       "value": 0.0115,
       "source": "filing_text",
       "citation": "10-K text, chunk 519: \"| U.S. government bonds | 892 | 9 | 32 | – | 869 |\" + 10-K text, chunk 519: \"| Foreign government bonds | 261 | 16 | 51 | – | 226 |\"",
-      "note": "read by Sam from the 10-K; validated against the quoted text"
+      "note": "read by Seamore from the 10-K; validated against the quoted text"
     },
     "below_ig_share_of_bonds": {
       "value": 0.033,
       "source": "filing_text",
       "citation": "10-K text, chunk 316: \"as a percentage of total fixed maturity | AFS securities | 3.1 | % | 3.3 | % | 3.1 | % | 3.4 | %\"",
-      "note": "read by Sam from the 10-K; validated against the quoted text"
+      "note": "read by Seamore from the 10-K; validated against the quoted text"
     },
     "ig_bbb_share": {
       "value": 0.45,
@@ -167,7 +167,7 @@
       "value": 0.5,
       "source": "assumption",
       "citation": "",
-      "note": "life vs pension split not tagged; Sam reads segment mix in Project 6"
+      "note": "life vs pension split not tagged; Seamore reads segment mix in Project 6"
     },
     "mrb_net": {
       "value": -3.635,

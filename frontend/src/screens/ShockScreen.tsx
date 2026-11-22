@@ -51,8 +51,8 @@ export function ShockScreen(props: {
 
         <div className="panel cro">
           <div className="cro-head">
-            <PixelSprite name={s.surplus_change < 0 ? "amara_concerned" : "amara_neutral"} size={72} title="Dr. Amara Okafor" />
-            <div className="cro-name">Dr. Amara Okafor · Chief Risk Officer</div>
+            <PixelSprite name={s.surplus_change < 0 ? "vera_concerned" : "vera_neutral"} size={72} title="Vera Atrisk" />
+            <div className="cro-name">Vera Atrisk · Chief Risk Officer</div>
           </div>
           <p className="cro-question">“{s.question}”</p>
           {second && (
@@ -77,7 +77,7 @@ export function ShockScreen(props: {
               {props.busy ? <span className="spinner" aria-label="marking" /> : second ? "Submit second try" : "Submit explanation"}
             </button>
           </div>
-          <p className="small muted">The breakdown by cause stays hidden until you explain. Amara marks four things: the main driver, why it moved surplus, the second factor, and what your trades did or could have done.</p>
+          <p className="small muted">The breakdown by cause stays hidden until you explain. Vera marks four things: the main driver, why it moved surplus, the second factor, and what your trades did or could have done.</p>
         </div>
       </div>
 

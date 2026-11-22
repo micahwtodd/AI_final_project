@@ -131,7 +131,7 @@
       "value": 0.0635,
       "source": "filing_text",
       "citation": "10-K text, chunk 423: \"| U.S. government securities | $ | 3,854 | $ | — | $ | 2 | $ | 851 | $ | 3,005 |\"",
-      "note": "read by Sam from the 10-K; validated against the quoted text"
+      "note": "read by Seamore from the 10-K; validated against the quoted text"
     },
     "below_ig_share_of_bonds": {
       "value": 0.07,
@@ -167,7 +167,7 @@
       "value": 0.5,
       "source": "assumption",
       "citation": "",
-      "note": "life vs pension split not tagged; Sam reads segment mix in Project 6"
+      "note": "life vs pension split not tagged; Seamore reads segment mix in Project 6"
     },
     "mrb_net": {
       "value": -4.113,

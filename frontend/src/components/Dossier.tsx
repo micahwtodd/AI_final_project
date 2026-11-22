@@ -4,7 +4,7 @@ import { PixelSprite } from "./PixelSprite";
 
 const BADGE: Record<string, { label: string; cls: string; tip: string }> = {
   tagged: { label: "Tagged", cls: "b-tagged", tip: "Read by code from the 10-K's tagged XBRL financial data" },
-  filing_text: { label: "Filing text", cls: "b-text", tip: "Read by Sam from the 10-K text; the quote was checked word-for-word by code" },
+  filing_text: { label: "Filing text", cls: "b-text", tip: "Read by Seamore from the 10-K text; the quote was checked word-for-word by code" },
   derived: { label: "Derived", cls: "b-derived", tip: "Computed by code from tagged or text figures" },
   assumption: { label: "Assumption", cls: "b-assume", tip: "Labelled default: not disclosed consistently, editable in data/assumptions.json" },
 };
@@ -21,9 +21,9 @@ export function Dossier(props: { company: Company }) {
   return (
     <div className="dossier-box">
       <div className="dossier-intro">
-        <PixelSprite name="sam_neutral" size={56} className="sam-face" title="Sam Nakamura" />
+        <PixelSprite name="seamore_neutral" size={56} className="sam-face" title="Seamore Tenkays" />
         <div>
-          <div className="cro-name">Sam Nakamura · Calibration Analyst</div>
+          <div className="cro-name">Seamore Tenkays · Calibration Analyst</div>
           <div className="small">“It's in the notes.” Here is how I built this balance sheet from {c.name}'s FY{c.fiscal_year} 10-K
             (accession {c.accession}). Every figure shows where it came from; click a row for the citation. To change what the game uses, edit the inputs above.</div>
           <div className="badge-row">

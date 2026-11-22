@@ -83,11 +83,11 @@ class Canvas:
 CX, CY, RX, RY = 32, 28, 12, 14
 
 CAST = {
-    "amara": {"skin": 5, "hair": "locs", "hair_c": 8, "top": "blazer", "top_c": 9, "inner": 2, "glasses": False, "age": "older"},
-    "walt": {"skin": 3, "hair": "balding", "hair_c": 8, "top": "cardigan", "top_c": 13, "inner": 2, "glasses": True, "age": "older"},
-    "priya": {"skin": 4, "hair": "ponytail", "hair_c": 7, "top": "jacket", "top_c": 11, "inner": 2, "glasses": False, "age": "mid"},
-    "teo": {"skin": 4, "hair": "spiky", "hair_c": 7, "top": "hoodie", "top_c": 12, "inner": 14, "glasses": False, "headset": True, "age": "young"},
-    "sam": {"skin": 3, "hair": "bob", "hair_c": 7, "top": "blazer", "top_c": 13, "inner": 2, "glasses": True, "age": "mid"},
+    "vera": {"skin": 5, "hair": "locs", "hair_c": 8, "top": "blazer", "top_c": 9, "inner": 2, "glasses": False, "age": "older"},
+    "morty": {"skin": 3, "hair": "balding", "hair_c": 8, "top": "cardigan", "top_c": 13, "inner": 2, "glasses": True, "age": "older"},
+    "bonnie": {"skin": 4, "hair": "ponytail", "hair_c": 7, "top": "jacket", "top_c": 11, "inner": 2, "glasses": False, "age": "mid"},
+    "swap": {"skin": 4, "hair": "spiky", "hair_c": 7, "top": "hoodie", "top_c": 12, "inner": 14, "glasses": False, "headset": True, "age": "young"},
+    "seamore": {"skin": 3, "hair": "bob", "hair_c": 7, "top": "blazer", "top_c": 13, "inner": 2, "glasses": True, "age": "mid"},
 }
 
 

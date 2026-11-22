@@ -62,7 +62,7 @@ export function ReportCardPanel(props: { rc: ReportCard; results: number; unders
           {rc.breaches > 0 && ` ${rc.breaches} floor breach${rc.breaches > 1 ? "es" : ""}.`}
         </div>
       </div>
-      <PixelSprite name={good ? "amara_pleased" : "amara_concerned"} size={96} title="Dr. Amara Okafor" />
+      <PixelSprite name={good ? "vera_pleased" : "vera_concerned"} size={96} title="Vera Atrisk" />
     </div>
   );
 }

@@ -131,13 +131,13 @@
       "value": 0.1989,
       "source": "filing_text",
       "citation": "10-K text, chunk 411: \"| U.S. Government | 22,520 | 655 | 4,382 | 0 | 18,793 | 21,451 | 584 | 4,499 | 0 | 17,536 |\" + 10-K text, chunk 410: \"| Foreign government(2) | 61,928 | 474 | 12,324 | 0 | 50,078 | 62,880 | 1,828 | 7,801 | 0 | 56,907 |\"",
-      "note": "read by Sam from the 10-K; validated against the quoted text"
+      "note": "read by Seamore from the 10-K; validated against the quoted text"
     },
     "below_ig_share_of_bonds": {
       "value": 0.0474,
       "source": "filing_text",
       "citation": "10-K text, chunk 417: \"securities considered below investment grade based on low issue composite ratings total $16,427 million, or 5% of the total fixed maturities\"",
-      "note": "read by Sam from the 10-K; validated against the quoted text"
+      "note": "read by Seamore from the 10-K; validated against the quoted text"
     },
     "ig_bbb_share": {
       "value": 0.45,
@@ -167,7 +167,7 @@
       "value": 0.5,
       "source": "assumption",
       "citation": "",
-      "note": "life vs pension split not tagged; Sam reads segment mix in Project 6"
+      "note": "life vs pension split not tagged; Seamore reads segment mix in Project 6"
     },
     "mrb_net": {
       "value": 2.293,
@@ -191,7 +191,7 @@
       "value": 0.39,
       "source": "filing_text",
       "citation": "10-K text, chunk 397: \"As of December 31, 2025 and 2024, 39% and 42%, respectively, of our general account investments attributable to PFI excluding the Closed Block division and Funds Withheld related t\"",
-      "note": "read by Sam from the 10-K; validated against the quoted text"
+      "note": "read by Seamore from the 10-K; validated against the quoted text"
     },
     "fx_exposed_share": {
       "value": 0.039,

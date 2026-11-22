@@ -24,13 +24,13 @@ const SAMPLES = [
   "Should we hedge more of the stock-market guarantees?",
 ];
 
-export const CAST: Record<string, { name: string; role: string; color: string }> = {
-  solo: { name: "Dr. Amara Okafor", role: "CRO · Solo", color: "#001F5B" },
-  cro: { name: "Dr. Amara Okafor", role: "Chief Risk Officer", color: "#001F5B" },
-  actuary: { name: "Walt Brennan", role: "Actuary", color: "#537D93" },
-  portfolio_manager: { name: "Priya Raman", role: "Portfolio Manager", color: "#B88600" },
-  trader: { name: "Teo Vargas", role: "Trader", color: "#007AC1" },
-  system: { name: "System", role: "", color: "#939598" },
+export const CAST: Record<string, { name: string; short: string; role: string; color: string }> = {
+  solo: { name: "Vera Atrisk", short: "Vera", role: "CRO · Solo", color: "#001F5B" },
+  cro: { name: "Vera Atrisk", short: "Vera", role: "Chief Risk Officer", color: "#001F5B" },
+  actuary: { name: "Morty Tables", short: "Morty", role: "Actuary", color: "#537D93" },
+  portfolio_manager: { name: "Bonnie Yields", short: "Bonnie", role: "Portfolio Manager", color: "#B88600" },
+  trader: { name: "Swap Dogg", short: "Swap Dogg", role: "Trader", color: "#007AC1" },
+  system: { name: "System", short: "System", role: "", color: "#939598" },
 };
 
 function fromHistory(chat: ChatMsg[]): Turn[] {
@@ -48,8 +48,9 @@ function short(v: unknown): string {
   return String(v);
 }
 
-function who(agent: string) {
-  return CAST[agent]?.name.split(" ").slice(-2).join(" ") ?? agent;
+/** The short name the cast goes by: Vera, Morty, Bonnie, Swap Dogg. */
+export function nick(agent: string | undefined): string {
+  return (agent && CAST[agent]?.short) || agent || "A colleague";
 }
 
 /** Who is working right now in a pending turn, and on what: drives the typing line and the cast chips. */
@@ -58,7 +59,7 @@ function activity(t: Turn): { agent: string; doing: string } {
   let doing = "typing";
   for (const e of t.trace) {
     if (e.type === "delegation" && e.detail.to) { agent = e.detail.to; doing = "reading the question"; }
-    else if (e.type === "delegation" && e.detail.from) { agent = t.agent ?? "cro"; doing = `reading ${CAST[e.detail.from]?.name.split(" ")[0] ?? "the"}'s answer`; }
+    else if (e.type === "delegation" && e.detail.from) { agent = t.agent ?? "cro"; doing = `reading ${nick(e.detail.from)}'s answer`; }
     else if (e.type === "tool_call" && !String(e.detail.tool).startsWith("ask_")) {
       agent = e.agent;
       doing = `checking the ${String(e.detail.tool).replace(/^get_/, "").replace(/_/g, " ")}`;
@@ -73,7 +74,7 @@ function TypingLine({ t }: { t: Turn }) {
   return (
     <div className="typing" aria-live="polite">
       {face && <span className="typing-face"><PixelSprite name={face} size={24} /></span>}
-      <span><b>{a.agent === "cro" || a.agent === "solo" ? "Amara" : CAST[a.agent]?.name.split(" ")[0] ?? "A colleague"}</b> is {a.doing}</span>
+      <span><b>{nick(a.agent)}</b> is {a.doing}</span>
       <span className="dots3"><i /><i /><i /></span>
     </div>
   );
@@ -93,11 +94,11 @@ function Reactions({ t }: { t: Turn }) {
 }
 
 function TraceLine({ e }: { e: AgentEvent }) {
-  const tag = <span className="tr-agent" style={{ color: CAST[e.agent]?.color }}>{who(e.agent).split(" ")[0]}</span>;
+  const tag = <span className="tr-agent" style={{ color: CAST[e.agent]?.color }}>{nick(e.agent)}</span>;
   if (e.type === "delegation" && e.detail.to)
     return <li className="tr-deleg">{tag} → asked <b>{CAST[e.detail.to]?.name}</b>: <span className="muted">{e.detail.task}</span></li>;
   if (e.type === "delegation" && e.detail.from)
-    return <li className="tr-deleg">{tag} → answered Amara</li>;
+    return <li className="tr-deleg">{tag} → answered Vera</li>;
   if (e.type === "tool_call" && !String(e.detail.tool).startsWith("ask_"))
     return <li className="tr-call">{tag} called <code>{e.detail.tool}</code>{Object.keys(e.detail.args ?? {}).length ? <span className="muted"> {JSON.stringify(e.detail.args)}</span> : null}</li>;
   if (e.type === "tool_result")
@@ -201,16 +202,16 @@ export function ChatPanel(props: {
             const k = c === "team" ? "cro" : c;
             return (
               <button key={c} className={`cast-chip ${to === c ? "on" : ""} ${liveAgent === k ? "working" : ""} ${answered.has(k) ? "answered" : ""}`} style={{ borderColor: CAST[k].color }}
-                onClick={() => setTo(c)} disabled={busy} title={c === "team" ? "Amara routes your question to the right specialists" : `Ask ${CAST[k].name} directly`}>
+                onClick={() => setTo(c)} disabled={busy} title={c === "team" ? "Vera routes your question to the right specialists" : `Ask ${CAST[k].name} directly`}>
                 <PixelSprite name={spriteFor(k)!} size={22} className="chip-face" />
-                {c === "team" ? "Amara (routes to team)" : `${CAST[k].name.split(" ")[0]} · ${CAST[k].role}`}
+                {c === "team" ? "Vera (routes to team)" : `${CAST[k].short} · ${CAST[k].role}`}
                 {answered.has(k) && <span className="chip-check">✓</span>}
               </button>
             );
           })}
         </div>
       ) : (
-        <div className="small muted">Solo mode: one agent, Dr. Amara Okafor, holds every tool. Switch to Team to hear specialists with different views.</div>
+        <div className="small muted">Solo mode: one agent, Vera Atrisk, holds every tool. Switch to Team to hear specialists with different views.</div>
       )}
       {blocked && <div className="banner warn-banner">Budget cap reached: the AI colleagues are offline for this session. The game continues.</div>}
       <div className="chat-log">

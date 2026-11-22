@@ -55,7 +55,7 @@ export function TraceScreen(props: { game: GameView; onBack: () => void }) {
                 <tr key={i}>
                   <td className="small">{new Date(e.ts * 1000).toLocaleTimeString()}</td>
                   <td className="small">{(e as unknown as { quarter: number }).quarter}</td>
-                  <td className="small" style={{ color: CAST[e.agent]?.color }}><b>{CAST[e.agent]?.name.split(" ").slice(-1)[0] ?? e.agent}</b></td>
+                  <td className="small" style={{ color: CAST[e.agent]?.color }}><b>{CAST[e.agent]?.short ?? e.agent}</b></td>
                   <td className="small"><code>{e.type}</code></td>
                   <td className="small">{summarize(e)}</td>
                   <td className="num small">{e.input_tokens ? `${e.input_tokens} / ${e.cached_tokens} / ${e.output_tokens}` : ""}</td>

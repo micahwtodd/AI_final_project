@@ -1,4 +1,4 @@
-"""Calibration: filing sanitizer, retrieval and Sam's validation (no model calls, no network)."""
+"""Calibration: filing sanitizer, retrieval and Seamore's validation (no model calls, no network)."""
 
 from __future__ import annotations
 
@@ -74,7 +74,7 @@ def test_validation_accepts_supported_findings_and_rejects_the_rest():
     assert abs(acc["govt_share_of_bonds"]["value"] - 3005 / 50000) < 1e-9
     assert acc["rate_sensitivity"]["value"] == -1.25
     reasons = " | ".join(r["reason"] for r in rej)
-    assert "not one Sam retrieved" in reasons
+    assert "not one Seamore retrieved" in reasons
     assert "not found word-for-word" in reasons
     assert "number is not in the quote" in reasons
     assert "foreign_share" not in acc

@@ -1,6 +1,6 @@
 """Explain-back marking (plan 5.4).
 
-Amara in examiner mode marks the learner's explanation against the engine's answer key.
+Vera in examiner mode marks the learner's explanation against the engine's answer key.
 She has no tools and is the only agent that ever sees the key. Scores are summed in code
 from her four true/false checks, never taken from model text. If the AI is unavailable
 (no key, offline, budget cap), a deterministic keyword marker takes over.
@@ -81,7 +81,7 @@ def _agent() -> Agent:
 
 async def review_with_ai(session, rec: QuarterRecord, key: dict, text: str, mode: str, attempt: int,
                          prior: list[dict]) -> ExplanationReview | None:
-    """Ask Amara (examiner) to mark. Returns None if the AI is unavailable or the budget is reached."""
+    """Ask Vera (examiner) to mark. Returns None if the AI is unavailable or the budget is reached."""
     if not agents.ai_available() or session.spend_usd >= session.budget_cap_usd:
         return None
     run_id = secrets.token_hex(4)

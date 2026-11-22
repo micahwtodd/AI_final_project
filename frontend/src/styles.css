@@ -592,3 +592,14 @@ details.advanced > *:not(summary) { margin: 0 1rem 1rem; }
 .reactions { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.45rem; }
 .reaction { font-size: 0.74rem; background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px; padding: 0.1rem 0.55rem; color: var(--navy);
   animation: pop-in 0.35s ease-out both; }
+
+/* intro cards: bigger top-left label, How this works note, How to win categories */
+.intro-card .intro-kicker { font-size: 1.6rem; letter-spacing: 0.08em; }
+.intro-note { font-size: 0.95rem; color: var(--steel); border-left: 4px solid #ffc72c; padding-left: 0.7rem; }
+.score-cats { display: grid; gap: 0.7rem; }
+.score-cat { display: flex; gap: 0.8rem; align-items: flex-start; background: var(--panel-2); border-radius: 12px; padding: 0.7rem 0.9rem;
+  animation: slide-in 0.35s ease-out both; }
+.score-cat:nth-child(2) { animation-delay: 0.12s; }
+.score-cat b { font-size: 1.1rem; color: var(--navy); }
+.score-n { flex-shrink: 0; width: 2.1rem; height: 2.1rem; border-radius: 50%; background: var(--blue); color: white; font-weight: 900;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 1.1rem; }

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { api, type Usage } from "../api";
 
-const NAMES: Record<string, string> = { solo: "Amara (Solo)", cro: "Amara (CRO)", actuary: "Walt (Actuary)",
-  portfolio_manager: "Priya (Portfolio Mgr)", trader: "Teo (Trader)", examiner: "Amara (Examiner)", calibration: "Sam (Calibration)" };
+const NAMES: Record<string, string> = { solo: "Vera (Solo)", cro: "Vera (CRO)", actuary: "Morty (Actuary)",
+  portfolio_manager: "Bonnie (Portfolio Mgr)", trader: "Swap Dogg (Trader)", examiner: "Vera (Examiner)", calibration: "Seamore (Calibration)" };
 
 export function UsageMeter(props: { gameId: string; usage: Usage; onUsage: (u: Usage) => void }) {
   const [open, setOpen] = useState(false);

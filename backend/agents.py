@@ -1,7 +1,7 @@
 """Agents. Every model call goes to gpt-6-luna, through Portkey or OpenAI.
 
-Solo mode: one agent (Amara's voice) holding every read tool plus propose_trade.
-Team mode: Amara (CRO) routes the learner's question to specialists through async
+Solo mode: one agent (Vera's voice) holding every read tool plus propose_trade.
+Team mode: Vera (CRO) routes the learner's question to specialists through async
 delegation tools; each specialist holds only its own tools (permissions, plan 6.2).
 Every model call is logged with API-reported usage, and a hard budget cap is checked
 before a run and after every model response, in every agent.
@@ -37,11 +37,11 @@ MAX_DELEGATIONS = 3
 HISTORY_RUNS = 3  # short-term memory: the last few question/answer exchanges
 
 AGENT_NAMES = {
-    "solo": "Dr. Amara Okafor (Solo)",
-    "cro": "Dr. Amara Okafor (CRO)",
-    "actuary": "Walt Brennan (Actuary)",
-    "portfolio_manager": "Priya Raman (Portfolio Manager)",
-    "trader": "Teo Vargas (Trader)",
+    "solo": "Vera Atrisk (Solo)",
+    "cro": "Vera Atrisk (CRO)",
+    "actuary": "Morty Tables (Actuary)",
+    "portfolio_manager": "Bonnie Yields (Portfolio Manager)",
+    "trader": "Swap Dogg (Trader)",
     "system": "System",
 }
 WORKERS = ("actuary", "portfolio_manager", "trader")
@@ -116,7 +116,7 @@ async def _delegate(ctx: RunContext[Deps], worker: str, task: str) -> dict:
         return {"error": "The session budget cap was reached; the specialist is offline."}
     run.delegations += 1
     run.emit(ctx.deps.agent, "delegation", {"to": worker, "to_name": AGENT_NAMES[worker], "task": task[:600]})
-    out = await _run_agent(worker, f"Question from Dr. Amara Okafor (CRO): {task}", run)
+    out = await _run_agent(worker, f"Question from Vera Atrisk (CRO): {task}", run)
     if out is None:
         return {"error": f"{AGENT_NAMES[worker]} could not answer ({run.stopped or 'error'})."}
     run.emit(worker, "delegation", {"from": worker, "from_name": AGENT_NAMES[worker], "answer": out.text,
@@ -134,17 +134,17 @@ def register_tools(agent: Agent, allowed: set[str]) -> None:
     # --- delegation (CRO only)
     @add
     async def ask_actuary(ctx: RunContext[Deps], task: str) -> dict:
-        """Ask Walt Brennan, the Actuary: liabilities, surrenders, stock-market guarantees. Give a focused task."""
+        """Ask Morty Tables, the Actuary: liabilities, surrenders, stock-market guarantees. Give a focused task."""
         return await _delegate(ctx, "actuary", task)
 
     @add
     async def ask_portfolio_manager(ctx: RunContext[Deps], task: str) -> dict:
-        """Ask Priya Raman, the Portfolio Manager: investments, credit quality, liquidity. Give a focused task."""
+        """Ask Bonnie Yields, the Portfolio Manager: investments, credit quality, liquidity. Give a focused task."""
         return await _delegate(ctx, "portfolio_manager", task)
 
     @add
     async def ask_trader(ctx: RunContext[Deps], task: str) -> dict:
-        """Ask Teo Vargas, the Trader: hedges, hedge costs, trade previews and tickets. Give a focused task."""
+        """Ask Swap Dogg, the Trader: hedges, hedge costs, trade previews and tickets. Give a focused task."""
         return await _delegate(ctx, "trader", task)
 
     # --- shared reads

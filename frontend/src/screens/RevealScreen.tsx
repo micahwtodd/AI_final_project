@@ -63,9 +63,9 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
       <BadgeUnlocks badges={r.badges_new ?? []} />
       <div className="panel examiner">
         <div className="examiner-head">
-          <PixelSprite name={(u?.points ?? 0) >= 50 ? "amara_pleased" : "amara_concerned"} size={72} title="Dr. Amara Okafor" />
+          <PixelSprite name={(u?.points ?? 0) >= 50 ? "vera_pleased" : "vera_concerned"} size={72} title="Vera Atrisk" />
           <div className="examiner-text">
-            <div className="cro-name">Dr. Amara Okafor · your explanation, marked</div>
+            <div className="cro-name">Vera Atrisk · your explanation, marked</div>
             {r.review && <p className="cro-feedback">{r.review.reply_text}</p>}
             {r.review?.instruction_attempt && <div className="flag small">⚑ Your answer tried to instruct the grader. That part was ignored; only the finance content was marked.</div>}
             {r.marker === "keywords" && <div className="small muted">Marked by the keyword checker (AI examiner offline).</div>}

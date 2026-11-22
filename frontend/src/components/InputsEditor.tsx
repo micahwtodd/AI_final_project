@@ -31,7 +31,7 @@ export function InputsEditor(props: {
           <b>Game inputs</b>
           <div className="small muted">What the game actually runs on. Change any figure to test your own view; the balance sheet above updates as you type.</div>
         </div>
-        <button className="ghost" disabled={edited === 0} onClick={() => props.onChange({})}>Reset to Sam's values{edited ? ` (${edited} edited)` : ""}</button>
+        <button className="ghost" disabled={edited === 0} onClick={() => props.onChange({})}>Reset to Seamore's values{edited ? ` (${edited} edited)` : ""}</button>
       </div>
       {props.error && <div className="flag small">{props.error}</div>}
       <div className="inputs-groups">

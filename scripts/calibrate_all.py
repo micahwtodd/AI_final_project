@@ -1,10 +1,10 @@
 """Build the six cached company profiles.
 
 Run from the repo folder:
-  python scripts/calibrate_all.py           tagged facts + Sam's targeted 10-K reading (needs an API key)
+  python scripts/calibrate_all.py           tagged facts + Seamore's targeted 10-K reading (needs an API key)
   python scripts/calibrate_all.py --tagged  tagged facts and labelled defaults only (no AI)
 
-Writes data/profiles/{TICKER}.json, data/filings_sample/{TICKER}.json (only the chunks Sam used)
+Writes data/profiles/{TICKER}.json, data/filings_sample/{TICKER}.json (only the chunks Seamore used)
 and evidence/calibration_report.json. Raw SEC downloads are cached in data/cache/ (git-ignored).
 """
 
@@ -47,7 +47,7 @@ async def calibrate(ticker: str, use_text: bool) -> dict:
 async def main() -> None:
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser()
-    ap.add_argument("--tagged", action="store_true", help="skip Sam (no AI)")
+    ap.add_argument("--tagged", action="store_true", help="skip Seamore (no AI)")
     ap.add_argument("--only", nargs="*", default=TICKERS)
     args = ap.parse_args()
     report = []

@@ -8,8 +8,8 @@ export type Mood = "neutral" | "pleased" | "concerned";
 
 // Which portrait each agent uses.
 const FACE: Record<string, string> = {
-  solo: "amara", cro: "amara", examiner: "amara",
-  actuary: "walt", portfolio_manager: "priya", trader: "teo", calibration: "sam", sam: "sam",
+  solo: "vera", cro: "vera", examiner: "vera",
+  actuary: "morty", portfolio_manager: "bonnie", trader: "swap", calibration: "seamore", sam: "seamore",
 };
 
 export function spriteFor(agent: string | undefined, mood: Mood = "neutral"): string | null {

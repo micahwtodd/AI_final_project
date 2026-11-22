@@ -154,7 +154,7 @@
     "scale_min": 0.6,
     "scale_max": 1.4
   },
-  "_starting_gap_note": "Liability durations are scaled (within the bounds) so the unhedged duration gap starts near the target, with liabilities longer than assets. Replaced by the company's disclosed rate sensitivity when Sam finds one.",
+  "_starting_gap_note": "Liability durations are scaled (within the bounds) so the unhedged duration gap starts near the target, with liabilities longer than assets. Replaced by the company's disclosed rate sensitivity when Seamore finds one.",
   "floors": {
     "capital_ratio_pct": 100,
     "liquidity_ratio_pct": 100,
@@ -180,9 +180,9 @@
   },
   "credit_tiers": {
     "a_default_ratio_to_bbb": 0.15,
-    "_note": "Investment-grade corporates are split into AAA (no credit losses), A (credit losses at 15% of the BBB rate) and BBB (the card's ig_loss_pct). Shares of the IG bucket are defaults until Sam reads the credit-quality table in Project 6."
+    "_note": "Investment-grade corporates are split into AAA (no credit losses), A (credit losses at 15% of the BBB rate) and BBB (the card's ig_loss_pct). Shares of the IG bucket are defaults until Seamore reads the credit-quality table in Project 6."
   },
   "stock_beta": 1.0,
   "_stock_note": "Stocks held are folded into the alternatives bucket (per Micah). Each company's alternatives beta blends alternatives at 0.2 with its stocks at stock_beta.",
-  "_foreign_note": "When Sam finds the share of business in foreign operations, 90% of those assets are assumed matched by liabilities in the same currency (local policies), so only 10% moves surplus when the dollar moves. Default foreign holdings (5%) are assumed unmatched."
+  "_foreign_note": "When Seamore finds the share of business in foreign operations, 90% of those assets are assumed matched by liabilities in the same currency (local policies), so only 10% moves surplus when the dollar moves. Default foreign holdings (5%) are assumed unmatched."
 }

@@ -14,7 +14,7 @@ export function CompanySelect(props: { companies: Company[]; busy: boolean; onSt
   const [inputErr, setInputErr] = useState<string | null>(null);
   const panel = useRef<HTMLDivElement>(null);
 
-  // a new company starts from Sam's values; scroll its balance sheet into view
+  // a new company starts from Seamore's values; scroll its balance sheet into view
   useEffect(() => {
     setOverrides({});
     setPreview(null);
@@ -49,7 +49,7 @@ export function CompanySelect(props: { companies: Company[]; busy: boolean; onSt
           <li><span className="rule-n">1</span><b>Read the wire.</b> A hint of what's coming. Maybe.</li>
           <li><span className="rule-n">2</span><b>Make your moves.</b> Hedge, de-risk, hold cash. Nothing's free.</li>
           <li><span className="rule-n">3</span><b>Take the hit.</b> Stay above the capital and cash floors.</li>
-          <li><span className="rule-n">4</span><b>Explain it to Amara.</b> Get it right, score points.</li>
+          <li><span className="rule-n">4</span><b>Explain it to Vera.</b> Get it right, score points.</li>
         </ol>
       </div>
 
@@ -86,7 +86,7 @@ export function CompanySelect(props: { companies: Company[]; busy: boolean; onSt
             </h2>
           </div>
           <BalanceSheetPanel dashboard={preview?.dashboard ?? chosen.dashboard} />
-          {edited > 0 && <div className="custom-flag small">Using your edited inputs ({edited}). Sam's figures are under Advanced options.</div>}
+          {edited > 0 && <div className="custom-flag small">Using your edited inputs ({edited}). Seamore's figures are under Advanced options.</div>}
           <p className="small muted">
             Excludes separate account assets, but includes general account guarantees written on them.
             Equity is shown excluding unrealized bond gains and losses (AOCI).
@@ -97,7 +97,7 @@ export function CompanySelect(props: { companies: Company[]; busy: boolean; onSt
             </button>
           </div>
           <details className="advanced">
-            <summary>Advanced options <span className="muted small">· seed, edit inputs, Sam's sources</span></summary>
+            <summary>Advanced options <span className="muted small">· seed, edit inputs, Seamore's sources</span></summary>
             <div className="seed-row">
               <label>
                 Seed{" "}

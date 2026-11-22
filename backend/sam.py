@@ -1,7 +1,7 @@
-"""Sam Nakamura, Calibration Analyst: reads targeted 10-K chunks for figures that are not tagged.
+"""Seamore Tenkays, Calibration Analyst: reads targeted 10-K chunks for figures that are not tagged.
 
-Sam has read-only tools over one filing and a typed output. Code validates every finding:
-the chunk must be one Sam retrieved, the quote must appear in that chunk, the number must
+Seamore has read-only tools over one filing and a typed output. Code validates every finding:
+the chunk must be one Seamore retrieved, the quote must appear in that chunk, the number must
 appear in the quote, and the resulting share must sit inside a sanity range. Anything else
 is rejected, logged, and replaced by the labelled default.
 """
@@ -189,7 +189,7 @@ def validate(findings: SamFindings | None, run: CalibRun, tagged: dict) -> tuple
 
         chunk = run.retrieved.get(f.chunk_id)
         if chunk is None:
-            reject("chunk was not one Sam retrieved")
+            reject("chunk was not one Seamore retrieved")
             continue
         if _norm(f.quote) not in _norm(chunk) or len(f.quote.split()) < 3:
             reject("quote not found word-for-word in the chunk")

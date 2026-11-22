@@ -2,7 +2,7 @@
 
 Step 1 (code, this file): read tagged XBRL facts and build a CompanyProfile, filling
 anything untagged with labelled defaults from data/assumptions.json.
-Step 2 (Sam, the Calibration Analyst agent, added in Project 6): read targeted text
+Step 2 (Seamore, the Calibration Analyst agent, added in Project 6): read targeted text
 from the 10-K for credit quality, rate sensitivity, segment mix and foreign share.
 """
 
@@ -96,7 +96,7 @@ def build_profile(ticker: str, text: dict | None = None, rejections: list | None
         if name in text:
             t = text[name]
             fields[name] = FieldSource(value=round(t["value"], 4), source="filing_text", citation=t["citation"],
-                                       note=t.get("note") or "read by Sam from the 10-K; validated against the quoted text")
+                                       note=t.get("note") or "read by Seamore from the 10-K; validated against the quoted text")
             return t["value"]
         return assume(name, default, note)
 
@@ -110,7 +110,7 @@ def build_profile(ticker: str, text: dict | None = None, rejections: list | None
         ig_bbb_share = min(0.8, max(0.1, text["bbb_share_of_bonds"]["value"] / corp_ig))
         fields["bbb_share_of_bonds"] = FieldSource(value=round(text["bbb_share_of_bonds"]["value"], 4), source="filing_text",
                                                    citation=text["bbb_share_of_bonds"]["citation"],
-                                                   note="BBB share of fixed maturities, read by Sam")
+                                                   note="BBB share of fixed maturities, read by Seamore")
         derive("ig_bbb_share", ig_bbb_share, "BBB share of investment-grade corporates = BBB / (bonds - government - junk)")
         ig_aaa_share = derive("ig_aaa_share", min(a["aaa_share_of_ig"], (1 - ig_bbb_share) * 0.36),
                               "AAA share of investment-grade corporates: default proportion of the non-BBB part")
@@ -151,7 +151,7 @@ def build_profile(ticker: str, text: dict | None = None, rejections: list | None
     # ---- liabilities: modeled general account = invested assets - surplus ----
     modeled_liab = invested - surplus
     life_share = assume("life_share_of_fpb", a["life_share_of_future_policy_benefits"],
-                        "life vs pension split not tagged; Sam reads segment mix in Project 6")
+                        "life vs pension split not tagged; Seamore reads segment mix in Project 6")
     mrb_net = v["mrb_liability"] - v["mrb_asset"]
     derive("mrb_net", mrb_net, "market risk benefit liability minus asset (VA guarantees)")
     raw_liab = {

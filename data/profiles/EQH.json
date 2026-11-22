@@ -131,7 +131,7 @@
       "value": 0.0475,
       "source": "filing_text",
       "citation": "10-K text, chunk 723: \"| U.S. government, agencies and authorities | 5,040 | 3,737 | 3,737\"",
-      "note": "read by Sam from the 10-K; validated against the quoted text"
+      "note": "read by Seamore from the 10-K; validated against the quoted text"
     },
     "below_ig_share_of_bonds": {
       "value": 0.07,
@@ -143,7 +143,7 @@
       "value": 0.2967,
       "source": "filing_text",
       "citation": "10-K text, chunk 299: \"| 2................................ | Baa | 26,255 | — | 147 | 3,043 | 23,359 |\"",
-      "note": "BBB share of fixed maturities, read by Sam"
+      "note": "BBB share of fixed maturities, read by Seamore"
     },
     "ig_bbb_share": {
       "value": 0.3362,
@@ -179,7 +179,7 @@
       "value": 0.5,
       "source": "assumption",
       "citation": "",
-      "note": "life vs pension split not tagged; Sam reads segment mix in Project 6"
+      "note": "life vs pension split not tagged; Seamore reads segment mix in Project 6"
     },
     "mrb_net": {
       "value": 9.401,

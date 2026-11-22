@@ -143,7 +143,7 @@
       "value": 0.275,
       "source": "filing_text",
       "citation": "10-K text, chunk 341: \"| 68.5 | % | 27.5 | % | 2.8 | % | 1.1 | % | 0.1 | % | — | % | 100.0 | %\"",
-      "note": "BBB share of fixed maturities, read by Sam"
+      "note": "BBB share of fixed maturities, read by Seamore"
     },
     "ig_bbb_share": {
       "value": 0.3526,
@@ -179,7 +179,7 @@
       "value": 0.5,
       "source": "assumption",
       "citation": "",
-      "note": "life vs pension split not tagged; Sam reads segment mix in Project 6"
+      "note": "life vs pension split not tagged; Seamore reads segment mix in Project 6"
     },
     "mrb_net": {
       "value": 1.948,

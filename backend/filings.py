@@ -1,6 +1,6 @@
 """10-K text: sanitize, chunk, and retrieve by keyword scoring (the Lecture 10 pattern).
 
-Sam never sees a whole filing: only the top-k chunks for each question.
+Seamore never sees a whole filing: only the top-k chunks for each question.
 """
 
 from __future__ import annotations
@@ -102,7 +102,7 @@ def search(ticker: str, query: str, k: int = 4) -> list[dict]:
 
 
 def save_sample(ticker: str, used: dict[int, str]) -> None:
-    """Commit only the chunks Sam actually used, as evidence."""
+    """Commit only the chunks Seamore actually used, as evidence."""
     SAMPLE_DIR.mkdir(parents=True, exist_ok=True)
     info = edgar.latest_10k(ticker)
     (SAMPLE_DIR / f"{ticker}.json").write_text(json.dumps(
