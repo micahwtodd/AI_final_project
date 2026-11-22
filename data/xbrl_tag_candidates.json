@@ -1,0 +1,18 @@
+{
+  "_note": "Per field, us-gaap tags tried in order; the first one with a FY 10-K value at the fiscal year end wins. Built by inspecting each company's companyfacts on EDGAR (FY2025 10-Ks). 'sum' fields add every tag that is present.",
+  "investments": {"mode": "first", "tags": ["Investments"]},
+  "cash": {"mode": "first", "tags": ["CashAndCashEquivalentsAtCarryingValue", "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents", "Cash"]},
+  "bonds_afs": {"mode": "first", "tags": ["AvailableForSaleSecuritiesDebtSecurities", "DebtSecuritiesAvailableForSaleExcludingAccruedInterest", "DebtSecurities"]},
+  "bonds_trading": {"mode": "first", "tags": ["TradingSecuritiesDebt"]},
+  "mortgage_loans": {"mode": "first", "tags": ["MortgageLoansOnRealEstateCommercialAndConsumerNet", "FinancingReceivableExcludingAccruedInterestAfterAllowanceForCreditLoss"]},
+  "equity_securities": {"mode": "first", "tags": ["EquitySecuritiesFvNi", "EquitySecuritiesFvNiCurrentAndNoncurrent"]},
+  "other_invested": {"mode": "first", "tags": ["OtherInvestments"]},
+  "policyholder_account_balances": {"mode": "first", "tags": ["PolicyholderContractDeposits", "PolicyholderFunds", "OtherPolicyholderFunds"]},
+  "future_policy_benefits": {"mode": "first", "tags": ["LiabilityForFuturePolicyBenefits", "LiabilityForFuturePolicyBenefitsAndUnpaidClaimsAndClaimsAdjustmentExpense", "SupplementaryInsuranceInformationLiabilityForFuturePolicyBenefitsAndUnpaidClaimsAndClaimsAdjustmentExpense"]},
+  "mrb_liability": {"mode": "first", "tags": ["MarketRiskBenefitLiabilityAmount"]},
+  "mrb_asset": {"mode": "first", "tags": ["MarketRiskBenefitAssetAmount"]},
+  "separate_account_assets": {"mode": "first", "tags": ["SeparateAccountAssets"]},
+  "total_equity": {"mode": "first", "tags": ["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"]},
+  "aoci": {"mode": "first", "tags": ["AccumulatedOtherComprehensiveIncomeLossNetOfTax"]},
+  "net_investment_income": {"mode": "first", "tags": ["NetInvestmentIncome"], "duration": true}
+}

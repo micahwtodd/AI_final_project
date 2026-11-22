@@ -1,0 +1,171 @@
+{
+  "_note": "Fixed four-quarter campaign. Magnitudes are stylized approximations of the historical quarter each card echoes, for Micah to verify or adjust. A shock is a vector of market moves, never a dollar loss; the engine turns it into profit and loss using each company's own balance sheet. ig_loss_pct is the credit loss on BBB-rated holdings; hy_default_pct is the default rate on below-investment-grade bonds (40% recovery).",
+  "cards": [
+    {
+      "id": "rate_spike",
+      "quarter": 1,
+      "title": "The Inflation Surprise",
+      "era": "Echoes 2022",
+      "signal_text": "WIRE: Consumer prices ran hotter than forecast for a third straight month. Some economists say the central bank is 'behind the curve'; others expect inflation to fade on its own.",
+      "headline": "CENTRAL BANK HIKES AGAIN; BOND YIELDS SURGE",
+      "narrative": "Rates jumped across the curve in a matter of weeks. Annuity buyers can now get a better rate at a competitor, and some policyholders are surrendering to move their money. Stocks sold off and the dollar strengthened.",
+      "primary_risk": "interest_rate",
+      "secondary_risks": [
+        "liquidity",
+        "equity"
+      ],
+      "base_shock": {
+        "rate_bp": 85,
+        "ig_spread_bp": 25,
+        "hy_spread_bp": 85,
+        "equity_pct": -9,
+        "fx_pct": 4.5,
+        "lapse_mult": 1.6
+      },
+      "lesson": "When rates rise fast, the value of bonds and of liabilities both fall, and what matters is the mismatch between them. Policyholders also surrender to chase higher rates, so you need cash on hand or you sell bonds at a loss. Collateralized swaps that lose money when rates rise demand cash the same quarter.",
+      "benchmark_action": {
+        "rate_hedge_pct": 20,
+        "credit_shift_pct": 0,
+        "equity_hedge_pct": 50,
+        "fx_hedge_pct": 60,
+        "cash_buffer_pct": 7,
+        "collateralized": true,
+        "dealers": 3
+      },
+      "glossary_terms": [
+        "duration",
+        "duration_gap",
+        "surrender",
+        "margin_call",
+        "liquidity_ratio"
+      ],
+      "source_note": "Stylized on 2022: US 10-year Treasury yield rose roughly 2.3 percentage points over the year, with the S&P 500 down about 19% and the dollar index up about 8%. The quarter here compresses part of that move. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it."
+    },
+    {
+      "id": "fx_shock",
+      "quarter": 2,
+      "title": "King Dollar",
+      "era": "Echoes the 2022 dollar surge",
+      "signal_text": "WIRE: Overseas central banks are holding rates steady while the US keeps tightening. Currency strategists are split on whether the dollar's rally has room to run. Separately, a large manufacturer is shopping its pension plan to insurers.",
+      "headline": "DOLLAR HITS 20-YEAR HIGH AS FOREIGN CURRENCIES SLIDE",
+      "narrative": "The dollar rose sharply against the yen, euro and pound. Foreign-currency bonds and overseas subsidiaries are worth less in dollars. Rates edged higher and stocks drifted lower.",
+      "primary_risk": "fx",
+      "secondary_risks": [
+        "growth_vs_capital",
+        "interest_rate"
+      ],
+      "base_shock": {
+        "rate_bp": 20,
+        "ig_spread_bp": 8,
+        "hy_spread_bp": 20,
+        "equity_pct": -3,
+        "fx_pct": 9,
+        "lapse_mult": 1.0
+      },
+      "lesson": "Foreign assets lose value in dollars when the dollar strengthens. Hedging with forwards locks in the exchange rate but costs money every quarter, so most insurers hedge a large share, not all. A pension deal brings premium and long liabilities: it grows the business but uses capital and lengthens the liabilities you have to match.",
+      "benchmark_action": {
+        "rate_hedge_pct": 70,
+        "credit_shift_pct": 0,
+        "equity_hedge_pct": 50,
+        "fx_hedge_pct": 80,
+        "cash_buffer_pct": 5,
+        "collateralized": true,
+        "dealers": 3,
+        "accept_prt": true
+      },
+      "glossary_terms": [
+        "fx_hedge",
+        "forward_contract",
+        "pension_risk_transfer",
+        "capital_ratio"
+      ],
+      "source_note": "Stylized on 2022, when the US dollar index rose to its highest level in about 20 years and the yen fell roughly 25% against the dollar at its weakest. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it.",
+      "offers_prt_deal": true
+    },
+    {
+      "id": "credit_crunch",
+      "quarter": 3,
+      "title": "The Credit Crunch",
+      "era": "Echoes Q4 2008",
+      "signal_text": "WIRE: Two mid-sized lenders have delayed earnings. Junk-bond issuance has stalled and some funds are limiting withdrawals. Officials say the system is 'well capitalized'.",
+      "headline": "CREDIT MARKETS FREEZE; DEFAULTS SPIKE; STOCKS PLUNGE",
+      "narrative": "Investors fled to safety. Government bond yields fell sharply while corporate bond spreads blew out. Several high-yield issuers defaulted, commercial mortgages took losses, and stock markets fell more than 20%. Market liquidity dried up: selling anything but government bonds means accepting a steep discount.",
+      "primary_risk": "credit",
+      "secondary_risks": [
+        "equity",
+        "liquidity",
+        "interest_rate"
+      ],
+      "base_shock": {
+        "rate_bp": -95,
+        "ig_spread_bp": 180,
+        "hy_spread_bp": 500,
+        "ig_loss_pct": 0.35,
+        "hy_default_pct": 3,
+        "mortgage_loss_pct": 0.7,
+        "equity_pct": -16,
+        "fx_pct": 5.5,
+        "lapse_mult": 1.15,
+        "stress_liquidity": true
+      },
+      "lesson": "Credit spread widening lowers bond prices even if nothing defaults; defaults are a separate, permanent loss. Falling rates raise the value of long liabilities and of variable annuity guarantees, and a stock crash makes those guarantees much more expensive. Moving out of the riskiest credit before the storm, and holding equity hedges, protects surplus.",
+      "benchmark_action": {
+        "rate_hedge_pct": 90,
+        "credit_shift_pct": 30,
+        "equity_hedge_pct": 80,
+        "fx_hedge_pct": 80,
+        "cash_buffer_pct": 6,
+        "collateralized": true,
+        "dealers": 3
+      },
+      "glossary_terms": [
+        "credit_spread",
+        "default",
+        "variable_annuity_guarantee",
+        "forced_selling",
+        "put_option"
+      ],
+      "source_note": "Stylized on Q4 2008: 10-year Treasury yields fell about 1.6 points, investment-grade spreads widened to roughly 6 points and high-yield spreads to about 20 points at the peak, and the S&P 500 fell about 22% in the quarter. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it."
+    },
+    {
+      "id": "dealer_down",
+      "quarter": 4,
+      "title": "The Dealer Goes Down",
+      "era": "Echoes September 2008",
+      "signal_text": "WIRE: Shares of a major derivatives dealer fell 40% this week on funding worries. Its CEO says it has 'ample liquidity'. Rival banks are said to be reviewing their exposure.",
+      "headline": "MAJOR DEALER FILES FOR BANKRUPTCY; SWAP CONTRACTS FROZEN",
+      "narrative": "One of the largest derivatives dealers collapsed. Every swap and option written with it is frozen: if it owed you money on those contracts and you did not hold collateral, that money is gone, and the hedges have to be replaced at today's prices. Markets fell again in the turmoil.",
+      "primary_risk": "counterparty",
+      "secondary_risks": [
+        "equity",
+        "credit"
+      ],
+      "base_shock": {
+        "rate_bp": -30,
+        "ig_spread_bp": 60,
+        "hy_spread_bp": 150,
+        "equity_pct": -7,
+        "fx_pct": 0,
+        "lapse_mult": 1.1,
+        "dealer_default": true
+      },
+      "lesson": "A hedge is a promise from a dealer. If the dealer fails, the promise is only as good as the collateral you hold. Daily collateral and spreading trades across several dealers cost a little every quarter and turn a potential large loss into a small one.",
+      "benchmark_action": {
+        "rate_hedge_pct": 90,
+        "credit_shift_pct": 30,
+        "equity_hedge_pct": 80,
+        "fx_hedge_pct": 80,
+        "cash_buffer_pct": 6,
+        "collateralized": true,
+        "dealers": 3
+      },
+      "glossary_terms": [
+        "counterparty_risk",
+        "collateral",
+        "isda_csa",
+        "replacement_cost"
+      ],
+      "source_note": "Stylized on Lehman Brothers' bankruptcy in September 2008, when counterparties with uncollateralized derivatives faced losses and had to replace hedges in a volatile market. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it."
+    }
+  ]
+}

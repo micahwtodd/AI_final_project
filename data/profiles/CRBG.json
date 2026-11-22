@@ -1,0 +1,188 @@
+{
+  "ticker": "CRBG",
+  "name": "Corebridge Financial",
+  "fiscal_year": 2025,
+  "accession": "0001889539-26-000022",
+  "invested_assets_usd_bn": 265.71,
+  "surplus_usd_bn": 22.65,
+  "asset_mix": {
+    "govt": 0.1099623,
+    "ig_corp": 0.5931619,
+    "below_ig": 0.0513158,
+    "mortgage": 0.2050386,
+    "equity": 0.0002973,
+    "alts": 0.0385193,
+    "cash": 0.0017049
+  },
+  "liability_mix": {
+    "annuities": 0.7173879,
+    "life": 0.1157899,
+    "prt": 0.1157899,
+    "other": 0.0510324
+  },
+  "guarantee_exposure_usd_bn": 47.79,
+  "guarantee_value_usd_bn": 4.92,
+  "separate_account_assets_usd_bn": 95.58,
+  "equity_to_assets": 0.0853,
+  "net_investment_yield": 0.0494,
+  "rate_sensitivity": null,
+  "foreign_share": 0.05,
+  "fields": {
+    "investments": {
+      "value": 265.258,
+      "source": "tagged",
+      "citation": "us-gaap:Investments, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "cash": {
+      "value": 0.453,
+      "source": "tagged",
+      "citation": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "bonds_afs": {
+      "value": 189.381,
+      "source": "tagged",
+      "citation": "us-gaap:DebtSecuritiesAvailableForSaleExcludingAccruedInterest, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "bonds_trading": {
+      "value": 5.407,
+      "source": "tagged",
+      "citation": "us-gaap:TradingSecuritiesDebt, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "mortgage_loans": {
+      "value": 54.481,
+      "source": "tagged",
+      "citation": "us-gaap:FinancingReceivableExcludingAccruedInterestAfterAllowanceForCreditLoss, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "equity_securities": {
+      "value": 0.079,
+      "source": "tagged",
+      "citation": "us-gaap:EquitySecuritiesFvNiCurrentAndNoncurrent, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "other_invested": {
+      "value": 10.235,
+      "source": "tagged",
+      "citation": "us-gaap:OtherInvestments, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "policyholder_account_balances": {
+      "value": 188.876,
+      "source": "tagged",
+      "citation": "us-gaap:PolicyholderContractDeposits, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "future_policy_benefits": {
+      "value": 60.971,
+      "source": "tagged",
+      "citation": "us-gaap:LiabilityForFuturePolicyBenefits, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "mrb_liability": {
+      "value": 7.309,
+      "source": "tagged",
+      "citation": "us-gaap:MarketRiskBenefitLiabilityAmount, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "mrb_asset": {
+      "value": 2.392,
+      "source": "tagged",
+      "citation": "us-gaap:MarketRiskBenefitAssetAmount, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "separate_account_assets": {
+      "value": 95.585,
+      "source": "tagged",
+      "citation": "us-gaap:SeparateAccountAssets, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "total_equity": {
+      "value": 13.201,
+      "source": "tagged",
+      "citation": "us-gaap:StockholdersEquity, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "aoci": {
+      "value": -9.452,
+      "source": "tagged",
+      "citation": "us-gaap:AccumulatedOtherComprehensiveIncomeLossNetOfTax, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "net_investment_income": {
+      "value": 13.124,
+      "source": "tagged",
+      "citation": "us-gaap:NetInvestmentIncome, 10-K 0001889539-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "invested_assets": {
+      "value": 265.711,
+      "source": "derived",
+      "citation": "",
+      "note": "Investments + cash and cash equivalents"
+    },
+    "govt_share_of_bonds": {
+      "value": 0.15,
+      "source": "assumption",
+      "citation": "",
+      "note": "credit split not tagged; Sam reads it from the filing in Project 6"
+    },
+    "below_ig_share_of_bonds": {
+      "value": 0.07,
+      "source": "assumption",
+      "citation": "",
+      "note": "credit split not tagged; Sam reads it from the filing in Project 6"
+    },
+    "residual_invested": {
+      "value": 5.675,
+      "source": "derived",
+      "citation": "",
+      "note": "policy loans, short-term and other invested assets not tagged separately; treated as investment-grade fixed income"
+    },
+    "surplus": {
+      "value": 22.653,
+      "source": "derived",
+      "citation": "",
+      "note": "stockholders' equity excluding AOCI (unrealized bond gains and losses)"
+    },
+    "life_share_of_fpb": {
+      "value": 0.5,
+      "source": "assumption",
+      "citation": "",
+      "note": "life vs pension split not tagged; Sam reads segment mix in Project 6"
+    },
+    "mrb_net": {
+      "value": 4.917,
+      "source": "derived",
+      "citation": "",
+      "note": "market risk benefit liability minus asset (VA guarantees)"
+    },
+    "liability_scale": {
+      "value": 0.9045,
+      "source": "derived",
+      "citation": "",
+      "note": "tagged reserves exceed invested assets less surplus (reinsurance, funds withheld); scaled to fit"
+    },
+    "guaranteed_share_of_sa": {
+      "value": 0.5,
+      "source": "assumption",
+      "citation": "",
+      "note": "share of separate-account value carrying guarantees; not tagged"
+    },
+    "foreign_share": {
+      "value": 0.05,
+      "source": "assumption",
+      "citation": "",
+      "note": "not tagged; Sam reads it from the filing in Project 6"
+    },
+    "net_investment_yield": {
+      "value": 0.0494,
+      "source": "derived",
+      "citation": "",
+      "note": "net investment income / invested assets"
+    }
+  }
+}

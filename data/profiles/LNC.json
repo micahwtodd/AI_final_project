@@ -1,0 +1,188 @@
+{
+  "ticker": "LNC",
+  "name": "Lincoln National",
+  "fiscal_year": 2025,
+  "accession": "0000059558-26-000016",
+  "invested_assets_usd_bn": 148.41,
+  "surplus_usd_bn": 14.96,
+  "asset_mix": {
+    "govt": 0.0961431,
+    "ig_corp": 0.5846487,
+    "below_ig": 0.0448668,
+    "mortgage": 0.1514184,
+    "equity": 0.0042854,
+    "alts": 0.0546122,
+    "cash": 0.0640253
+  },
+  "liability_mix": {
+    "annuities": 0.7268503,
+    "life": 0.1122378,
+    "prt": 0.1122378,
+    "other": 0.0486741
+  },
+  "guarantee_exposure_usd_bn": 90.05,
+  "guarantee_value_usd_bn": -3.63,
+  "separate_account_assets_usd_bn": 180.09,
+  "equity_to_assets": 0.1008,
+  "net_investment_yield": 0.0409,
+  "rate_sensitivity": null,
+  "foreign_share": 0.05,
+  "fields": {
+    "investments": {
+      "value": 138.908,
+      "source": "tagged",
+      "citation": "us-gaap:Investments, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "cash": {
+      "value": 9.502,
+      "source": "tagged",
+      "citation": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "bonds_afs": {
+      "value": 93.448,
+      "source": "tagged",
+      "citation": "us-gaap:DebtSecuritiesAvailableForSaleExcludingAccruedInterest, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "bonds_trading": {
+      "value": 1.676,
+      "source": "tagged",
+      "citation": "us-gaap:TradingSecuritiesDebt, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "mortgage_loans": {
+      "value": 22.472,
+      "source": "tagged",
+      "citation": "us-gaap:FinancingReceivableExcludingAccruedInterestAfterAllowanceForCreditLoss, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "equity_securities": {
+      "value": 0.636,
+      "source": "tagged",
+      "citation": "us-gaap:EquitySecuritiesFvNi, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "other_invested": {
+      "value": 8.105,
+      "source": "tagged",
+      "citation": "us-gaap:OtherInvestments, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "policyholder_account_balances": {
+      "value": 136.245,
+      "source": "tagged",
+      "citation": "us-gaap:PolicyholderFunds, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "future_policy_benefits": {
+      "value": 42.077,
+      "source": "tagged",
+      "citation": "us-gaap:LiabilityForFuturePolicyBenefits, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "mrb_liability": {
+      "value": 1.118,
+      "source": "tagged",
+      "citation": "us-gaap:MarketRiskBenefitLiabilityAmount, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "mrb_asset": {
+      "value": 4.753,
+      "source": "tagged",
+      "citation": "us-gaap:MarketRiskBenefitAssetAmount, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "separate_account_assets": {
+      "value": 180.092,
+      "source": "tagged",
+      "citation": "us-gaap:SeparateAccountAssets, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "total_equity": {
+      "value": 10.906,
+      "source": "tagged",
+      "citation": "us-gaap:StockholdersEquity, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "aoci": {
+      "value": -4.058,
+      "source": "tagged",
+      "citation": "us-gaap:AccumulatedOtherComprehensiveIncomeLossNetOfTax, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "net_investment_income": {
+      "value": 6.075,
+      "source": "tagged",
+      "citation": "us-gaap:NetInvestmentIncome, 10-K 0000059558-26-000016, period 2025-12-31",
+      "note": ""
+    },
+    "invested_assets": {
+      "value": 148.41,
+      "source": "derived",
+      "citation": "",
+      "note": "Investments + cash and cash equivalents"
+    },
+    "govt_share_of_bonds": {
+      "value": 0.15,
+      "source": "assumption",
+      "citation": "",
+      "note": "credit split not tagged; Sam reads it from the filing in Project 6"
+    },
+    "below_ig_share_of_bonds": {
+      "value": 0.07,
+      "source": "assumption",
+      "citation": "",
+      "note": "credit split not tagged; Sam reads it from the filing in Project 6"
+    },
+    "residual_invested": {
+      "value": 12.571,
+      "source": "derived",
+      "citation": "",
+      "note": "policy loans, short-term and other invested assets not tagged separately; treated as investment-grade fixed income"
+    },
+    "surplus": {
+      "value": 14.964,
+      "source": "derived",
+      "citation": "",
+      "note": "stockholders' equity excluding AOCI (unrealized bond gains and losses)"
+    },
+    "life_share_of_fpb": {
+      "value": 0.5,
+      "source": "assumption",
+      "citation": "",
+      "note": "life vs pension split not tagged; Sam reads segment mix in Project 6"
+    },
+    "mrb_net": {
+      "value": -3.635,
+      "source": "derived",
+      "citation": "",
+      "note": "market risk benefit liability minus asset (VA guarantees)"
+    },
+    "liability_scale": {
+      "value": 0.7313,
+      "source": "derived",
+      "citation": "",
+      "note": "tagged reserves exceed invested assets less surplus (reinsurance, funds withheld); scaled to fit"
+    },
+    "guaranteed_share_of_sa": {
+      "value": 0.5,
+      "source": "assumption",
+      "citation": "",
+      "note": "share of separate-account value carrying guarantees; not tagged"
+    },
+    "foreign_share": {
+      "value": 0.05,
+      "source": "assumption",
+      "citation": "",
+      "note": "not tagged; Sam reads it from the filing in Project 6"
+    },
+    "net_investment_yield": {
+      "value": 0.0409,
+      "source": "derived",
+      "citation": "",
+      "note": "net investment income / invested assets"
+    }
+  }
+}

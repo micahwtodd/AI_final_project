@@ -1,0 +1,188 @@
+{
+  "ticker": "JXN",
+  "name": "Jackson Financial",
+  "fiscal_year": 2025,
+  "accession": "0001822993-26-000022",
+  "invested_assets_usd_bn": 74.94,
+  "surplus_usd_bn": 12.42,
+  "asset_mix": {
+    "govt": 0.0947216,
+    "ig_corp": 0.603899,
+    "below_ig": 0.0442034,
+    "mortgage": 0.1362611,
+    "equity": 0.0022953,
+    "alts": 0.0425024,
+    "cash": 0.0761173
+  },
+  "liability_mix": {
+    "annuities": 0.8208951,
+    "life": 0.0660957,
+    "prt": 0.0660957,
+    "other": 0.0469134
+  },
+  "guarantee_exposure_usd_bn": 118.25,
+  "guarantee_value_usd_bn": -4.11,
+  "separate_account_assets_usd_bn": 236.5,
+  "equity_to_assets": 0.1658,
+  "net_investment_yield": 0.042,
+  "rate_sensitivity": null,
+  "foreign_share": 0.05,
+  "fields": {
+    "investments": {
+      "value": 69.233,
+      "source": "tagged",
+      "citation": "us-gaap:Investments, 10-K 0001822993-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "cash": {
+      "value": 5.704,
+      "source": "tagged",
+      "citation": "us-gaap:CashAndCashEquivalentsAtCarryingValue, 10-K 0001822993-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "bonds_afs": {
+      "value": 47.321,
+      "source": "tagged",
+      "citation": "us-gaap:DebtSecuritiesAvailableForSaleExcludingAccruedInterest, 10-K 0001822993-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "bonds_trading": {
+      "value": null,
+      "source": "assumption",
+      "citation": "",
+      "note": "not tagged"
+    },
+    "mortgage_loans": {
+      "value": 10.211,
+      "source": "tagged",
+      "citation": "us-gaap:FinancingReceivableExcludingAccruedInterestAfterAllowanceForCreditLoss, 10-K 0001822993-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "equity_securities": {
+      "value": 0.172,
+      "source": "tagged",
+      "citation": "us-gaap:EquitySecuritiesFvNiCurrentAndNoncurrent, 10-K 0001822993-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "other_invested": {
+      "value": 3.185,
+      "source": "tagged",
+      "citation": "us-gaap:OtherInvestments, 10-K 0001822993-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "policyholder_account_balances": {
+      "value": 67.663,
+      "source": "tagged",
+      "citation": "us-gaap:OtherPolicyholderFunds, 10-K 0001822993-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "future_policy_benefits": {
+      "value": 10.896,
+      "source": "tagged",
+      "citation": "us-gaap:LiabilityForFuturePolicyBenefitsAndUnpaidClaimsAndClaimsAdjustmentExpense, 10-K 0001822993-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "mrb_liability": {
+      "value": 3.754,
+      "source": "tagged",
+      "citation": "us-gaap:MarketRiskBenefitLiabilityAmount, 10-K 0001822993-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "mrb_asset": {
+      "value": 7.867,
+      "source": "tagged",
+      "citation": "us-gaap:MarketRiskBenefitAssetAmount, 10-K 0001822993-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "separate_account_assets": {
+      "value": 236.496,
+      "source": "tagged",
+      "citation": "us-gaap:SeparateAccountAssets, 10-K 0001822993-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "total_equity": {
+      "value": 9.953,
+      "source": "tagged",
+      "citation": "us-gaap:StockholdersEquity, 10-K 0001822993-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "aoci": {
+      "value": -2.47,
+      "source": "tagged",
+      "citation": "us-gaap:AccumulatedOtherComprehensiveIncomeLossNetOfTax, 10-K 0001822993-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "net_investment_income": {
+      "value": 3.151,
+      "source": "tagged",
+      "citation": "us-gaap:NetInvestmentIncome, 10-K 0001822993-26-000022, period 2025-12-31",
+      "note": ""
+    },
+    "invested_assets": {
+      "value": 74.937,
+      "source": "derived",
+      "citation": "",
+      "note": "Investments + cash and cash equivalents"
+    },
+    "govt_share_of_bonds": {
+      "value": 0.15,
+      "source": "assumption",
+      "citation": "",
+      "note": "credit split not tagged; Sam reads it from the filing in Project 6"
+    },
+    "below_ig_share_of_bonds": {
+      "value": 0.07,
+      "source": "assumption",
+      "citation": "",
+      "note": "credit split not tagged; Sam reads it from the filing in Project 6"
+    },
+    "residual_invested": {
+      "value": 8.344,
+      "source": "derived",
+      "citation": "",
+      "note": "policy loans, short-term and other invested assets not tagged separately; treated as investment-grade fixed income"
+    },
+    "surplus": {
+      "value": 12.423,
+      "source": "derived",
+      "citation": "",
+      "note": "stockholders' equity excluding AOCI (unrealized bond gains and losses)"
+    },
+    "life_share_of_fpb": {
+      "value": 0.5,
+      "source": "assumption",
+      "citation": "",
+      "note": "life vs pension split not tagged; Sam reads segment mix in Project 6"
+    },
+    "mrb_net": {
+      "value": -4.113,
+      "source": "derived",
+      "citation": "",
+      "note": "market risk benefit liability minus asset (VA guarantees)"
+    },
+    "liability_scale": {
+      "value": 0.8083,
+      "source": "derived",
+      "citation": "",
+      "note": "tagged reserves exceed invested assets less surplus (reinsurance, funds withheld); scaled to fit"
+    },
+    "guaranteed_share_of_sa": {
+      "value": 0.5,
+      "source": "assumption",
+      "citation": "",
+      "note": "share of separate-account value carrying guarantees; not tagged"
+    },
+    "foreign_share": {
+      "value": 0.05,
+      "source": "assumption",
+      "citation": "",
+      "note": "not tagged; Sam reads it from the filing in Project 6"
+    },
+    "net_investment_yield": {
+      "value": 0.042,
+      "source": "derived",
+      "citation": "",
+      "note": "net investment income / invested assets"
+    }
+  }
+}

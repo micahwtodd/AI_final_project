@@ -1,0 +1,182 @@
+{
+  "_note": "Labelled assumptions for a simplified training model. 10-Ks do not disclose these consistently. Edit freely; the engine reads this file at start-up. Durations in years, rates and shares as decimals.",
+  "asset_buckets": {
+    "govt": {
+      "duration": 8.0,
+      "spread_duration": 0.0,
+      "capital_factor": 0.005,
+      "yield_weight": 0.85,
+      "haircut": 0.002,
+      "beta": 0.0,
+      "liquid": true
+    },
+    "ig_corp": {
+      "duration": 7.0,
+      "spread_duration": 7.0,
+      "capital_factor": 0.015,
+      "yield_weight": 1.05,
+      "haircut": 0.01,
+      "beta": 0.0,
+      "liquid": true
+    },
+    "below_ig": {
+      "duration": 4.0,
+      "spread_duration": 4.0,
+      "capital_factor": 0.08,
+      "yield_weight": 1.45,
+      "haircut": 0.03,
+      "beta": 0.0,
+      "liquid": false
+    },
+    "mortgage": {
+      "duration": 5.0,
+      "spread_duration": 5.0,
+      "capital_factor": 0.03,
+      "yield_weight": 1.15,
+      "haircut": 0.08,
+      "beta": 0.0,
+      "liquid": false
+    },
+    "equity": {
+      "duration": 0.0,
+      "spread_duration": 0.0,
+      "capital_factor": 0.3,
+      "yield_weight": 0.45,
+      "haircut": 0.01,
+      "beta": 1.0,
+      "liquid": false
+    },
+    "alts": {
+      "duration": 0.0,
+      "spread_duration": 0.0,
+      "capital_factor": 0.3,
+      "yield_weight": 1.5,
+      "haircut": 0.15,
+      "beta": 0.2,
+      "liquid": false
+    },
+    "cash": {
+      "duration": 0.1,
+      "spread_duration": 0.0,
+      "capital_factor": 0.0,
+      "yield_weight": 0.85,
+      "haircut": 0.0,
+      "beta": 0.0,
+      "liquid": true
+    }
+  },
+  "sell_order": [
+    "cash",
+    "govt",
+    "ig_corp"
+  ],
+  "stress_haircut_mult": 3.0,
+  "liability_buckets": {
+    "annuities": {
+      "duration": 5.0,
+      "surrenderable": 1.0,
+      "capital_factor": 0.01
+    },
+    "life": {
+      "duration": 12.0,
+      "surrenderable": 0.3,
+      "capital_factor": 0.015
+    },
+    "prt": {
+      "duration": 11.0,
+      "surrenderable": 0.0,
+      "capital_factor": 0.02
+    },
+    "other": {
+      "duration": 3.0,
+      "surrenderable": 0.3,
+      "capital_factor": 0.005
+    }
+  },
+  "guarantee": {
+    "k_eq": 0.06,
+    "k_rate": 4.0,
+    "capital_factor": 0.04,
+    "_note": "Guarantee value change = exposure x (k_eq x -equity_move + k_rate x -rate_change). k_eq 0.06 means a 10% market fall adds 0.6% of guaranteed account value to the liability."
+  },
+  "defaults_when_untagged": {
+    "govt_share_of_bonds": 0.15,
+    "below_ig_share_of_bonds": 0.07,
+    "bbb_share_of_ig": 0.45,
+    "mortgage_share_of_invested": 0.13,
+    "life_share_of_future_policy_benefits": 0.5,
+    "guaranteed_share_of_separate_accounts": 0.5,
+    "foreign_share": 0.05,
+    "other_liability_floor_share": 0.05
+  },
+  "market": {
+    "base_rate": 0.042,
+    "annuity_crediting_rate": 0.042,
+    "base_lapse_quarterly": 0.015,
+    "lapse_rate_sensitivity": 0.5,
+    "hy_recovery": 0.4,
+    "surrender_charge_offset": 0.6,
+    "_surrender_note": "Share of the loss from paying book value on surrender that surrender charges and market value adjustments recover.",
+    "stress_run_share": 0.15,
+    "_stress_note": "Liquidity ratio = (cash + government bonds after stressed haircut) / (15% of surrenderable liabilities + collateral for a 100bp adverse rate move).",
+    "_lapse_note": "Crediting rate starts equal to the market rate, so surrenders rise only when rates climb: lapses rise by 50% for every 1 percentage point that market rates exceed the crediting rate."
+  },
+  "carry": {
+    "liability_cost_ratio": 0.8,
+    "expense_ratio_annual": 0.004,
+    "_note": "Liability cost = 80% of the portfolio yield on liabilities; expenses = 0.4% of invested assets a year."
+  },
+  "hedge_costs_quarterly": {
+    "swap_per_dv01": 1.5,
+    "put_premium": 0.012,
+    "fx_forward": 0.0025,
+    "three_dealers": 5e-05,
+    "collateral_ops": 3e-05,
+    "_note": "swap: $bn per quarter for each $bn-per-bp of swap DV01; put: share of the hedged guarantee equity sensitivity; fx: share of hedged foreign assets; dealers and collateral: share of invested assets, charged only while any hedge is on."
+  },
+  "counterparty": {
+    "largest_dealer_share": {
+      "1": 1.0,
+      "3": 0.4
+    },
+    "collateralized_loss_share": 0.05
+  },
+  "prt_deal": {
+    "size_share_of_invested": 0.03,
+    "premium_margin": 0.02,
+    "assets_received_as": "ig_corp"
+  },
+  "liability_spread_offset": {
+    "ig_a": 0.95,
+    "bbb": 0.95,
+    "mortgage": 0.95,
+    "below_ig": 0.85
+  },
+  "_liability_spread_note": "Share of a bond's spread mark absorbed by the liabilities it backs (a buy-and-hold insurer discounts liabilities with part of its asset spread, like Europe's 'matching adjustment'). Liabilities fall by this share of the asset spread loss. 0 would mean liabilities ignore spreads entirely. Defaults are never offset: they are permanent.",
+  "starting_gap": {
+    "target_years": 0.6,
+    "scale_min": 0.6,
+    "scale_max": 1.4
+  },
+  "_starting_gap_note": "Liability durations are scaled (within the bounds) so the unhedged duration gap starts near the target, with liabilities longer than assets. Replaced by the company's disclosed rate sensitivity when Sam finds one.",
+  "floors": {
+    "capital_ratio_pct": 100,
+    "liquidity_ratio_pct": 100,
+    "capital_amber_pct": 130,
+    "liquidity_amber_pct": 150
+  },
+  "stressed_outflow": {
+    "lapse_mult": 2.0,
+    "margin_rate_bp": 100
+  },
+  "severity_levels": [
+    0.6,
+    1.0,
+    1.4
+  ],
+  "noise_sd": 0.05,
+  "score": {
+    "clip_max": 1.2,
+    "breach_penalty": 10
+  }
+}
