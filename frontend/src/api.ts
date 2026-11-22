@@ -153,6 +153,7 @@ export type Preview = {
 export type MarketMove = { key: string; label: string; value: number | null; unit: string };
 
 export type Shock = {
+  real_world?: { title: string; text: string };
   quarter: number;
   title: string;
   era: string;

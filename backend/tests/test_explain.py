@@ -16,10 +16,12 @@ def _to_explain(ticker="PRU"):
     return gid, shock
 
 
-def test_short_explanation_rejected():
+def test_empty_explanation_rejected_but_short_is_fine():
     gid, _ = _to_explain()
+    r = client.post(f"/api/game/{gid}/explain", json={"text": "   "})
+    assert r.status_code == 409 and "write an answer" in r.json()["detail"]
     r = client.post(f"/api/game/{gid}/explain", json={"text": "rates went up"})
-    assert r.status_code == 409 and "15 words" in r.json()["detail"]
+    assert r.status_code == 200  # no word minimum
 
 
 def test_missed_main_driver_gets_one_follow_up_then_half_credit():

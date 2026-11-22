@@ -95,6 +95,7 @@ class EventCard(BaseModel):
     source_note: str
     offers_prt_deal: bool = False
     sample_answer: str = ""
+    real_world: dict = {}  # {"title", "text"}: the real episode this quarter echoes
 
 
 # ---------- the learner's levers ----------

@@ -345,12 +345,13 @@ def advance(s: Session) -> dict:
         "surplus_change": change,
         "dashboard_before": before_dash.model_dump(), "dashboard_after": engine.dashboard(new_state).model_dump(),
         "sample_answer": card.sample_answer if s.demo else None,
+        "real_world": card.real_world,
         "question": f"Surplus {'fell' if rec.surplus_after < rec.surplus_before else 'rose'} "
                     f"${abs(change):.2f} billion. Walk me through why.",
     }
 
 
-MIN_WORDS = 15
+MIN_WORDS = 1  # any answer is accepted; the examiner marks what is there
 
 
 async def explain(s: Session, text: str, not_sure: bool = False) -> dict:
@@ -365,7 +366,7 @@ async def explain(s: Session, text: str, not_sure: bool = False) -> dict:
     attempts = s.explain_attempts.setdefault(q, [])
     text = (text or "").strip()[:2000]
     if not not_sure and len(text.split()) < MIN_WORDS:
-        raise GameError(f"Please write at least {MIN_WORDS} words, or choose \"I'm not sure\".")
+        raise GameError("Please write an answer, or choose \"I'm not sure\".")
 
     mode = "walkthrough" if not_sure else "mark"
     attempt = len(attempts) + 1

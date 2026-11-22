@@ -15,7 +15,6 @@ export function ShockScreen(props: {
 }) {
   const s = props.shock;
   const [text, setText] = useState("");
-  const words = text.trim().split(/\s+/).filter(Boolean).length;
   const second = props.firstTry !== null;
   const breach = s.dashboard_after.status.capital === "red" || s.dashboard_after.status.liquidity === "red";
   useEffect(() => {
@@ -34,22 +33,38 @@ export function ShockScreen(props: {
         <p className="paper-body">{s.narrative}</p>
       </div>
 
-      <div className="two-col">
-        <div className="panel">
-          <h3>What the markets did <span className="muted small">(severity {s.severity}×, seed {s.seed})</span></h3>
-          <table className="table">
-            <tbody>
-              {s.market_moves.map((m) => (
-                <tr key={m.key}><td>{m.label}</td><td className="num">{fmtMove(m.value, m.unit)}</td></tr>
-              ))}
-            </tbody>
-          </table>
-          <div className={`big-change pop-late ${s.surplus_change < 0 ? "neg" : "pos"}`}>
-            Surplus <CountUp value={s.surplus_change} format={(v) => fmtSigned(v)} ms={1200} /> <span className="muted small">(${s.surplus_before.toFixed(2)}bn → ${s.surplus_after.toFixed(2)}bn)</span>
+      <div className="shock-grid">
+        <div className="panel shock-dash">
+          <h3>Dashboard before → after</h3>
+          <Meters dashboard={s.dashboard_before} after={s.dashboard_after} />
+        </div>
+
+        <div className="shock-mid">
+          <div className="panel market-summary">
+            <h3>Capital Market Summary</h3>
+            <table className="table compact">
+              <tbody>
+                {s.market_moves.map((m) => (
+                  <tr key={m.key}><td>{m.label}</td><td className="num">{fmtMove(m.value, m.unit)}</td></tr>
+                ))}
+              </tbody>
+            </table>
+            <div className={`big-change pop-late ${s.surplus_change < 0 ? "neg" : "pos"}`}>
+              Surplus <CountUp value={s.surplus_change} format={(v) => fmtSigned(v)} ms={1200} />
+              <div className="muted small">${s.surplus_before.toFixed(2)}bn → ${s.surplus_after.toFixed(2)}bn</div>
+            </div>
           </div>
+          {s.real_world?.title && (
+            <div className="panel real-world">
+              <h3>In real life</h3>
+              <b>{s.real_world.title}</b>
+              <p className="small">{s.real_world.text}</p>
+            </div>
+          )}
         </div>
 
         <div className="panel cro">
+          <h3 className="cro-title">Justify your actions and explain the outcomes to Vera</h3>
           <div className="cro-head">
             <PixelSprite name={s.surplus_change < 0 ? "vera_concerned" : "vera_neutral"} size={72} title="Vera Atrisk" />
             <div className="cro-name">Vera Atrisk · Chief Risk Officer</div>
@@ -66,24 +81,17 @@ export function ShockScreen(props: {
               <div className="small muted">Second try: checks you earn now count half.</div>
             </div>
           )}
-          <textarea rows={5} value={text} onChange={(e) => setText(e.target.value)}
+          <textarea rows={6} value={text} onChange={(e) => setText(e.target.value)}
             placeholder={second ? "Try again: what moved most, and why did it hurt or help this company?"
-              : "Two to four sentences: what moved, why it hurt or helped this company, and what your trades did."} />
+              : "What moved, why it hurt or helped this company, and what your trades did."} />
           <div className="explain-row">
-            <span className="small muted">{words} words {words < 15 && "(15 minimum)"}</span>
             {s.sample_answer && !second && <button className="ghost" onClick={() => setText(s.sample_answer!)}>Use a sample answer (demo)</button>}
             <button className="ghost" disabled={props.busy} onClick={() => props.onSubmit("", true)}>I'm not sure</button>
-            <button className="primary" disabled={props.busy || words < 15} onClick={() => { props.onSubmit(text, false); setText(""); }}>
+            <button className="primary" disabled={props.busy || !text.trim()} onClick={() => { props.onSubmit(text, false); setText(""); }}>
               {props.busy ? <span className="spinner" aria-label="marking" /> : second ? "Submit second try" : "Submit explanation"}
             </button>
           </div>
-          <p className="small muted">The breakdown by cause stays hidden until you explain. Vera marks four things: the main driver, why it moved surplus, the second factor, and what your trades did or could have done.</p>
         </div>
-      </div>
-
-      <div className="panel">
-        <h3>Dashboard before → after the shock</h3>
-        <Meters dashboard={s.dashboard_before} after={s.dashboard_after} />
       </div>
     </section>
   );

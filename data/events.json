@@ -40,7 +40,11 @@
         "liquidity_ratio"
       ],
       "source_note": "Stylized on 2022: US 10-year Treasury yield rose roughly 2.3 percentage points over the year, with the S&P 500 down about 19%. The quarter here compresses part of that move. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode for rates; spreads, credit losses and stocks run about 15% larger (re-tuned when currency risk was removed). A typical draw (1.0x) is about 70 to 80% of the episode.",
-      "sample_answer": "Interest rates jumped. Our liabilities and guarantees are more rate-sensitive than our assets, so their value fell more than our bonds did, which lifted surplus. Stocks fell too, which made the market guarantees more expensive. Stock-market insurance would have softened that."
+      "sample_answer": "Interest rates jumped. Our liabilities and guarantees are more rate-sensitive than our assets, so their value fell more than our bonds did, which lifted surplus. Stocks fell too, which made the market guarantees more expensive. Stock-market insurance would have softened that.",
+      "real_world": {
+        "title": "2022: the fastest rate hikes in 40 years",
+        "text": "Inflation hit its highest level in four decades and the Federal Reserve raised rates at the fastest pace since the early 1980s. The 10-year Treasury yield rose by more than 2 percentage points over the year, bond prices fell sharply, and the S&P 500 fell about 19%. Some annuity holders cashed out to chase higher rates elsewhere."
+      }
     },
     {
       "id": "pension_deal",
@@ -81,7 +85,11 @@
       ],
       "source_note": "Stylized on 2012, when General Motors and Verizon transferred large parts of their pension obligations to Prudential, starting a wave of pension risk transfer deals. Market moves this quarter are modest by design.",
       "offers_prt_deal": true,
-      "sample_answer": "Rates rose a little, and because our liabilities are longer than our assets that helped surplus slightly. Stocks drifted lower, which nudged up the stock-market guarantees. The pension deal adds long liabilities, so it uses capital and widens the rate mismatch; more rate protection would offset that."
+      "sample_answer": "Rates rose a little, and because our liabilities are longer than our assets that helped surplus slightly. Stocks drifted lower, which nudged up the stock-market guarantees. The pension deal adds long liabilities, so it uses capital and widens the rate mismatch; more rate protection would offset that.",
+      "real_world": {
+        "title": "2012: GM and Verizon hand their pensions to Prudential",
+        "text": "General Motors and Verizon transferred large parts of their pension obligations to Prudential, GM's covering roughly $25 billion. It started a wave of pension risk transfer deals that insurers still compete for: steady, long-dated business that grows the balance sheet but uses capital."
+      }
     },
     {
       "id": "credit_crunch",
@@ -127,7 +135,11 @@
         "put_option"
       ],
       "source_note": "Stylized on Q4 2008: 10-year Treasury yields fell about 1.6 points, investment-grade spreads widened to roughly 6 points and high-yield spreads to about 20 points at the peak, and the S&P 500 fell about 22% in the quarter. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode for rates; spreads, credit losses and stocks run about 15% larger (re-tuned when currency risk was removed). A typical draw (1.0x) is about 70 to 80% of the episode.",
-      "sample_answer": "Rates fell sharply. Our liabilities and guarantees are longer than our assets, so they rose in value more than our bonds, which hurt surplus. Stocks crashed too, raising the guarantees. More rate protection with swaps would have helped most."
+      "sample_answer": "Rates fell sharply. Our liabilities and guarantees are longer than our assets, so they rose in value more than our bonds, which hurt surplus. Stocks crashed too, raising the guarantees. More rate protection with swaps would have helped most.",
+      "real_world": {
+        "title": "Late 2008: the credit crisis",
+        "text": "After Lehman Brothers failed, credit markets froze. Corporate bond spreads blew out, defaults rose, commercial mortgages took losses and stocks fell nearly 40% over the year. Investors fled to government bonds, pushing their yields down, and selling anything else meant accepting fire-sale prices."
+      }
     },
     {
       "id": "dealer_down",
@@ -168,7 +180,11 @@
         "replacement_cost"
       ],
       "source_note": "Stylized on Lehman Brothers' bankruptcy in September 2008, when counterparties with uncollateralized derivatives faced losses and had to replace hedges in a volatile market. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode for rates; spreads, credit losses and stocks run about 15% larger (re-tuned when currency risk was removed). A typical draw (1.0x) is about 70 to 80% of the episode.",
-      "sample_answer": "Stocks dropped, which raised the cost of the stock-market guarantees we owe: that was the biggest hit. Rates fell again too, and with liabilities longer than assets that hurt surplus. Because our hedges were small, the dealer failure itself cost us little; daily collateral would have protected larger hedges."
+      "sample_answer": "Stocks dropped, which raised the cost of the stock-market guarantees we owe: that was the biggest hit. Rates fell again too, and with liabilities longer than assets that hurt surplus. Because our hedges were small, the dealer failure itself cost us little; daily collateral would have protected larger hedges.",
+      "real_world": {
+        "title": "September 2008: Lehman Brothers collapses",
+        "text": "Lehman Brothers, one of the largest derivatives dealers, filed for bankruptcy. Firms with hedges at Lehman lost what Lehman owed them unless they had collected collateral, and had to replace those hedges at worse prices. AIG needed a government rescue after collateral calls on its own derivatives."
+      }
     }
   ]
 }

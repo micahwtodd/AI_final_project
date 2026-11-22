@@ -37,10 +37,7 @@ const SLIDES: Slide[] = [
     kicker: "Your boss", title: "Vera Atrisk, Chief Risk Officer",
     body: <>Vera runs the organization, sends your questions to the right expert, and will ask you to explain your
       decisions after every market shock.</>,
-    art: <div className="intro-moods">
-      <PixelSprite name="vera_pleased" size={96} title="Vera, pleased" />
-      <PixelSprite name="vera_concerned" size={96} title="Vera, concerned" />
-    </div>,
+    art: <PixelSprite name="vera_neutral" size={150} title="Vera Atrisk" />,
   },
   {
     kicker: "Your team", title: "Three specialists. Three opinions.",

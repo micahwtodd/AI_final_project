@@ -530,10 +530,19 @@ def bonnie(mood: str) -> Image.Image:
 
 
 def swap(mood: str) -> Image.Image:
-    """Swap Dogg: a crunchy old hippie trader. Long silver hair, tie-dye headband, beard, round tinted glasses."""
+    """Swap Dogg: a crunchy old hippie trader. Long wavy silver hair, a wide tie-dye headband with a peace
+    sign, a bushy beard, small tinted wire glasses, a tie-dye shirt under a fringed suede vest."""
     s = Sprite(64, 64)
     skin, hair = R["skin_tan"], R["hair_grey"]
-    s.region("hair_back", {p for p in ellipse(CX, 28, 17.5, 22) if p[1] <= 56}, hair, hl=False)
+    # long wavy hair: the silhouette ripples all the way down past the shoulders
+    back = set()
+    for y in range(10, 64):
+        hw = 15.5 + max(0, y - 18) * 0.12 + 1.8 * math.sin(y / 2.6)
+        if y < 18:
+            hw = math.sqrt(max(0, 16.5 ** 2 * (1 - ((y - 17.5) / 9.5) ** 2)))
+        for x in range(round(CX - hw + 0.5), round(CX + hw - 0.5) + 1):
+            back.add((x, y))
+    s.region("hair_back", back, hair, hl=False)
     base_body(s, skin, R["shirt"], shirt=False, lapels=False)
     torso = s.pts_of("torso")
     dye = ["#e85d5d", "#f2a541", "#f5dd5b", "#6cc46a", "#4f9de0", "#9b6ad6"]
@@ -544,54 +553,81 @@ def swap(mood: str) -> Image.Image:
         if x > CX + 12:
             col = mix(col, INK, 0.25)
         s.px(x, y, col)
-    vest = R["orange"]
-    suede = [mix(c, hx("#8a6a48"), 0.65) for c in vest]
+    suede = [mix(c, hx("#8a6a48"), 0.65) for c in R["orange"]]
     for sx in (-1, 1):  # a fringed suede vest
-        side = {(x, y) for (x, y) in torso if (x - CX) * sx > 7 + (y - 47) * 0.15}
+        side = {(x, y) for (x, y) in torso if (x - CX) * sx > 8 + (y - 47) * 0.15}
         s.region("vest%d" % sx, side, suede)
-        for (x, y) in side:
-            s.detail.pop((x, y), None)
-        for x in range(min(p[0] for p in side), max(p[0] for p in side) + 1):
+        for p in side:
+            s.detail.pop(p, None)
+        for x in range(min(q[0] for q in side), max(q[0] for q in side) + 1):
             if x % 2 == 0:
                 s.px(x, 63, suede[1])
-    s.px(31, 52, R["shirt"][4])  # peace pendant on a cord
-    s.px(32, 52, R["shirt"][4])
-    s.px(31, 53, R["shirt"][2])
-    s.px(32, 53, R["shirt"][2])
-    for x, y in ((28, 48), (29, 49), (30, 50), (35, 48), (34, 49), (33, 50)):
-        s.px(x, y, hx("#6b4a2a"))
-    s.region("hair_crown", ellipse(CX, 16, 16.5, 9.5), hair, hl=False)
-    shade_hair(s, ("hair_back", "hair_crown"), sheen=(27, 13, 13, 6),
-               strands=[((31, 8), (31, 15)), ((22, 14), (16, 40)), ((19, 20), (15, 48)), ((41, 14), (47, 40)), ((44, 20), (48, 48))])
-    for x in range(17, 47):  # tie-dye headband
-        for y in (17, 18):
-            s.px(x, y, mix(hx(dye[(x // 3) % len(dye)]), INK, 0.15 if y == 18 else 0))
+    # hair in front of the shoulders, then the crown with a centre part
+    for sx in (-1, 1):
+        front = set()
+        for y in range(24, 60):
+            x0 = CX + sx * (15.5 + 1.4 * math.sin(y / 2.6 + 1))
+            front |= {(round(x0) + k * sx, y) for k in range(4)} - face_pts()
+        s.region("hair_front%d" % sx, front, hair, hl=False)
+    s.region("hair_crown", {q for q in ellipse(CX, 16.5, 16.5, 9.5) if q[1] <= 20 or not (19 <= q[0] <= 44)}, hair, hl=False)
+    names = ("hair_back", "hair_crown", "hair_front-1", "hair_front1")
+    shade_hair(s, names, sheen=(26, 12, 12, 5.5), strands=[((31, 8), (31, 15)), ((32, 8), (32, 15))])
+    for (x, y), r in list(s.owner.items()):  # wavy strands
+        if r in names and y > 18:
+            w = (y + 2.5 * math.sin(x / 2.2)) % 7
+            if w < 1:
+                s.tone(x, y, max(1, s.tone_override.get((x, y), 3) - 1))
+            elif 3 < w < 4 and x < CX - 4:
+                s.tone(x, y, 4)
+    # a wide tie-dye headband with a peace sign
+    for x in range(14, 50):
+        for y in range(14, 21):
+            if s.owner.get((x, y), "").startswith("hair") or (x, y) in face_pts():
+                col = hx(dye[((x + y) // 3) % len(dye)])
+                s.px(x, y, mix(col, INK, 0.3 if y == 20 else 0.12 if x > CX + 10 else 0))
+    pc = (31, 17)
+    for (x, y) in ellipse(31.5, 17.5, 4.6, 4.6):
+        s.px(x, y, R["navy"][2])
+    for x in range(27, 36):
+        for y in range(13, 22):
+            d = math.hypot(x - pc[0], y - pc[1])
+            if 2.6 <= d <= 3.6 or (x == pc[0] and abs(y - pc[1]) <= 3) or (x, y) in ((30, 18), (29, 19), (32, 18), (33, 19)):
+                s.px(x, y, WHITE)
     cast_shadow(s, from_prefix=("hair",))
-    for x in range(24, 40, 3):  # forehead and crow's feet lines
+    for x in range(24, 40, 3):  # forehead lines and crow's feet
         s.px(x, 21, skin[2])
     for x, y in ((19, 29), (19, 31), (44, 29), (44, 31)):
         s.px(x, y, skin[1])
     eyes(s, hx("#5a7a4a"), mood, skin=skin)
     brows(s, hair[1], mood)
-    beard = poly([(18.5, 32), (22, 31), (26, 35), (37, 35), (41, 31), (44.5, 32), (43, 42), (37, 49), (31.5, 51), (26, 49), (20, 42)])
+    # a big bushy beard with a curly edge
+    beard = poly([(19, 34), (23, 35), (26, 37), (37, 37), (40, 35), (44, 34), (46, 41), (43, 50), (37, 56), (31.5, 58), (26, 56), (20, 50), (17, 41)])
+    for a in range(200, 341, 14):
+        beard |= ellipse(CX + 14 * math.cos(math.radians(a + 180)), 46 + 11 * math.sin(math.radians(a + 180)) * -1, 2.4, 2.4)
     s.region("beard", beard, hair)
-    shade_hair(s, ("beard",), strands=[((24, 38), (27, 47)), ((31, 40), (31, 50)), ((39, 38), (36, 47))])
-    s.region("stache", poly([(25, 35.5), (38, 35.5), (37.5, 38), (31.5, 37), (25.5, 38)]), hair)
-    nose_mouth(s, skin, hx("#7a3e34"), mood, mouth_y=39)
-    for x in range(28, 36):  # the beard hides the chin: draw the mouth into it
-        for y in (40, 41, 42):
-            if (x, y) in s.detail and s.owner.get((x, y)) == "beard" and y > 40:
-                s.detail.pop((x, y))
-    for cx in (23.5, 39.5):  # round, orange-tinted granny glasses
-        for (x, y) in ellipse(cx, 29.5, 4, 3.6):
-            base = s.detail.get((x, y))
-            under = base if base is not None else s.ramps[s.owner[(x, y)]][3] if (x, y) in s.owner else hx("#ffffff")
-            s.px(x, y, mix(under, hx("#f2a03a"), 0.35))
-        for a in range(0, 360, 12):
-            s.px(round(cx + 4.3 * math.cos(math.radians(a))), round(29.5 + 3.9 * math.sin(math.radians(a))), R["gold"][1])
-        s.px(round(cx) - 2, 27, WHITE)
+    shade_hair(s, ("beard",), deep_bottom=0.85)
+    for (x, y) in s.pts_of("beard"):
+        w = (x + 2 * math.sin(y / 2.4)) % 5
+        if w < 1:
+            s.tone(x, y, max(1, s.tone_override.get((x, y), 3) - 1))
+        elif 2.5 < w < 3.3 and x < CX:
+            s.tone(x, y, 4)
+    s.region("stache", poly([(24, 35), (39, 35), (40, 39), (36, 37.5), (31.5, 38), (27, 37.5), (23, 39)]), hair)
+    shade_hair(s, ("stache",))
+    nose_mouth(s, skin, hx("#7a3e34"), mood, mouth_y=40)
+    for p in ((31, 43), (32, 43)):
+        s.detail.pop(p, None)
+    for cx in (23.5, 39.5):  # small round wire glasses with a light orange tint
+        for (x, y) in ellipse(cx, 29.5, 3.2, 3.0):
+            under = s.detail.get((x, y)) or (s.ramps[s.owner[(x, y)]][3] if (x, y) in s.owner else WHITE)
+            s.px(x, y, mix(under, hx("#f2a03a"), 0.15))
+        for a in range(0, 360, 15):
+            s.px(round(cx + 3.6 * math.cos(math.radians(a))), round(29.5 + 3.3 * math.sin(math.radians(a))), R["gold"][1])
+        s.px(round(cx) - 1, 28, WHITE)
     for x in range(28, 36):
-        s.px(x, 28, R["gold"][1])
+        s.px(x, 29, R["gold"][1])
+    for x, y in ((31, 54), (32, 54), (31, 55), (32, 55)):  # the peace pendant peeks out of the beard
+        s.px(x, y, R["shirt"][4] if y == 54 else R["shirt"][2])
     if mood == "concerned":
         sweat(s)
     return s.render(badge_bg(), clip=in_badge())
