@@ -51,7 +51,7 @@ export function Desk(props: {
           </div>
         )}
 
-        <ChatPanel gameId={g.id} chat={g.chat} usage={props.usage} onUsage={props.onUsage}
+        <ChatPanel gameId={g.id} chat={g.chat} mode={g.agent_mode} usage={props.usage} onUsage={props.onUsage}
           onLoadTicket={(a) => setDraft({ ...a, accept_prt: offersPrt ? a.accept_prt : null })} />
 
         <div className="panel">

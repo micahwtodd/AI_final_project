@@ -105,3 +105,53 @@ def test_ask_route_streams_blocked_reply_when_capped():
         body = "".join(r.iter_text())
     events = [json.loads(line[6:]) for line in body.split("\n") if line.startswith("data: ")]
     assert events[-1]["type"] == "usage" and any(e["type"] == "reply" for e in events)
+
+
+# ---------------------------------------------------------------- Team mode (Project 4)
+
+def test_permissions_match_plan():
+    T = agents.TOOLSETS
+    # only the Trader (and Solo) can write a ticket
+    assert {k for k, v in T.items() if "propose_trade" in v} == {"trader", "solo"}
+    # only the CRO delegates
+    assert {k for k, v in T.items() if any(t.startswith("ask_") for t in v)} == {"cro"}
+    # specialists see only their own area
+    assert T["actuary"].isdisjoint({"get_asset_summary", "get_credit_exposure", "get_hedge_costs"})
+    assert T["portfolio_manager"].isdisjoint({"get_liability_summary", "get_hedge_costs", "propose_trade"})
+    assert T["trader"].isdisjoint({"get_liability_summary", "get_credit_exposure"})
+    # the coach reads the dashboard but not the specialists' detail
+    assert T["cro"].isdisjoint({"get_liability_summary", "get_asset_summary", "get_hedge_costs", "propose_trade"})
+    # no agent has a tool that changes positions, scores or the budget
+    every = set().union(*T.values())
+    assert not any(t.startswith(("set_", "execute", "commit", "score", "update_")) for t in every)
+
+
+def test_prompts_load_with_rules_and_glossary():
+    for kind in agents.PROMPT_FILES:
+        text = agents.load_prompt(agents.PROMPT_FILES[kind])
+        assert "{RULES}" not in text and "{GLOSSARY}" not in text
+        assert "Numbers only from tools" in text and "Duration" in text
+
+
+def test_mode_switch_route():
+    gid = client.post("/api/game", json={"ticker": "EQH"}).json()["id"]
+    assert client.get(f"/api/game/{gid}").json()["agent_mode"] == "team"
+    assert client.post(f"/api/game/{gid}/mode", json={"agent_mode": "solo"}).json()["agent_mode"] == "solo"
+    assert client.get(f"/api/game/{gid}").json()["agent_mode"] == "solo"
+    assert client.post(f"/api/game/{gid}/mode", json={"agent_mode": "boss"}).status_code == 422
+
+
+def test_delegation_cap_and_budget_stop_without_model_calls():
+    s = game.new_game("MET", 409)
+    events = []
+    run = agents.RunCtx(session=s, run_id="t", emit=lambda *a, **k: events.append(a) or {})
+
+    class Ctx:  # minimal stand-in for RunContext
+        deps = agents.Deps(run=run, agent="cro")
+
+    run.delegations = agents.MAX_DELEGATIONS
+    out = asyncio.run(agents._delegate(Ctx(), "actuary", "anything"))
+    assert "limit" in out["error"]
+    run.delegations, run.stopped = 0, "budget"
+    out = asyncio.run(agents._delegate(Ctx(), "trader", "anything"))
+    assert "budget" in out["error"] and s.tokens["requests"] == 0

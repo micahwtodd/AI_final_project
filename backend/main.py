@@ -139,7 +139,7 @@ async def ask(session_id: str, body: AskBody):
 
     async def produce() -> None:
         try:
-            await agents.ask(s, body.message.strip(), queue, game.save)
+            await agents.ask(s, body.message.strip(), queue, game.save, to=body.to)
         finally:
             queue.put_nowait(None)
 
@@ -155,6 +155,19 @@ async def ask(session_id: str, body: AskBody):
 
     return StreamingResponse(stream(), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+class ModeBody(BaseModel):
+    agent_mode: Literal["solo", "team"]
+
+
+@app.post("/api/game/{session_id}/mode")
+def set_mode(session_id: str, body: ModeBody) -> dict:
+    """Switch between Solo (one agent) and Team (CRO plus specialists). The examiner is the same in both."""
+    s = _session(session_id)
+    s.agent_mode = body.agent_mode
+    game.save(s)
+    return {"agent_mode": s.agent_mode}
 
 
 @app.get("/api/usage/{session_id}")

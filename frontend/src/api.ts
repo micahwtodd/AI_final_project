@@ -68,6 +68,7 @@ export type GameView = {
   ticker: string;
   company: string;
   seed: number;
+  agent_mode: AgentMode;
   quarter: number;
   phase: "position" | "explain" | "finished";
   card: Card | null;
@@ -99,7 +100,12 @@ export type ChatMsg = {
   run_id?: string;
   stopped?: string | null;
   proposed_ticket?: Ticket | null;
+  subs?: SubAnswer[];
 };
+
+export type SubAnswer = { agent: string; agent_name: string; text: string };
+export type AgentMode = "solo" | "team";
+export type Colleague = "team" | "actuary" | "portfolio_manager" | "trader";
 
 export type AgentEvent = {
   ts: number;
@@ -202,14 +208,15 @@ export const api = {
   debrief: (id: string) => call<Debrief>(`/game/${id}/debrief`),
   usage: (id: string) => call<Usage>(`/usage/${id}`),
   setBudget: (id: string, cap_usd: number) => call<Usage>(`/budget/${id}`, { cap_usd }),
+  setMode: (id: string, agent_mode: AgentMode) => call<{ agent_mode: AgentMode }>(`/game/${id}/mode`, { agent_mode }),
 };
 
 /** POST a question and read the Server-Sent Events stream until the reply arrives. */
-export async function askStream(id: string, message: string, onEvent: (e: AgentEvent) => void): Promise<void> {
+export async function askStream(id: string, message: string, onEvent: (e: AgentEvent) => void, to?: Colleague): Promise<void> {
   const res = await fetch(`/api/game/${id}/ask`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({ message, to: to && to !== "team" ? to : null }),
   });
   if (!res.ok || !res.body) throw new Error(`Ask failed (${res.status})`);
   const reader = res.body.getReader();
