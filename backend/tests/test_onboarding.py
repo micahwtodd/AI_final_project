@@ -39,18 +39,21 @@ def test_question_matches_headline_change():
     assert amount == round(abs(shock["surplus_change"]), 2)
 
 
-def test_sprite_sheet_shape():
-    data = json.loads((ROOT / "frontend/src/sprites/sprites.json").read_text(encoding="utf-8"))
-    assert len(data["palette"]) == 16
-    sprites = data["sprites"]
+def _png_size(path: Path) -> tuple[int, int]:
+    head = path.read_bytes()[:24]
+    assert head[1:4] == b"PNG"
+    return int.from_bytes(head[16:20], "big"), int.from_bytes(head[20:24], "big")
+
+
+def test_art_files_exist_with_the_right_sizes():
+    art = ROOT / "frontend/public/art"
     for who in ["vera", "morty", "bonnie", "swap", "seamore"]:
         for mood in ["neutral", "pleased", "concerned"]:
-            rows = sprites[f"{who}_{mood}"]
-            assert len(rows) == len(rows[0]) and len({len(r) for r in rows}) == 1
+            assert _png_size(art / f"{who}_{mood}.png") == (64, 64)
     for state in ["nap", "alert", "hide"]:
-        assert f"cat_{state}" in sprites
-    for rows in sprites.values():
-        assert all(re.fullmatch(r"[0-9a-f]+", r) for r in rows)
+        assert _png_size(art / f"cat_{state}.png") == (48, 48)
+    for v in ["day", "storm"]:
+        assert _png_size(art / f"office_{v}.png") == (480, 270)
 
 
 # ---------------------------------------------------------------- Gate 1 changes: editable game inputs, 5-item quiz

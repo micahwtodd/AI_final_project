@@ -91,7 +91,7 @@ export default function App() {
 
   return (
     <GlossaryContext.Provider value={glossary}>
-    <div className="app">
+    <div className={`app scene-${screen.name}`}>
       <header className="topbar">
         <div className="brand" onClick={() => setScreen({ name: "select" })} title="Back to company select">
           RISK DESK

@@ -122,7 +122,7 @@ export function WelcomeScreen(props: { onDone: () => void }) {
           <div className="welcome-cast">
             {["morty", "bonnie", "vera", "swap", "seamore"].map((w, k) => (
               <span key={w} className="bob" style={{ animationDelay: `${k * 0.15}s` }}>
-                <PixelSprite name={`${w}_${stage === "too-bad" ? "concerned" : "pleased"}`} size={w === "vera" ? 96 : 72} />
+                <PixelSprite name={`${w}_${stage === "too-bad" ? "concerned" : "pleased"}`} size={w === "vera" ? 128 : 96} />
               </span>
             ))}
           </div>

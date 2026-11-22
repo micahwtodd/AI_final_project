@@ -1,9 +1,3 @@
-import { useEffect, useRef } from "react";
-import data from "../sprites/sprites.json";
-
-type SpriteData = { palette: string[]; sprites: Record<string, string[]> };
-const SPRITES = data as SpriteData;
-
 export type Mood = "neutral" | "pleased" | "concerned";
 
 // Which portrait each agent uses.
@@ -17,32 +11,14 @@ export function spriteFor(agent: string | undefined, mood: Mood = "neutral"): st
   return who ? `${who}_${mood}` : null;
 }
 
-/** Draws one sprite from sprites.json on a canvas, scaled with crisp pixels. */
+/** One sprite from public/art (drawn by scripts/render_sprites.py), scaled with crisp pixels.
+ *  Portraits are round badges; the cat has a transparent background. */
 export function PixelSprite(props: { name: string; size: number; title?: string; className?: string }) {
-  const ref = useRef<HTMLCanvasElement>(null);
-  const rows = SPRITES.sprites[props.name];
-
-  useEffect(() => {
-    const cv = ref.current;
-    if (!cv || !rows) return;
-    const ctx = cv.getContext("2d");
-    if (!ctx) return;
-    ctx.clearRect(0, 0, cv.width, cv.height);
-    rows.forEach((row, y) => {
-      for (let x = 0; x < row.length; x++) {
-        const i = parseInt(row[x], 16);
-        if (i === 0) continue;
-        ctx.fillStyle = SPRITES.palette[i];
-        ctx.fillRect(x, y, 1, 1);
-      }
-    });
-  }, [rows]);
-
-  if (!rows) return null;
+  const portrait = !props.name.startsWith("cat_");
   return (
-    <canvas ref={ref} width={rows[0].length} height={rows.length} className={`pixel ${props.className ?? ""}`}
-      style={{ width: props.size, height: props.size * rows.length / rows[0].length }}
-      role={props.title ? "img" : undefined} aria-label={props.title} aria-hidden={props.title ? undefined : true} />
+    <img src={`/art/${props.name}.png`} width={props.size} height={props.size} draggable={false}
+      className={`pixel ${portrait ? "portrait" : ""} ${props.className ?? ""}`}
+      alt={props.title ?? ""} aria-hidden={props.title ? undefined : true} />
   );
 }
 

@@ -1,385 +1,889 @@
-"""Generate the pixel art in code and render a contact sheet for review (dev-only; needs Pillow).
+"""Generate the game's pixel art in code and render a contact sheet for review (dev-only; needs Pillow).
 
 Run from the repo folder:  python scripts/render_sprites.py
-Writes frontend/src/sprites/sprites.json (palette + palette-index grids) and
-evidence/sprites_contact_sheet.png (every sprite at 8x).
+Writes frontend/public/art/*.png (portraits 64x64, cat 48x48, office backgrounds 480x270)
+and evidence/sprites_contact_sheet.png plus evidence/office_backgrounds.png.
 
-Art rules (build plan 11.1): one fixed 16-color palette, 1-pixel dark outline,
-light from the top left, the same proportions for the whole cast.
+Style rules: light from the top left; every material has a five-step color ramp (deep shadow, shadow,
+base, light, highlight); outlines are the darkest step of the material they wrap, never pure black;
+portraits sit in a round badge with sky and a city skyline, like a character select screen.
 """
 
 from __future__ import annotations
 
-import json
 import math
+import random
 import sys
 from pathlib import Path
 
+from PIL import Image, ImageDraw, ImageFont
+
 ROOT = Path(__file__).resolve().parent.parent
-
-PALETTE = [
-    "#00000000",  # 0 transparent
-    "#1b1f3b",    # 1 outline
-    "#f2f2f2",    # 2 white
-    "#f2c9a0",    # 3 skin light
-    "#d6a06c",    # 4 skin tan
-    "#a8693f",    # 5 skin brown
-    "#6e4326",    # 6 skin deep
-    "#2a2a33",    # 7 hair black
-    "#c9ccd6",    # 8 silver
-    "#1f8a5b",    # 9 emerald
-    "#12613f",    # 10 emerald dark
-    "#007ac1",    # 11 Prudential blue
-    "#0b2a5c",    # 12 navy
-    "#537d93",    # 13 steel
-    "#e2a400",    # 14 gold
-    "#c8504a",    # 15 red
-]
-SHADE = {2: 8, 3: 4, 4: 5, 5: 6, 6: 7, 7: 1, 8: 13, 9: 10, 10: 1, 11: 12, 12: 1, 13: 12, 14: 5, 15: 6}
-LIGHT = {4: 3, 5: 4, 6: 5, 9: 9, 11: 11, 13: 8}
+OUT = ROOT / "frontend" / "public" / "art"
+EVIDENCE = ROOT / "evidence"
 
 
-class Canvas:
+def hx(s: str) -> tuple[int, int, int]:
+    s = s.lstrip("#")
+    return tuple(int(s[i:i + 2], 16) for i in (0, 2, 4))  # type: ignore[return-value]
+
+
+def ramp(*cols: str) -> list[tuple[int, int, int]]:
+    return [hx(c) for c in cols]
+
+
+def mix(a, b, t: float):
+    return tuple(round(a[i] + (b[i] - a[i]) * t) for i in range(3))
+
+
+# ---------------------------------------------------------------- material ramps (deep shadow -> highlight)
+
+R = {
+    "skin_deep": ramp("#3b2219", "#5c3523", "#7d4a2f", "#9a6040", "#b57a55"),
+    "skin_light": ramp("#6b4434", "#b77c64", "#d99c80", "#f0bfa0", "#fbd8bf"),
+    "skin_tan": ramp("#5e3a26", "#a0663f", "#c48455", "#dca26f", "#efc093"),
+    "skin_warm": ramp("#4a2c1c", "#7f4c2e", "#a4673f", "#c08352", "#d9a06d"),
+    "skin_fair": ramp("#6b4434", "#c08a6c", "#e0a888", "#f3c8a8", "#fde0c8"),
+    "hair_silver": ramp("#3e4452", "#6f7787", "#a4abb9", "#cfd4de", "#f0f2f6"),
+    "hair_grey": ramp("#4a4d55", "#7c808a", "#a9adb6", "#cfd2d9", "#eceef2"),
+    "hair_blueblack": ramp("#141626", "#22263d", "#323a5c", "#46548a", "#6a7fc0"),
+    "hair_black": ramp("#15120f", "#2a221c", "#3d3129", "#55463a", "#7a6656"),
+    "hair_plum": ramp("#120f16", "#241d2b", "#362c40", "#4c3f5a", "#6e5d82"),
+    "emerald": ramp("#0b3b28", "#11583b", "#1a774f", "#239866", "#3cb882"),
+    "steel": ramp("#1f2f3a", "#34505f", "#4a6c7f", "#62889c", "#86a9bb"),
+    "pru_blue": ramp("#06264a", "#0a3d72", "#0b5aa0", "#007ac1", "#3aa0dc"),
+    "navy": ramp("#060f24", "#0d1b3d", "#14295a", "#1f3a78", "#34529a"),
+    "slate": ramp("#232a36", "#394456", "#4f5d74", "#687896", "#8a9ab6"),
+    "shirt": ramp("#8f9aa8", "#b9c2cd", "#dce2e9", "#f3f6f9", "#ffffff"),
+    "gold": ramp("#6b4a00", "#a87400", "#d49b10", "#f2c230", "#ffe27a"),
+    "headset": ramp("#0e1420", "#1d2738", "#2f3d55", "#46597a", "#6f86ab"),
+    "tie": ramp("#3a0d14", "#6b1624", "#962033", "#b8304a", "#d65a70"),
+    "orange": ramp("#5a2a0a", "#9c4f17", "#cf7a2a", "#ef9f45", "#ffc77e"),
+    "white_fur": ramp("#7d828c", "#bfc4cc", "#e1e4ea", "#f4f5f8", "#ffffff"),
+    "desk": ramp("#0a1326", "#13213f", "#1d3160", "#2a4480", "#3d5ca3"),
+}
+INK = hx("#1b1f3b")
+WHITE = hx("#ffffff")
+EYE_WHITE = hx("#f4f1ea")
+
+
+# ---------------------------------------------------------------- shape helpers (pixel sets)
+
+def ellipse(cx, cy, rx, ry) -> set:
+    out = set()
+    for y in range(math.floor(cy - ry) - 1, math.ceil(cy + ry) + 2):
+        for x in range(math.floor(cx - rx) - 1, math.ceil(cx + rx) + 2):
+            if ((x + 0.5 - cx) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2 <= 1:
+                out.add((x, y))
+    return out
+
+
+def poly(points) -> set:
+    xs = [p[0] for p in points]
+    ys = [p[1] for p in points]
+    out = set()
+    for y in range(math.floor(min(ys)), math.ceil(max(ys)) + 1):
+        for x in range(math.floor(min(xs)), math.ceil(max(xs)) + 1):
+            px, py = x + 0.5, y + 0.5
+            inside = False
+            j = len(points) - 1
+            for i in range(len(points)):
+                xi, yi = points[i]
+                xj, yj = points[j]
+                if (yi > py) != (yj > py) and px < (xj - xi) * (py - yi) / (yj - yi + 1e-9) + xi:
+                    inside = not inside
+                j = i
+            if inside:
+                out.add((x, y))
+    return out
+
+
+def rect(x0, y0, x1, y1) -> set:
+    return {(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)}
+
+
+# ---------------------------------------------------------------- the sprite builder
+
+class Sprite:
+    """Regions are painted in order (later covers earlier), shaded by edge-bevel with light from the top left,
+    then details are drawn on top and a colored outline wraps the silhouette."""
+
     def __init__(self, w: int, h: int):
         self.w, self.h = w, h
-        self.px = [[0] * w for _ in range(h)]
+        self.owner: dict[tuple[int, int], str] = {}
+        self.ramps: dict[str, list] = {}
+        self.opts: dict[str, dict] = {}
+        self.detail: dict[tuple[int, int], tuple] = {}
+        self.tone_override: dict[tuple[int, int], int] = {}
 
-    def set(self, x: int, y: int, c: int) -> None:
+    def region(self, name: str, pts: set, rmp: list, **opts) -> None:
+        self.ramps[name] = rmp
+        self.opts[name] = opts
+        for p in pts:
+            if 0 <= p[0] < self.w and 0 <= p[1] < self.h:
+                self.owner[p] = name
+                self.tone_override.pop(p, None)
+
+    def px(self, x: int, y: int, col) -> None:
         if 0 <= x < self.w and 0 <= y < self.h:
-            self.px[y][x] = c
+            self.detail[(x, y)] = col
 
-    def get(self, x: int, y: int) -> int:
-        return self.px[y][x] if 0 <= x < self.w and 0 <= y < self.h else 0
+    def tone(self, x: int, y: int, t: int) -> None:
+        self.tone_override[(x, y)] = t
 
-    def rect(self, x0, y0, x1, y1, c):
-        for y in range(y0, y1 + 1):
-            for x in range(x0, x1 + 1):
-                self.set(x, y, c)
+    def pts_of(self, name: str) -> set:
+        return {p for p, r in self.owner.items() if r == name}
 
-    def ellipse(self, cx, cy, rx, ry, c, only_empty=False):
-        for y in range(int(cy - ry) - 1, int(cy + ry) + 2):
-            for x in range(int(cx - rx) - 1, int(cx + rx) + 2):
-                if ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1.0:
-                    if not only_empty or self.get(x, y) == 0:
-                        self.set(x, y, c)
+    def render(self, bg=None, outline=True, clip=None) -> Image.Image:
+        img = bg.copy() if bg is not None else Image.new("RGBA", (self.w, self.h), (0, 0, 0, 0))
+        pix = img.load()
+        boxes: dict[str, tuple] = {}
+        for (x, y), r in self.owner.items():
+            b = boxes.get(r, (x, y, x, y))
+            boxes[r] = (min(b[0], x), min(b[1], y), max(b[2], x), max(b[3], y))
 
-    def outline(self, color: int = 1) -> None:
-        """1-pixel dark outline around every shape."""
-        add = []
-        for y in range(self.h):
-            for x in range(self.w):
-                if self.px[y][x] == 0 and any(self.get(x + dx, y + dy) not in (0, color)
-                                              for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
-                    add.append((x, y))
-        for x, y in add:
-            self.px[y][x] = color
+        def same(p, r):
+            return self.owner.get(p) == r
 
-    def rows(self) -> list[str]:
-        return ["".join("0123456789abcdef"[c] for c in row) for row in self.px]
-
-
-# ---------------------------------------------------------------- portraits (64 x 64)
-
-CX, CY, RX, RY = 32, 28, 12, 14
-
-CAST = {
-    "vera": {"skin": 5, "hair": "locs", "hair_c": 8, "top": "blazer", "top_c": 9, "inner": 2, "glasses": False, "age": "older"},
-    "morty": {"skin": 3, "hair": "balding", "hair_c": 8, "top": "cardigan", "top_c": 13, "inner": 2, "glasses": True, "age": "older"},
-    "bonnie": {"skin": 4, "hair": "ponytail", "hair_c": 7, "top": "jacket", "top_c": 11, "inner": 2, "glasses": False, "age": "mid"},
-    "swap": {"skin": 4, "hair": "spiky", "hair_c": 7, "top": "hoodie", "top_c": 12, "inner": 14, "glasses": False, "headset": True, "age": "young"},
-    "seamore": {"skin": 3, "hair": "bob", "hair_c": 7, "top": "blazer", "top_c": 13, "inner": 2, "glasses": True, "age": "mid"},
-}
-
-
-def torso(c: Canvas, p: dict) -> None:
-    top, inner = p["top_c"], p["inner"]
-    for y in range(45, 64):
-        half = 11 + (y - 45) * 0.75
-        for x in range(int(CX - half), int(CX + half) + 1):
-            c.set(x, y, top)
-    for y in range(40, 47):  # neck
-        for x in range(28, 37):
-            c.set(x, y, p["skin"] if y < 45 else top)
-    for x in range(29, 36):  # one row of shade under the chin
-        c.set(x, 43, SHADE[p["skin"]])
-    if p["top"] in ("blazer", "cardigan"):  # V opening with shirt
-        for y in range(45, 64):
-            w = max(0, 6 - (y - 45) // 3)
-            for x in range(CX - w, CX + w + 1):
-                c.set(x, y, inner)
-        for y in range(45, 64):  # lapel edges
-            w = max(0, 6 - (y - 45) // 3)
-            c.set(CX - w - 1, y, SHADE[top])
-            c.set(CX + w + 1, y, SHADE[top])
-        if p["top"] == "cardigan":
-            for y in (52, 57, 62):
-                c.set(CX + 3, y, 14)
-    elif p["top"] == "jacket":
-        for y in range(45, 64):
-            c.set(CX, y, 2)  # zipper
-        for x in range(CX - 5, CX + 6):
-            c.set(x, 45, 2)  # collar
-    elif p["top"] == "hoodie":
-        for x in range(CX - 9, CX + 10):
-            c.set(x, 45, SHADE[top])
-        for y in range(46, 56):  # drawstrings
-            c.set(CX - 3, y, inner)
-            c.set(CX + 3, y, inner)
-    for y in range(47, 64):  # shading on the right (light from the top left)
-        half = 11 + (y - 45) * 0.75
-        for x in range(int(CX + half * 0.8), int(CX + half) + 1):
-            if c.get(x, y) == top:
-                c.set(x, y, SHADE[top])
+        for (x, y), r in self.owner.items():
+            o = self.opts[r]
+            t = 3
+            if not same((x + 1, y), r) or not same((x, y + 1), r):
+                t = 2
+            elif o.get("hl", True) and (not same((x - 1, y), r) or not same((x, y - 1), r)):
+                t = 4
+            bx0, by0, bx1, by1 = boxes[r]
+            wfrac = (x - bx0) / max(1, bx1 - bx0)
+            if wfrac > o.get("shade_right", 0.78):
+                t = min(t, 2)
+            if o.get("deep_right") and wfrac > o["deep_right"]:
+                t = min(t, 1)
+            t = self.tone_override.get((x, y), t)
+            pix[x, y] = (*self.ramps[r][t], 255)
+        for (x, y), col in self.detail.items():
+            pix[x, y] = (*col, 255)
+        if outline:
+            inside = set(self.owner) | set(self.detail)
+            for (x, y) in list(self.owner):
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    q = (x + dx, y + dy)
+                    if q in inside:
+                        continue
+                    if clip is not None and not clip(*q):
+                        continue  # the badge edge crops the figure: no outline there
+                    pix[x, y] = (*self.ramps[self.owner[(x, y)]][0], 255)
+                    break
+        if clip is not None:  # crop to the badge
+            for y in range(self.h):
+                for x in range(self.w):
+                    if not clip(x, y) and (x, y) in self.owner and bg is not None:
+                        pix[x, y] = bg.getpixel((x, y))
+        return img
 
 
-def head(c: Canvas, p: dict) -> None:
-    s = p["skin"]
-    c.ellipse(CX - 13, 29, 2, 3, s)  # ears
-    c.ellipse(CX + 13, 29, 2, 3, s)
-    c.ellipse(CX, CY, RX, RY, s)
-    for y in range(CY - RY, CY + RY + 1):  # shade the lower right of the face
-        for x in range(CX - RX, CX + RX + 1):
-            if c.get(x, y) == s and (((x - CX) / RX > 0.68 and y > CY - 6) or ((y - CY) / RY > 0.82 and x > CX - 2)):
-                c.set(x, y, SHADE[s])
-    c.set(CX + 13, 29, SHADE[s])
+# ---------------------------------------------------------------- portrait badge background
+
+def badge_bg(size: int = 64) -> Image.Image:
+    """Round badge: sky, a few clouds, a pale city skyline, a glass tower; transparent outside the circle."""
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    p = img.load()
+    c = (size - 1) / 2
+    rnd = random.Random(7)
+    sky_top, sky_bot = hx("#7fc0ec"), hx("#d8effb")
+    inside = lambda x, y: (x - c) ** 2 + (y - c) ** 2 <= (size / 2 - 0.5) ** 2  # noqa: E731
+    for y in range(size):
+        for x in range(size):
+            if inside(x, y):
+                bayer = BAYER[y % 4][x % 4] / 16
+                col = mix(sky_top, sky_bot, max(0, min(1, y / size * 1.15 + (bayer - 0.5) * 0.12)))
+                p[x, y] = (*col, 255)
+    for cx, cy, w in ((14, 12, 9), (46, 8, 7), (54, 19, 5)):
+        for (x, y) in ellipse(cx, cy, w, 2.2) | ellipse(cx - w * 0.3, cy - 1.5, w * 0.45, 2):
+            if 0 <= x < size and 0 <= y < size and inside(x, y):
+                p[x, y] = (*(hx("#e3f2fb") if y > cy else WHITE), 255)
+    far, far_win = hx("#a9c4db"), hx("#d3e4f1")
+    x = 0
+    while x < size:
+        w = rnd.randint(4, 8)
+        top = rnd.randint(34, 44)
+        for xx in range(x, min(size, x + w)):
+            for yy in range(top, size):
+                if inside(xx, yy):
+                    win = (yy - top) % 3 == 1 and (xx - x) % 2 == 1 and xx - x < w - 1
+                    p[xx, yy] = (*(far_win if win else far), 255)
+        x += w + rnd.randint(0, 2)
+    for x0, x1, top, glass in ((45, 53, 24, True), (6, 14, 30, False)):
+        for xx in range(x0, x1 + 1):
+            for yy in range(top, size):
+                if not inside(xx, yy):
+                    continue
+                if glass:
+                    col = hx("#6f9fd4") if (xx - x0) in (1, 2) else mix(hx("#2c4f7c"), hx("#1b3558"), (xx - x0) / 10)
+                    if (yy - top) % 4 == 0:
+                        col = mix(col, hx("#9cc4ea"), 0.4)
+                else:
+                    col = hx("#efe3cc") if (xx - x0) % 3 == 0 else hx("#c9b89a")
+                    if (yy - top) % 3 == 1 and (xx - x0) % 3 != 0:
+                        col = hx("#7d8fa3")
+                p[xx, yy] = (*col, 255)
+    for y in range(size):
+        for x in range(size):
+            d = math.hypot(x - c, y - c)
+            if size / 2 - 1.5 <= d <= size / 2 - 0.5:
+                p[x, y] = (*hx("#f4fbff"), 255)
+            elif size / 2 - 2.5 <= d < size / 2 - 1.5:
+                p[x, y] = (*hx("#c2d9ea"), 255)
+    return img
 
 
-def hairline(c: Canvas, p: dict, drop: int = 0) -> None:
-    """Re-open the face below a gentle hairline so hair never covers the brows."""
-    s = p["skin"]
-    for x in range(CX - RX + 2, CX + RX - 1):
-        top = int(CY - 8 + drop + ((x - CX) / RX) ** 2 * 5)
-        for y in range(top, CY + RY):
-            if ((x - CX) / (RX - 0.5)) ** 2 + ((y - CY) / (RY - 0.5)) ** 2 <= 1:
-                if c.get(x, y) not in (s, SHADE[s]):
-                    c.set(x, y, SHADE[s] if (x - CX) / RX > 0.68 else s)
+def in_badge(size: int = 64):
+    c = (size - 1) / 2
+    return lambda x, y: (x - c) ** 2 + (y - c) ** 2 <= (size / 2 - 2.5) ** 2
 
 
-def hair(c: Canvas, p: dict) -> None:
-    h, style = p["hair_c"], p["hair"]
-    hs = SHADE[h]
-    if style == "locs":
-        c.ellipse(CX, CY - 6, RX + 3, RY - 3, h)
-        for x in range(CX - RX - 4, CX + RX + 5):  # hanging locs on a solid backing
-            if abs(x - CX) <= RX - 3:
-                continue
-            for y in range(CY - 8, 50 - (abs(x - CX) > RX + 2) * 2):
-                c.set(x, y, h if x % 2 == 0 else hs)
-        for x in range(CX - RX - 1, CX + RX + 2, 3):  # continuous strands on top
-            for y in range(CY - RY - 2, CY - 7):
-                if c.get(x, y) == h:
-                    c.set(x, y, hs)
-        for y in range(CY + 8, 46):  # fill behind the locs beside the neck
-            for x in list(range(CX - RX - 4, CX - 4)) + list(range(CX + 5, CX + RX + 5)):
-                if c.get(x, y) == 0:
-                    c.set(x, y, hs)
-        hairline(c, p, drop=1)
-    elif style == "balding":
-        for side in (-1, 1):
-            for y in range(CY - 6, CY + 5):
-                for dx in range(0, 3):
-                    c.set(CX + side * (RX - dx), y, h if dx else hs)
-        for x in range(CX - 5, CX + 6, 2):  # a few wisps on top
-            c.set(x, CY - RY, h)
-    elif style == "ponytail":
-        c.ellipse(CX, CY - 7, RX + 1, RY - 5, h)
-        for y in range(CY - 13, CY - 4):  # center part
-            c.set(CX, y, hs)
-        for y in range(CY - 6, CY + 14):  # ponytail behind the right side
-            for x in range(CX + RX - 1, CX + RX + 4):
-                if c.get(x, y) in (0, p["skin"], SHADE[p["skin"]]) and abs(x - (CX + RX + 1)) <= 2 - (y > CY + 10):
-                    c.set(x, y, h if x < CX + RX + 2 else hs)
-        hairline(c, p)
-    elif style == "spiky":
-        c.ellipse(CX, CY - 8, RX + 1, RY - 6, h)
-        for x0 in (CX - 8, CX - 3, CX + 2, CX + 7):  # four tufts leaning right
-            for k in range(4):
-                c.set(x0 + k // 2, CY - RY - 1 - k, h)
-                c.set(x0 + 1 + k // 2, CY - RY - 1 - k, h if k < 3 else hs)
-        hairline(c, p)
-    elif style == "bob":
-        c.ellipse(CX, CY - 4, RX + 2, RY - 1, h)
-        for y in range(CY - 4, CY + 9):  # sides down to the jaw
-            for x in list(range(CX - RX - 2, CX - RX + 2)) + list(range(CX + RX - 1, CX + RX + 3)):
-                c.set(x, y, h if x < CX else hs)
-        hairline(c, p)
-        for x in range(CX - 10, CX + 2):  # side-swept fringe
-            for y in range(CY - 6, CY - 6 + max(1, (x - (CX - 10)) // 4)):
-                c.set(x, y, h)
-    for y in range(CY - RY - 4, CY + 2):  # hair highlight on the top left
-        for x in range(CX - RX - 4, CX):
-            if h != 7 and c.get(x, y) == h and c.get(x + 1, y + 1) == h and (x + y) % 6 == 0 and y < CY - 9:
-                c.set(x, y, 2)
+# ---------------------------------------------------------------- the human portrait
+
+CX = 31.5  # the face is symmetric about this line (even width)
+EYES = {"L": 22, "R": 38}  # left x of each 4-pixel eye
+EYE_Y = 28  # the upper lid row
+MOUTH_Y = 38
 
 
-def face(c: Canvas, p: dict, mood: str) -> None:
-    s = p["skin"]
-    ey = CY + 1
-    dark = 1
-    for ex in (CX - 5, CX + 4):  # eyes 2x2 with a white highlight
-        c.rect(ex, ey, ex + 1, ey + 1, dark)
-        c.set(ex, ey, 2)
-    by = ey - 3
-    if mood == "concerned":  # inner ends raised
-        brows = [(CX - 7, by + 1), (CX - 6, by + 1), (CX - 5, by), (CX - 4, by - 1),
-                 (CX + 3, by - 1), (CX + 4, by), (CX + 5, by + 1), (CX + 6, by + 1)]
-    elif mood == "pleased":
-        brows = [(CX - 7, by), (CX - 6, by - 1), (CX - 5, by - 1), (CX - 4, by),
-                 (CX + 3, by), (CX + 4, by - 1), (CX + 5, by - 1), (CX + 6, by)]
-    else:
-        brows = [(CX - 7, by), (CX - 6, by), (CX - 5, by), (CX - 4, by),
-                 (CX + 3, by), (CX + 4, by), (CX + 5, by), (CX + 6, by)]
-    bc = 1 if p["hair_c"] == 7 or s >= 5 else 13
-    for x, y in brows:
-        c.set(x, y, bc)
-    c.set(CX + 1, ey + 3, SHADE[s])  # nose
-    c.set(CX + 1, ey + 4, SHADE[s])
-    c.set(CX, ey + 5, SHADE[s])
-    my = ey + 8
+def line_pts(x0, y0, x1, y1) -> list:
+    n = max(abs(x1 - x0), abs(y1 - y0), 1)
+    return [(round(x0 + (x1 - x0) * i / n), round(y0 + (y1 - y0) * i / n)) for i in range(n + 1)]
+
+
+def face_pts(top=14, chin=43) -> set:
+    pts = set()
+    for y in range(top, chin + 1):
+        t = y - top
+        if t < 3:
+            hw = 9.5 + t * 1.2
+        elif y <= 32:
+            hw = 13
+        else:
+            hw = 13 - (y - 32) * 0.85
+        for x in range(round(CX - hw + 0.5), round(CX + hw - 0.5) + 1):
+            pts.add((x, y))
+    return pts
+
+
+def torso_pts(top=47) -> set:
+    pts = set()
+    for y in range(top, 64):
+        t = y - top
+        hw = 14 + min(t, 4) * 2.4 + max(0, t - 4) * 0.8
+        if t == 0:
+            hw -= 3
+        for x in range(round(CX - hw + 0.5), round(CX + hw - 0.5) + 1):
+            pts.add((x, y))
+    return pts
+
+
+def shade_hair(s: Sprite, names, sheen=None, strands=(), deep_bottom=0.8):
+    """Hair: lit on the left, shadowed on the right and at the ends, a sheen band, a few drawn strands."""
+    pts = [p for p, r in s.owner.items() if r in names]
+    if not pts:
+        return
+    x0, x1 = min(p[0] for p in pts), max(p[0] for p in pts)
+    y0, y1 = min(p[1] for p in pts), max(p[1] for p in pts)
+    for (x, y) in pts:
+        fx, fy = (x - x0) / max(1, x1 - x0), (y - y0) / max(1, y1 - y0)
+        t = 3 if fx < 0.42 else 2
+        if fx > 0.82 or fy > deep_bottom:
+            t = min(t, 1 if fx > 0.9 else 2)
+        if sheen:
+            cx, cy, rx, ry = sheen
+            d = ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2
+            if 0.45 < d < 1.0 and x < cx + rx * 0.4:
+                t = 4
+        s.tone(x, y, t)
+    for a, b in strands:
+        for p in line_pts(*a, *b):
+            if s.owner.get(p) in names:
+                s.tone(*p, 1)
+
+
+def cast_shadow(s: Sprite, onto=("face",), from_prefix=("hair", "crown", "fringe", "bangs", "locs", "scalp_none")):
+    """Hair casts a one-pixel shadow onto the forehead and temples."""
+    for (x, y), r in list(s.owner.items()):
+        if r in onto:
+            above = s.owner.get((x, y - 1), "")
+            if any(above.startswith(f) for f in from_prefix):
+                s.tone(x, y, 2)
+                if s.owner.get((x, y + 1)) in onto and (x, y + 1) not in s.tone_override:
+                    s.tone(x, y + 1, 3)
+
+
+def eyes(s: Sprite, iris, mood: str, lashes=False, skin=None):
+    for side, x0 in EYES.items():
+        if mood == "pleased":  # smiling eyes: an upward arc with a lash flick
+            for dx, dy in ((0, 2), (1, 1), (2, 1), (3, 2)):
+                s.px(x0 + dx, EYE_Y + dy, INK)
+            if lashes:
+                s.px(x0 - 1 if side == "L" else x0 + 4, EYE_Y + 1, INK)
+            continue
+        for dx in range(4):
+            s.px(x0 + dx, EYE_Y, INK)  # upper lid
+        s.px(x0, EYE_Y + 1, EYE_WHITE)
+        s.px(x0 + 1, EYE_Y + 1, WHITE)  # catch-light
+        s.px(x0 + 2, EYE_Y + 1, mix(iris, INK, 0.7))  # pupil
+        s.px(x0 + 3, EYE_Y + 1, EYE_WHITE)
+        s.px(x0, EYE_Y + 2, EYE_WHITE)
+        s.px(x0 + 1, EYE_Y + 2, iris)
+        s.px(x0 + 2, EYE_Y + 2, mix(iris, INK, 0.25))
+        s.px(x0 + 3, EYE_Y + 2, mix(EYE_WHITE, skin[2] if skin else EYE_WHITE, 0.4))
+        if skin:  # soft lower lid
+            s.px(x0 + 1, EYE_Y + 3, skin[2])
+            s.px(x0 + 2, EYE_Y + 3, skin[2])
+        if lashes:
+            s.px(x0 - 1 if side == "L" else x0 + 4, EYE_Y - 1, INK)
+            s.px(x0 - 1 if side == "L" else x0 + 4, EYE_Y, INK)
+        if mood == "concerned":  # worried: a lid line droops at the inner corner
+            s.px(x0 + (3 if side == "L" else 0), EYE_Y + 1, mix(INK, EYE_WHITE, 0.5))
+
+
+def brows(s: Sprite, col, mood: str):
+    for side, x0 in EYES.items():
+        xs = list(range(x0 - 1, x0 + 4)) if side == "L" else list(range(x0, x0 + 5))
+        for i, x in enumerate(xs):
+            k = i if side == "L" else 4 - i  # 0 = outer end, 4 = inner end
+            if mood == "concerned":
+                y = EYE_Y - 2 - (1 if k >= 3 else 0) + (1 if k == 0 else 0)
+            elif mood == "pleased":
+                y = EYE_Y - 3 + (1 if k in (0, 4) else 0)
+            else:
+                y = EYE_Y - 2 - (1 if k in (1, 2) else 0)
+            s.px(x, y, col)
+
+
+def nose_mouth(s: Sprite, skin, lip, mood: str, mouth_y=MOUTH_Y):
+    s.px(31, 31, skin[4])
+    s.px(31, 32, skin[4])
+    s.px(33, 32, skin[2])
+    s.px(33, 33, skin[1])
+    s.px(30, 35, skin[1])
+    s.px(31, 35, skin[0])
+    s.px(32, 35, skin[1])
+    s.px(33, 34, skin[1])
     if mood == "pleased":
-        mouth = [(CX - 4, my - 1), (CX - 3, my), (CX - 2, my), (CX - 1, my), (CX, my), (CX + 1, my), (CX + 2, my), (CX + 3, my - 1)]
-        for x in range(CX - 2, CX + 2):
-            c.set(x, my - 1, 2)  # teeth
+        s.px(28, mouth_y - 1, skin[1])
+        s.px(35, mouth_y - 1, skin[1])
+        for x in range(28, 36):
+            s.px(x, mouth_y, INK if x in (28, 35) else WHITE)
+        for x in range(29, 35):
+            s.px(x, mouth_y + 1, mix(lip, INK, 0.3) if x in (29, 34) else lip)
+        for x in range(30, 34):
+            s.px(x, mouth_y + 2, skin[1])
+        for bx in (19, 20, 43, 44):
+            s.px(bx, 34, mix(skin[3], hx("#e8707a"), 0.45))
     elif mood == "concerned":
-        mouth = [(CX - 3, my + 1), (CX - 2, my), (CX - 1, my), (CX, my), (CX + 1, my), (CX + 2, my + 1)]
+        for x in range(30, 34):
+            s.px(x, mouth_y, mix(lip, INK, 0.55))
+        s.px(29, mouth_y + 1, mix(lip, INK, 0.55))
+        s.px(34, mouth_y + 1, mix(lip, INK, 0.55))
+        for x in range(30, 34):
+            s.px(x, mouth_y + 1, lip)
     else:
-        mouth = [(CX - 2, my), (CX - 1, my), (CX, my), (CX + 1, my)]
-    for x, y in mouth:
-        c.set(x, y, 15 if s <= 4 else 1)
+        for x in range(29, 35):
+            s.px(x, mouth_y, mix(lip, INK, 0.45))
+        for x in range(30, 34):
+            s.px(x, mouth_y + 1, lip)
+        s.px(31, mouth_y + 1, mix(lip, WHITE, 0.3))
+    s.px(31, mouth_y + 3, skin[2])  # chin dimple shadow
+    s.px(32, mouth_y + 3, skin[2])
 
 
-
-def glasses(c: Canvas) -> None:
-    ey = CY + 1
-    for ex in (CX - 5, CX + 4):
-        for x in range(ex - 2, ex + 4):
-            c.set(x, ey - 2, 1)
-            c.set(x, ey + 3, 1)
-        for y in range(ey - 2, ey + 4):
-            c.set(ex - 2, y, 1)
-            c.set(ex + 3, y, 1)
-    c.set(CX, ey, 1)
-    c.set(CX - 1, ey, 1)
+def sweat(s: Sprite):
+    for (x, y), col in {(48, 19): "#bfe6ff", (48, 20): "#8fd0ff", (47, 21): "#8fd0ff", (48, 21): "#5ab4f0",
+                        (49, 21): "#8fd0ff", (48, 22): "#5ab4f0"}.items():
+        s.px(x, y, hx(col))
+    s.px(47, 20, WHITE)
 
 
-def headset(c: Canvas) -> None:
-    for x in range(CX - RX - 1, CX + RX + 2):  # band over the head
-        y = int(CY - RY + 1 + ((x - CX) / (RX + 1)) ** 2 * 9)
-        c.set(x, y - 1, 12)
-        c.set(x, y, 13)
-    for side in (-1, 1):  # ear cups
-        c.rect(CX + side * 13 - 2, 26, CX + side * 13 + 2, 32, 12)
-        c.rect(CX + side * 13 - 1, 27, CX + side * 13 + 1, 31, 13)
-    for i in range(6):  # mic boom from the right cup toward the mouth corner
-        c.set(CX + 12 - i, 33 + i // 2, 12)
-    c.rect(CX + 5, 36, CX + 6, 37, 1)
+def base_body(s: Sprite, skin, coat, *, shirt=True, lapels=True):
+    s.region("torso", torso_pts(), coat, shade_right=0.72)
+    if shirt:
+        s.region("shirt", poly([(26.5, 46), (36.5, 46), (31.5, 57)]), R["shirt"], shade_right=0.85)
+    s.region("neck", rect(27, 39, 36, 48), skin, shade_right=0.8)
+    for x in range(27, 37):  # shadow under the jaw
+        s.tone(x, 44, 1)
+        s.tone(x, 45, 2)
+    if lapels:
+        for y in range(47, 61):
+            for x in (26 + (y - 47) // 2, 37 - (y - 47) // 2):
+                if s.owner.get((x, y)) == "torso":
+                    s.tone(x, y, 1)
+                    if s.owner.get((x - 1, y)) == "torso":
+                        s.tone(x - 1, y, 4)
+    s.region("face", face_pts(), skin, shade_right=0.88, deep_right=0.985)
+    for (x, y) in ((20, 32), (21, 32), (20, 33), (21, 31)):  # cheekbone highlight
+        s.tone(x, y, 4)
+    for y in range(40, 44):  # jaw shadow
+        for x in range(36, 45):
+            if s.owner.get((x, y)) == "face":
+                s.tone(x, y, 2)
+    for side in (-1, 1):  # ears
+        cx = CX + side * 13.6
+        s.region("ear" + str(side), ellipse(cx, 30, 1.9, 3), skin, shade_right=0.6)
+        s.tone(round(cx), 30, 1)
+        s.tone(round(cx), 31, 1)
 
 
-def portrait(name: str, mood: str) -> Canvas:
-    p = CAST[name]
-    c = Canvas(64, 64)
-    torso(c, p)
-    head(c, p)
-    hair(c, p)
-    face(c, p, mood)
-    if p.get("glasses"):
-        glasses(c)
-    if p.get("headset"):
-        headset(c)
-    c.outline()
-    return c
+# ---------------------------------------------------------------- the cast
+
+def vera(mood: str) -> Image.Image:
+    s = Sprite(64, 64)
+    skin, hair = R["skin_deep"], R["hair_silver"]
+    base_body(s, skin, R["emerald"])
+    # a short silver natural cut: a soft rounded halo with curl texture
+    halo = ellipse(CX, 17, 18, 11.5)
+    for a in range(0, 360, 20):  # a bumpy, curly edge
+        halo |= ellipse(CX + 17.3 * math.cos(math.radians(a)), 17 + 11 * math.sin(math.radians(a)), 2.2, 2.2)
+    halo = {p for p in halo if p[1] < 32 and (p[1] <= 18 or not (19 <= p[0] <= 44))}
+    s.region("hair", halo, hair, hl=False)
+    shade_hair(s, ("hair",), sheen=(26, 12, 14, 6))
+    for (x, y) in s.pts_of("hair"):
+        lit = s.tone_override.get((x, y), 3) >= 3
+        if (x * 3 + y * 5) % 7 == 0:
+            s.tone(x, y, 4 if lit else 1)  # curls catching the light
+        elif (x * 5 + y * 3) % 9 == 0:
+            s.tone(x, y, 2 if lit else 1)
+    cast_shadow(s)
+    eyes(s, hx("#4a2a18"), mood, lashes=True, skin=skin)
+    brows(s, hx("#d5d8e0"), mood)
+    nose_mouth(s, skin, hx("#7a3b3b"), mood)
+    for x, y, t in ((17, 33, 3), (17, 34, 1), (46, 33, 3), (46, 34, 1)):  # gold earrings
+        s.px(x, y, R["gold"][t])
+    for i, x in enumerate(range(27, 37)):  # gold necklace
+        s.px(x, 48 + (1 if 29 <= x <= 34 else 0), R["gold"][4 if i % 2 else 2])
+    s.px(31, 50, R["gold"][4])
+    s.px(32, 50, R["gold"][2])
+    if mood == "concerned":
+        sweat(s)
+    return s.render(badge_bg(), clip=in_badge())
 
 
-# ---------------------------------------------------------------- Convexity the office cat (32 x 32)
+def morty(mood: str) -> Image.Image:
+    s = Sprite(64, 64)
+    skin, hair = R["skin_light"], R["hair_grey"]
+    base_body(s, skin, R["steel"])
+    s.region("tie", poly([(30, 47), (33, 47), (34.5, 56), (31.5, 59), (28.5, 56)]), R["tie"])
+    for y in (51, 55, 59):  # cardigan buttons
+        s.px(39, y, R["gold"][3])
+    s.region("scalp", ellipse(CX, 17, 13.5, 8), skin, shade_right=0.74)
+    for p in ((23, 12), (24, 12), (25, 12), (23, 13), (24, 13), (26, 11)):
+        s.px(*p, skin[4])  # the shine on a bald head
+    for sx in (-1, 1):
+        s.region("hair%d" % sx, ellipse(CX + sx * 13.2, 25, 3.2, 6.5), hair)
+    shade_hair(s, ("hair-1", "hair1"), strands=[((17, 21), (19, 30)), ((45, 21), (44, 30))])
+    for x in range(25, 39, 3):  # forehead lines
+        s.px(x, 19, skin[2])
+        s.px(x + 1, 19, skin[2])
+    eyes(s, hx("#3c6e9e"), mood, skin=skin)
+    brows(s, hair[1], mood)
+    s.region("stache", poly([(25, 36), (38, 36), (37, 38.6), (31.5, 37.6), (26, 38.6)]), hair)
+    shade_hair(s, ("stache",), strands=[((28, 37), (30, 37)), ((33, 37), (35, 37))])
+    nose_mouth(s, skin, hx("#b0605a"), mood, mouth_y=39)
+    frame = R["navy"][2]
+    for x0 in (19, 35):
+        for x in range(x0, x0 + 10):
+            s.px(x, 26, frame)
+            s.px(x, 33, frame)
+        for y in range(26, 34):
+            s.px(x0, y, frame)
+            s.px(x0 + 9, y, frame)
+        s.px(x0 + 1, 27, WHITE)
+        s.px(x0 + 2, 27, mix(WHITE, skin[3], 0.4))
+        s.px(x0 + 1, 28, mix(WHITE, skin[3], 0.4))
+    for x in range(29, 35):
+        s.px(x, 28, frame)
+    if mood == "concerned":
+        sweat(s)
+    return s.render(badge_bg(), clip=in_badge())
 
-def cat(state: str) -> Canvas:
-    c = Canvas(32, 32)
-    fur, shade = 14, 5
+
+def bonnie(mood: str) -> Image.Image:
+    s = Sprite(64, 64)
+    skin, hair = R["skin_tan"], R["hair_blueblack"]
+    s.region("hair_tail", ellipse(51, 21, 5, 7) | ellipse(54, 31, 4.5, 7.5) | ellipse(52, 41, 3.5, 5.5), hair, hl=False)
+    s.region("hair_back", ellipse(CX, 25, 16, 14) - rect(0, 41, 63, 63), hair, hl=False)
+    base_body(s, skin, R["pru_blue"])
+    s.region("hair_crown", ellipse(CX, 15.5, 16, 10), hair, hl=False)
+    fringe = {(x, y) for x in range(17, 47) for y in range(14, 28) if y <= 27 - (x - 17) * 0.32}
+    s.region("hair_fringe", fringe, hair, hl=False)
+    s.region("hair_side", rect(17, 22, 20, 40) | {(18, 41), (19, 41)}, hair, hl=False)
+    shade_hair(s, ("hair_tail", "hair_back", "hair_crown", "hair_fringe", "hair_side"), sheen=(28, 15, 13, 6),
+               strands=[((33, 17), (22, 26)), ((40, 17), (31, 23)), ((53, 18), (55, 34)), ((18, 27), (19, 38))])
+    s.region("band", rect(46, 13, 48, 17), R["gold"])  # hair tie
+    cast_shadow(s)
+    eyes(s, hx("#3a2416"), mood, lashes=True, skin=skin)
+    brows(s, hair[1], mood)
+    nose_mouth(s, skin, hx("#a24a4a"), mood)
+    s.px(17, 34, WHITE)
+    s.px(46, 34, WHITE)  # pearl earrings
+    if mood == "concerned":
+        sweat(s)
+    return s.render(badge_bg(), clip=in_badge())
+
+
+def swap(mood: str) -> Image.Image:
+    s = Sprite(64, 64)
+    skin, hair = R["skin_warm"], R["hair_black"]
+    s.region("hood", ellipse(CX, 48, 15, 5), R["navy"], hl=False)
+    base_body(s, skin, R["navy"], shirt=False, lapels=False)
+    for x in (28, 35):  # drawstrings with gold tips
+        for y in range(48, 58):
+            s.px(x, y, R["shirt"][3] if y < 57 else R["gold"][3])
+    for i, x in enumerate(range(25, 39)):  # gold chain
+        y = 48 + round(3.5 * math.sin(math.pi * (x - 25) / 13))
+        s.px(x, y, R["gold"][4 if i % 2 else 2])
+    s.region("hair_base", ellipse(CX, 17, 14.5, 7.5), hair, hl=False)
+    for i, x0 in enumerate(range(17, 46, 4)):  # short twists: small rounded clumps, each lit from the top left
+        s.region("twist%d" % i, ellipse(x0 + 1.5, 11 + (i % 2) * 0.8, 2.4, 3.5), hair)
+    for p, r in list(s.owner.items()):
+        if r == "hair_base":
+            s.tone(*p, 1 if p[1] >= 18 else 2)
+    band = {(x, y) for x in range(14, 50) for y in range(6, 17)
+            if abs(((x - CX) / 17.2) ** 2 + ((y - 21) / 13.5) ** 2 - 1) < 0.11}
+    s.region("band", band, R["headset"])
+    for sx in (-1, 1):
+        s.region("cup%d" % sx, ellipse(CX + sx * 14.2, 30, 3.6, 4.6), R["headset"])
+        s.px(round(CX + sx * 14.2) - (1 if sx < 0 else 0), 28, R["pru_blue"][4])
+    for i in range(8):  # mic boom
+        s.px(45 - i, 34 + i // 2, R["headset"][3])
+    s.px(37, 38, R["headset"][0])
+    s.px(36, 38, R["headset"][1])
+    cast_shadow(s, from_prefix=("hair",))
+    eyes(s, hx("#6b4a22"), mood, skin=skin)
+    brows(s, hair[0], mood)
+    nose_mouth(s, skin, hx("#7a3e34"), mood)
+    if mood == "concerned":
+        sweat(s)
+    return s.render(badge_bg(), clip=in_badge())
+
+
+def seamore(mood: str) -> Image.Image:
+    s = Sprite(64, 64)
+    skin, hair = R["skin_fair"], R["hair_plum"]
+    s.region("hair_back", ellipse(CX, 25, 17.5, 16.5) - rect(0, 42, 63, 63), hair, hl=False)
+    base_body(s, skin, R["slate"])
+    s.region("hair_crown", ellipse(CX, 16, 16.5, 10), hair, hl=False)
+    bangs = rect(18, 15, 45, 23) | {(x, 24) for x in range(18, 46) if x % 3 != 1}
+    s.region("hair_bangs", bangs, hair, hl=False)
+    for sx in (-1, 1):
+        xs = range(15, 20) if sx < 0 else range(44, 49)
+        side = {(x, y) for x in xs for y in range(20, 41)}
+        side |= {(x, 41) for x in (range(17, 21) if sx < 0 else range(43, 47))}
+        s.region("hair_side%d" % sx, side, hair, hl=False)
+    shade_hair(s, ("hair_back", "hair_crown", "hair_bangs", "hair_side-1", "hair_side1"), sheen=(28, 14, 14, 6),
+               strands=[((24, 16), (23, 24)), ((30, 15), (30, 24)), ((36, 16), (37, 24)), ((41, 17), (42, 24)),
+                        ((17, 26), (18, 40)), ((46, 26), (45, 40))])
+    cast_shadow(s)
+    s.px(41, 53, R["gold"][3])  # a small pin on the lapel
+    s.px(42, 53, R["gold"][1])
+    eyes(s, hx("#3f7a55"), mood, skin=skin)
+    brows(s, hair[1], mood)
+    nose_mouth(s, skin, hx("#b4625e"), mood)
+    for cx in (23.5, 39.5):  # big round gold glasses
+        for a in range(0, 360, 10):
+            x = round(cx + 5.3 * math.cos(math.radians(a)))
+            y = round(30 + 4.6 * math.sin(math.radians(a)))
+            s.px(x, y, R["gold"][2] if 20 < a < 200 else R["gold"][4])
+        s.px(round(cx) - 3, 28, WHITE)
+        s.px(round(cx) - 2, 27, mix(WHITE, skin[3], 0.4))
+    for x in range(29, 35):
+        s.px(x, 28, R["gold"][2])
+    if mood == "concerned":
+        sweat(s)
+    return s.render(badge_bg(), clip=in_badge())
+
+
+CAST = {"vera": vera, "morty": morty, "bonnie": bonnie, "swap": swap, "seamore": seamore}
+MOODS = ["neutral", "pleased", "concerned"]
+
+
+# ---------------------------------------------------------------- Convexity the cat (48x48, transparent)
+
+def cat(state: str) -> Image.Image:
+    s = Sprite(48, 48)
+    fur, white = R["orange"], R["white_fur"]
+    eye_col = hx("#3fae5a")
     if state == "nap":
-        c.ellipse(16, 24, 11, 5, fur)            # curled body
-        c.ellipse(8, 22, 5, 4, fur)              # head
-        for x, y in ((5, 17), (6, 16), (6, 17), (10, 17), (11, 16), (11, 17)):  # ears
-            c.set(x, y, fur)
-        for x in range(13, 27):                   # tail wrapped round
-            c.set(x, 28, shade)
-        for x in range(10, 24, 4):                # stripes
-            c.set(x, 20, shade); c.set(x + 1, 21, shade)
-        c.set(6, 22, 1); c.set(7, 22, 1); c.set(9, 22, 1); c.set(10, 22, 1)  # closed eyes
-        for x, y in ((20, 8), (21, 8), (22, 8), (21, 9), (20, 10), (21, 10), (22, 10)):  # z
-            c.set(x, y, 13)
-        for x, y in ((25, 4), (26, 4), (26, 5), (25, 6), (26, 6)):
-            c.set(x, y, 13)
+        s.region("tail", {(x, y) for x in range(8, 42) for y in range(39, 45)
+                          if abs(y - (41.5 + 1.5 * math.sin((x - 8) / 5))) < 1.6}, fur)
+        s.region("body", ellipse(26, 33, 17, 9), fur, shade_right=0.8)
+        s.region("head", ellipse(13, 32, 8, 7), fur)
+        s.region("earL", poly([(6, 28), (8, 21), (12, 27)]), fur)
+        s.region("earR", poly([(13, 26), (17, 21), (19, 28)]), fur)
+        s.region("muzzle", ellipse(11, 35, 4, 2.6), white)
+        for x0 in (22, 27, 32, 37):  # tabby stripes
+            for y in range(25, 31):
+                s.tone(x0 + (y % 2), y, 1)
+        for x in range(8, 12):
+            s.px(x, 31, INK)
+        for x in range(14, 18):
+            s.px(x, 31, INK)
+        s.px(11, 34, hx("#e88fa0"))
+        for (x, y) in ((8, 23), (16, 23)):
+            s.px(x, y, hx("#f2a3b3"))
+        zz = [(30, 12), (31, 12), (32, 12), (31, 13), (30, 14), (31, 14), (32, 14),
+              (36, 6), (37, 6), (38, 6), (39, 6), (38, 7), (37, 8), (36, 9), (37, 9), (38, 9), (39, 9)]
+        for p in zz:
+            s.px(*p, hx("#6f9fd0"))
     elif state == "alert":
-        c.ellipse(16, 23, 7, 7, fur)             # sitting body
-        c.ellipse(16, 12, 6, 5, fur)             # head
-        for x, y in ((11, 6), (11, 7), (12, 7), (20, 6), (20, 7), (19, 7)):  # ears up
-            c.set(x, y, fur)
-        for y in range(18, 30):                   # tail up the side
-            c.set(24 + (y > 24), y, shade)
-        for ex in (13, 18):                       # wide eyes
-            c.rect(ex, 11, ex + 1, 12, 2)
-            c.set(ex + 1, 12, 1)
-        c.set(15, 14, 15); c.set(16, 14, 15)    # nose
-        for x in range(13, 20, 3):
-            c.set(x, 20, shade)
-    else:  # hiding under a desk: only eyes and ears showing
-        c.rect(0, 10, 31, 13, 12)                 # desk top
-        c.rect(2, 14, 3, 31, 12)                  # legs
-        c.rect(28, 14, 29, 31, 12)
-        c.ellipse(16, 27, 7, 4, shade)           # cat in the shadow
-        for x, y in ((11, 22), (12, 23), (20, 22), (19, 23)):
-            c.set(x, y, shade)
-        for ex in (13, 18):
-            c.rect(ex, 25, ex + 1, 26, 14)        # eyes glowing
-            c.set(ex + 1, 26, 1)
-    c.outline()
-    return c
+        s.region("tail", {(x, y) for y in range(14, 44) for x in range(28, 46)
+                          if abs(x - (31 + (44 - y) * 0.45 + 3 * math.sin((44 - y) / 6))) < 1.6}, fur)
+        s.region("body", ellipse(24, 35, 10.5, 11), fur, shade_right=0.8)
+        s.region("chest", ellipse(23, 36, 5, 7), white)
+        s.region("pawL", ellipse(19, 45, 3, 2), white)
+        s.region("pawR", ellipse(28, 45, 3, 2), white)
+        s.region("head", ellipse(24, 18, 10, 8.5), fur)
+        s.region("earL", poly([(15, 14), (16, 4), (22, 11)]), fur)
+        s.region("earR", poly([(26, 11), (32, 4), (33, 14)]), fur)
+        s.region("muzzle", ellipse(24, 22, 4.5, 3), white)
+        for x0 in (18, 24, 30):
+            s.tone(x0, 11, 1)
+            s.tone(x0, 12, 1)
+        for ex in (19, 27):  # wide green eyes
+            for dx in range(3):
+                for dy in range(3):
+                    s.px(ex + dx, 16 + dy, eye_col)
+            for dy in range(3):
+                s.px(ex + 1, 16 + dy, INK)
+            s.px(ex, 16, WHITE)
+        s.px(23, 21, hx("#e88fa0"))
+        s.px(24, 21, hx("#e88fa0"))
+        for (x, y) in ((17, 8), (30, 8)):
+            s.px(x, y, hx("#f2a3b3"))
+        for x in (11, 12, 13):  # whiskers
+            s.px(x, 21, white[1])
+            s.px(x + 24, 21, white[1])
+    else:  # hide: under the desk, eyes glowing in the shadow
+        s.region("top", rect(0, 8, 47, 13), R["desk"])
+        s.region("legL", rect(2, 14, 6, 47), R["desk"], shade_right=0.6)
+        s.region("legR", rect(41, 14, 45, 47), R["desk"], shade_right=0.6)
+        dark = [mix(c, hx("#101a3c"), 0.35) for c in fur]
+        s.region("shadow", rect(7, 14, 40, 47), [hx("#070c1c"), hx("#0b1430"), hx("#111b3a"), hx("#16224a"), hx("#1c2a55")], hl=False)
+        s.region("head", ellipse(24, 38, 8.5, 6.5), dark)
+        s.region("earL", poly([(17, 35), (18, 28), (22, 33)]), dark)
+        s.region("earR", poly([(26, 33), (30, 28), (31, 35)]), dark)
+        for ex in (20, 26):
+            s.px(ex, 37, hx("#9cf0a8"))
+            s.px(ex + 1, 37, eye_col)
+            s.px(ex, 38, eye_col)
+            s.px(ex + 1, 38, mix(eye_col, INK, 0.4))
+        for x in range(4, 44, 5):
+            s.px(x, 9, R["desk"][4])
+    return s.render(outline=True)
 
 
-# ---------------------------------------------------------------- output
+# ---------------------------------------------------------------- the office background (480x270)
 
-def build() -> dict:
-    sprites = {}
-    for name in CAST:
-        for mood in ("neutral", "pleased", "concerned"):
-            sprites[f"{name}_{mood}"] = portrait(name, mood).rows()
+BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]
+
+
+def office(variant: str = "day") -> Image.Image:
+    W, H = 480, 270
+    img = Image.new("RGB", (W, H))
+    p = img.load()
+    rnd = random.Random(409)
+    storm = variant == "storm"
+    sky_top = hx("#3a6fb8" if not storm else "#1c2236")
+    sky_bot = hx("#d4ecfa" if not storm else "#5a5f78")
+    win_top, win_bot, floor_y = 22, 192, 192
+    for y in range(win_top, win_bot):  # dithered sky gradient
+        t = (y - win_top) / (win_bot - win_top)
+        for x in range(W):
+            a = mix(sky_top, sky_bot, t)
+            b = mix(sky_top, sky_bot, min(1, t + 0.05))
+            p[x, y] = b if (t * 20) % 1 * 16 > BAYER[y % 4][x % 4] else a
+    for _ in range(9):  # clouds
+        cx, cy, w = rnd.randint(0, W), rnd.randint(32, 90), rnd.randint(18, 42)
+        lit, shade = (WHITE, hx("#d6e8f5")) if not storm else (hx("#8a8fa6"), hx("#5c6178"))
+        for (x, y) in ellipse(cx, cy, w, 5) | ellipse(cx - w * 0.3, cy - 4, w * 0.45, 5) | ellipse(cx + w * 0.25, cy - 3, w * 0.35, 4):
+            if 0 <= x < W and win_top <= y < win_bot:
+                p[x, y] = lit if y < cy + 1 else shade
+    x = 0
+    while x < W:  # far skyline
+        w = rnd.randint(10, 26)
+        top = rnd.randint(118, 150)
+        base = hx("#93b2cc" if not storm else "#3e4560")
+        for xx in range(x, min(W, x + w)):
+            for yy in range(top, win_bot):
+                lit = (yy - top) % 4 == 2 and (xx - x) % 3 == 1
+                if storm:
+                    p[xx, yy] = mix(base, hx("#f7e7a8"), 0.55) if lit and (xx * 7 + yy) % 5 < 2 else base
+                else:
+                    p[xx, yy] = mix(base, WHITE, 0.25) if lit else base
+        x += w + rnd.randint(1, 4)
+
+    def tower(x0, w, top, body, light, glass=True):
+        for xx in range(x0, x0 + w):
+            for yy in range(top, win_bot):
+                if not 0 <= xx < W:
+                    continue
+                f = (xx - x0) / w
+                if glass:
+                    col = mix(hx(light), hx(body), min(1, f * 4)) if f < 0.25 else mix(hx(body), hx("#0f2140"), (f - 0.25) * 0.8)
+                    if (yy - top) % 4 == 0:
+                        col = mix(col, hx("#9cc4ea"), 0.35)
+                    if (xx - x0) % 9 == 0:
+                        col = mix(col, hx("#cfe6ff"), 0.35)
+                else:
+                    col = hx(light) if (xx - x0) % 4 == 0 else hx(body)
+                    if (yy - top) % 4 in (1, 2) and (xx - x0) % 4 != 0:
+                        col = hx("#6c7f96")
+                        if storm and (xx * 3 + yy) % 7 < 2:
+                            col = hx("#e8c96a")
+                if storm:
+                    col = mix(col, hx("#1a1f33"), 0.45)
+                p[xx, yy] = col
+
+    tower(28, 46, 70, "#c9b89a", "#efe3cc", glass=False)  # a classic stone tower
+    tower(168, 30, 54, "#1f3d66", "#6f9fd4")  # twin glass towers
+    tower(196, 34, 62, "#1a3459", "#5f8fc4")
+    for xx in range(250, 300):  # brick block with a roof garden
+        for yy in range(128, win_bot):
+            col = hx("#a8553a") if (yy % 5 and xx % 6) else hx("#7a3a28")
+            if yy < 131:
+                col = hx("#4f9a48") if (xx + yy) % 3 else hx("#3c7a38")
+            p[xx, yy] = mix(col, hx("#1a1f33"), 0.45) if storm else col
+    tower(360, 40, 84, "#2a4a75", "#7aa8d8")
+    tower(420, 30, 104, "#c2b08f", "#e6dac2", glass=False)
+    for xx in range(W):  # tree tops at the bottom of the view
+        h = 178 + round(4 * math.sin(xx / 7) + 3 * math.sin(xx / 3.1))
+        for yy in range(h, win_bot):
+            col = hx("#2f6b3a") if (xx + yy) % 4 else hx("#3f8a48")
+            p[xx, yy] = mix(col, hx("#10141f"), 0.5) if storm else col
+    if storm:  # rain and one lightning bolt
+        for _ in range(420):
+            x0, y0 = rnd.randint(0, W - 1), rnd.randint(win_top, win_bot - 1)
+            for k in range(5):
+                xx, yy = x0 - k // 2, y0 + k
+                if 0 <= xx < W and win_top <= yy < win_bot:
+                    p[xx, yy] = mix(p[xx, yy], hx("#b9c6e6"), 0.6)
+        x0 = 330
+        for y in range(win_top, 120):
+            x0 += rnd.choice((-1, 0, 1, 1))
+            for dx in (0, 1):
+                p[x0 + dx, y] = hx("#fff6c8")
+    frame, frame_hi = hx("#1e2633"), hx("#3a4658")  # window mullions and transom
+    for xx in range(0, W, 80):
+        for dx in range(4):
+            for yy in range(win_top, win_bot):
+                p[(xx + dx) % W, yy] = frame_hi if dx == 0 else frame
+    for yy in (win_top, win_top + 1, 62, 63):
+        for xx in range(W):
+            p[xx, yy] = frame
+    for xx in range(W):  # glass glare
+        for yy in range(win_top + 2, win_bot):
+            if (xx - yy * 0.6) % 160 < 10 and (xx % 80) > 4:
+                p[xx, yy] = mix(p[xx, yy], WHITE, 0.12)
+    for yy in range(0, win_top):  # ceiling, light strips, market ticker
+        for xx in range(W):
+            p[xx, yy] = mix(hx("#141a26"), hx("#1f2736"), yy / win_top)
+    for xx in range(20, W - 60, 120):
+        for dx in range(60):
+            p[xx + dx, 3] = hx("#ffe9b0")
+            p[xx + dx, 4] = hx("#c9b27a")
+    for xx in range(W):
+        p[xx, 12] = hx("#0a0d14")
+        p[xx, 18] = hx("#0a0d14")
+    xx = 2
+    while xx < W - 8:
+        col = rnd.choice([hx("#5be37d"), hx("#ff6b7d"), hx("#ffc72c")])
+        for k in range(rnd.randint(3, 7)):
+            for yy in range(14, 17):
+                if (xx * 5 + k * 3 + yy) % 10 < 7:
+                    p[xx + k, yy] = col
+        xx += rnd.randint(9, 15)
+    for yy in range(floor_y, H):  # polished stone floor with window reflections
+        t = (yy - floor_y) / (H - floor_y)
+        for xx in range(W):
+            base = mix(hx("#2a2f3c"), hx("#171a22"), t)
+            src = win_bot - 1 - (yy - floor_y) * 2
+            if (xx % 80) > 4 and t < 0.6 and src > win_top:
+                base = mix(base, p[xx, src], 0.18 * (1 - t))
+            if (xx + yy * 3) % 64 == 0:
+                base = mix(base, WHITE, 0.08)
+            p[xx, yy] = base
+    for xx in range(W):
+        p[xx, floor_y] = hx("#0d1017")
+        p[xx, floor_y + 1] = hx("#3d4556")
+
+    d = ImageDraw.Draw(img)
+
+    def plant(x0):
+        for (lx, ly, r) in ((0, 214, 9), (-8, 222, 7), (8, 220, 7), (-4, 204, 6), (5, 206, 6), (0, 196, 5)):
+            d.ellipse([x0 + lx - r, ly - r * 0.7, x0 + lx + r, ly + r * 0.7], fill=hx("#2f7a3c"))
+            d.ellipse([x0 + lx - r + 2, ly - r * 0.7 + 1, x0 + lx + r - 4, ly], fill=hx("#4aa55a"))
+        d.line([x0, 236, x0, 210], fill=hx("#5a3b22"))
+        d.rectangle([x0 - 7, 236, x0 + 7, 262], fill=hx("#e8e2d6"))
+        d.rectangle([x0 - 7, 236, x0 + 7, 238], fill=WHITE)
+        d.rectangle([x0 + 3, 239, x0 + 7, 262], fill=hx("#c9c1b2"))
+
+    plant(18)
+    plant(462)
+    d.rectangle([300, 226, 430, 232], fill=hx("#6b4226"))  # walnut desk with two chart monitors
+    d.rectangle([300, 226, 430, 227], fill=hx("#8c5a36"))
+    d.rectangle([306, 233, 312, 266], fill=hx("#4a2d1a"))
+    d.rectangle([418, 233, 424, 266], fill=hx("#4a2d1a"))
+    for mx, up in ((322, True), (370, False)):
+        d.rectangle([mx, 196, mx + 40, 222], fill=hx("#0d1220"))
+        d.rectangle([mx + 2, 198, mx + 38, 220], fill=hx("#11203a"))
+        pts = [(mx + 3 + i * 5, 212 + (-i if up else i) + (2 if i % 2 else 0)) for i in range(8)]
+        d.line(pts, fill=hx("#5be37d" if up else "#ff6b7d"))
+        d.rectangle([mx + 18, 222, mx + 22, 226], fill=hx("#2a2f3c"))
+    d.rectangle([44, 228, 150, 252], fill=hx("#5a2f22"))  # leather sofa
+    d.rectangle([44, 214, 150, 230], fill=hx("#6e3a2a"))
+    d.rectangle([44, 214, 150, 216], fill=hx("#8a4d38"))
+    d.rectangle([40, 220, 50, 254], fill=hx("#4a261b"))
+    d.rectangle([144, 220, 154, 254], fill=hx("#4a261b"))
+    for sx in (80, 114):
+        d.line([sx, 230, sx, 250], fill=hx("#4a261b"))
+    return img
+
+
+# ---------------------------------------------------------------- build + contact sheets
+
+def build() -> None:
+    OUT.mkdir(parents=True, exist_ok=True)
+    EVIDENCE.mkdir(exist_ok=True)
+    sprites: dict[str, Image.Image] = {}
+    for who, fn in CAST.items():
+        for mood in MOODS:
+            sprites[f"{who}_{mood}"] = fn(mood)
     for state in ("nap", "alert", "hide"):
-        sprites[f"cat_{state}"] = cat(state).rows()
-    return {"palette": PALETTE, "sprites": sprites,
-            "_note": "Generated by scripts/render_sprites.py. Rows are palette indexes in hex (0 = transparent)."}
+        sprites[f"cat_{state}"] = cat(state)
+    for name, im in sprites.items():
+        im.save(OUT / f"{name}.png", optimize=True)
+    offices = {v: office(v) for v in ("day", "storm")}
+    for v, im in offices.items():
+        im.save(OUT / f"office_{v}.png", optimize=True)
 
-
-def contact_sheet(data: dict, path: Path, scale: int = 8) -> None:
-    from PIL import Image, ImageDraw
-
-    pal = [tuple(int(h[i:i + 2], 16) for i in (1, 3, 5)) + ((0,) if len(h) > 7 else (255,)) for h in data["palette"]]
-    names = list(data["sprites"])
-    cols, cell = 5, 64 * scale + 24
-    rows = math.ceil(len(names) / cols)
-    sheet = Image.new("RGBA", (cols * cell, rows * (cell + 20)), (243, 246, 250, 255))
-    draw = ImageDraw.Draw(sheet)
-    for i, n in enumerate(names):
-        grid = data["sprites"][n]
-        h, w = len(grid), len(grid[0])
-        img = Image.new("RGBA", (w, h))
-        img.putdata([pal[int(ch, 16)] for row in grid for ch in row])
-        img = img.resize((w * scale, h * scale), Image.NEAREST)
-        x, y = (i % cols) * cell + 12, (i // cols) * (cell + 20) + 12
-        sheet.alpha_composite(img, (x, y))
-        draw.text((x, y + 64 * scale + 2), n, fill=(13, 31, 60, 255))
-    sheet.save(path)
-
-
-def main() -> None:
-    data = build()
-    out = ROOT / "frontend" / "src" / "sprites"
-    out.mkdir(parents=True, exist_ok=True)
-    (out / "sprites.json").write_text(json.dumps(data), encoding="utf-8")
-    sheet = ROOT / "evidence" / "sprites_contact_sheet.png"
-    sheet.parent.mkdir(exist_ok=True)
-    contact_sheet(data, sheet)
-    print(f"{len(data['sprites'])} sprites -> {out / 'sprites.json'} and {sheet}")
+    scale, pad, cols = 6, 18, 6
+    cell = 64 * scale + pad
+    rows = math.ceil(len(sprites) / cols)
+    sheet = Image.new("RGB", (cols * cell + pad, rows * (cell + 16) + pad), hx("#f3f6fa"))
+    dr = ImageDraw.Draw(sheet)
+    font = ImageFont.load_default()
+    for i, (name, im) in enumerate(sprites.items()):
+        k = scale if im.width == 64 else 8
+        big = im.resize((im.width * k, im.height * k), Image.NEAREST)
+        x = pad + (i % cols) * cell
+        y = pad + (i // cols) * (cell + 16)
+        sheet.paste(big, (x, y), big)
+        dr.text((x, y + 64 * scale + 2), name, fill=hx("#0d1f3c"), font=font)
+    sheet.save(EVIDENCE / "sprites_contact_sheet.png")
+    both = Image.new("RGB", (480 * 2 + 10, 270), WHITE)
+    both.paste(offices["day"], (0, 0))
+    both.paste(offices["storm"], (490, 0))
+    both.resize((both.width * 2, both.height * 2), Image.NEAREST).save(EVIDENCE / "office_backgrounds.png")
+    print(f"{len(sprites)} sprites + 2 office backgrounds -> {OUT}")
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.stdout.reconfigure(encoding="utf-8")
+    build()
