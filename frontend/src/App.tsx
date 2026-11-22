@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api, type Company, type Debrief, type GameView, type Health, type Reveal, type Shock } from "./api";
+import { api, type Company, type Debrief, type GameView, type Health, type Reveal, type Shock, type Usage } from "./api";
+import { UsageMeter } from "./components/UsageMeter";
 import { CompanySelect } from "./screens/CompanySelect";
 import { Desk } from "./screens/Desk";
 import { ShockScreen } from "./screens/ShockScreen";
@@ -39,6 +40,11 @@ export default function App() {
   }
 
   const game = "game" in screen ? screen.game : screen.name === "reveal" ? screen.reveal.view : null;
+  const [usage, setUsage] = useState<Usage | null>(null);
+  useEffect(() => {
+    if (game?.usage) setUsage(game.usage);
+  }, [game?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  const mergeUsage = (u: Partial<Usage>) => setUsage((prev) => (prev ? { ...prev, ...u } : (u as Usage)));
   const quarterLabel =
     screen.name === "shock" || screen.name === "reveal"
       ? `Q${screen.shock.quarter} results`
@@ -62,6 +68,7 @@ export default function App() {
             <span className="pill strong">Surplus ${surplusShown.toFixed(2)}bn</span>
           </div>
         )}
+        {game && usage && <UsageMeter gameId={game.id} usage={usage} onUsage={(u) => { setUsage(u); }} />}
         <div className={`pill status ${health?.key_found ? "ok" : "off"}`}>
           {health?.key_found ? `AI colleagues: ${health.model} ready` : "AI colleagues offline"}
         </div>
@@ -91,6 +98,8 @@ export default function App() {
             run={run}
             onUpdate={(g) => setScreen({ name: "desk", game: g })}
             onShock={(shock) => setScreen({ name: "shock", game: screen.game, shock })}
+            usage={usage ?? screen.game.usage}
+            onUsage={mergeUsage}
           />
         )}
         {screen.name === "shock" && (

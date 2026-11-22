@@ -77,6 +77,41 @@ export type GameView = {
   prt_decided: boolean;
   history: HistoryRow[];
   start_surplus_usd_bn: number;
+  usage: Usage;
+  chat: ChatMsg[];
+};
+
+export type Usage = {
+  spend_usd: number;
+  budget_cap_usd: number;
+  blocked: boolean;
+  tokens: { input: number; cached: number; cache_write: number; output: number; reasoning: number; requests: number };
+  by_agent: Record<string, { input: number; cached: number; output: number; requests: number; cost_usd: number }>;
+};
+
+export type Ticket = { action: Action; rationale: string; by: string };
+
+export type ChatMsg = {
+  role: "user" | "agent";
+  text: string;
+  agent?: string;
+  agent_name?: string;
+  run_id?: string;
+  stopped?: string | null;
+  proposed_ticket?: Ticket | null;
+};
+
+export type AgentEvent = {
+  ts: number;
+  run_id: string;
+  agent: string;
+  agent_name?: string;
+  type: "start" | "delegation" | "tool_call" | "tool_result" | "reply" | "blocked" | "spend" | "stop" | "error" | "usage";
+  detail: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  input_tokens: number;
+  cached_tokens: number;
+  output_tokens: number;
+  cost_usd: number;
 };
 
 export type Preview = {
@@ -165,4 +200,31 @@ export const api = {
   advance: (id: string) => call<Shock>(`/game/${id}/advance`, {}),
   explain: (id: string, text: string, not_sure: boolean) => call<Reveal>(`/game/${id}/explain`, { text, not_sure }),
   debrief: (id: string) => call<Debrief>(`/game/${id}/debrief`),
+  usage: (id: string) => call<Usage>(`/usage/${id}`),
+  setBudget: (id: string, cap_usd: number) => call<Usage>(`/budget/${id}`, { cap_usd }),
 };
+
+/** POST a question and read the Server-Sent Events stream until the reply arrives. */
+export async function askStream(id: string, message: string, onEvent: (e: AgentEvent) => void): Promise<void> {
+  const res = await fetch(`/api/game/${id}/ask`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message }),
+  });
+  if (!res.ok || !res.body) throw new Error(`Ask failed (${res.status})`);
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    let i;
+    while ((i = buf.indexOf("\n\n")) >= 0) {
+      const chunk = buf.slice(0, i);
+      buf = buf.slice(i + 2);
+      const line = chunk.split("\n").find((l) => l.startsWith("data: "));
+      if (line) onEvent(JSON.parse(line.slice(6)) as AgentEvent);
+    }
+  }
+}

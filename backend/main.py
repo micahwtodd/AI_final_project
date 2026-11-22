@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
+import asyncio
+import json
 from typing import Literal
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from backend import game
+from backend import agents, audit, game
 from backend.env import MODEL_NAME, REPO_DIR, load_env
 from backend.models import Action
 
@@ -116,6 +118,60 @@ def explain(session_id: str, body: ExplainBody) -> dict:
 @app.get("/api/game/{session_id}/debrief")
 def debrief(session_id: str) -> dict:
     return _run(game.debrief, _session(session_id))
+
+
+# ---------------------------------------------------------------- AI colleagues
+
+class AskBody(BaseModel):
+    message: str = Field(min_length=1, max_length=2000)
+    to: str | None = None
+
+
+class BudgetBody(BaseModel):
+    cap_usd: float = Field(ge=0, le=5)
+
+
+@app.post("/api/game/{session_id}/ask")
+async def ask(session_id: str, body: AskBody):
+    """Streams agent events (Server-Sent Events) and ends with the reply."""
+    s = _session(session_id)
+    queue: asyncio.Queue = asyncio.Queue()
+
+    async def produce() -> None:
+        try:
+            await agents.ask(s, body.message.strip(), queue, game.save)
+        finally:
+            queue.put_nowait(None)
+
+    task = asyncio.create_task(produce())
+
+    async def stream():
+        while True:
+            ev = await queue.get()
+            if ev is None:
+                break
+            yield f"data: {json.dumps(ev, default=str)}\n\n"
+        await task
+
+    return StreamingResponse(stream(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+@app.get("/api/usage/{session_id}")
+def usage(session_id: str) -> dict:
+    return game.usage_view(_session(session_id))
+
+
+@app.post("/api/budget/{session_id}")
+def budget(session_id: str, body: BudgetBody) -> dict:
+    return game.set_budget(_session(session_id), body.cap_usd)
+
+
+@app.get("/api/audit/{session_id}")
+def audit_trail(session_id: str) -> dict:
+    _session(session_id)
+    return {"events": audit.read_session(audit.AUDIT, session_id),
+            "usage": audit.read_session(audit.USAGE, session_id)}
 
 
 # ---------------------------------------------------------------- frontend

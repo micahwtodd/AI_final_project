@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { api, type Action, type GameView, type Preview, type Shock } from "../api";
+import { api, type Action, type GameView, type Preview, type Shock, type Usage } from "../api";
+import { ChatPanel } from "../components/ChatPanel";
 import { LEVERS, type LeverKey } from "../labels";
 import { Meters } from "../components/Meters";
 import { BalanceSheetPanel } from "../components/BalanceSheet";
@@ -12,6 +13,8 @@ export function Desk(props: {
   run: Run;
   onUpdate: (g: GameView) => void;
   onShock: (s: Shock) => void;
+  usage: Usage;
+  onUsage: (u: Partial<Usage>) => void;
 }) {
   const g = props.game;
   const [draft, setDraft] = useState<Action>(g.pending ?? { ...g.action, accept_prt: null });
@@ -47,6 +50,9 @@ export function Desk(props: {
             <p className="small muted">A hint, not a forecast. The market may move more, less, or not at all.</p>
           </div>
         )}
+
+        <ChatPanel gameId={g.id} chat={g.chat} usage={props.usage} onUsage={props.onUsage}
+          onLoadTicket={(a) => setDraft({ ...a, accept_prt: offersPrt ? a.accept_prt : null })} />
 
         <div className="panel">
           <h3>Risk dashboard {preview && !signed && <span className="muted small">(→ shows the effect of your draft ticket)</span>}</h3>

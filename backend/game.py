@@ -39,6 +39,13 @@ class Session(BaseModel):
     last_record: QuarterRecord | None = None
     explanations: dict[int, dict] = {}
     timings: dict[str, float] = {}
+    # AI usage and budget (Project 3)
+    budget_cap_usd: float = 0.25
+    spend_usd: float = 0.0
+    tokens: dict[str, int] = {"input": 0, "cached": 0, "cache_write": 0, "output": 0, "reasoning": 0, "requests": 0}
+    by_agent: dict[str, dict] = {}
+    chat: list[dict] = []  # transcript for display (the model's memory is kept in agents.py)
+    proposed_ticket: dict | None = None
 
 
 _SESSIONS: dict[str, Session] = {}
@@ -125,7 +132,24 @@ def view(s: Session) -> dict:
         "prt_decided": s.state.prt_decided,
         "history": [_history_row(r, s) for r in s.state.history],
         "start_surplus_usd_bn": round(engine.surplus(s.start_state), 3),
+        "usage": usage_view(s),
+        "chat": s.chat[-40:],
     }
+
+
+def usage_view(s: Session) -> dict:
+    return {"spend_usd": round(s.spend_usd, 6), "budget_cap_usd": s.budget_cap_usd,
+            "blocked": s.spend_usd >= s.budget_cap_usd, "tokens": s.tokens, "by_agent": s.by_agent}
+
+
+def set_budget(s: Session, cap_usd: float) -> dict:
+    s.budget_cap_usd = max(0.0, min(5.0, float(cap_usd)))
+    _save(s)
+    return usage_view(s)
+
+
+def save(s: Session) -> None:
+    _save(s)
 
 
 def _history_row(r: QuarterRecord, s: Session) -> dict:
