@@ -6,13 +6,15 @@ import { Desk } from "./screens/Desk";
 import { ShockScreen } from "./screens/ShockScreen";
 import { RevealScreen } from "./screens/RevealScreen";
 import { DebriefScreen } from "./screens/DebriefScreen";
+import { SafetyLab } from "./screens/SafetyLab";
 
 type Screen =
   | { name: "select" }
   | { name: "desk"; game: GameView }
   | { name: "shock"; game: GameView; shock: Shock; firstTry: { review: Review; question: string } | null }
   | { name: "reveal"; reveal: Reveal; shock: Shock }
-  | { name: "debrief"; game: GameView; debrief: Debrief };
+  | { name: "debrief"; game: GameView; debrief: Debrief }
+  | { name: "safety"; back: Screen };
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>({ name: "select" });
@@ -69,6 +71,9 @@ export default function App() {
           </div>
         )}
         {game && usage && <UsageMeter gameId={game.id} usage={usage} onUsage={(u) => { setUsage(u); }} />}
+        {screen.name !== "safety" && (
+          <button className="pill lab-pill" onClick={() => setScreen({ name: "safety", back: screen })}>Safety Lab</button>
+        )}
         <div className={`pill status ${health?.key_found ? "ok" : "off"}`}>
           {health?.key_found ? `AI colleagues: ${health.model} ready` : "AI colleagues offline"}
         </div>
@@ -132,6 +137,7 @@ export default function App() {
             }}
           />
         )}
+        {screen.name === "safety" && <SafetyLab onBack={() => setScreen(screen.back)} />}
         {screen.name === "debrief" && (
           <DebriefScreen debrief={screen.debrief} game={screen.game} onRestart={() => setScreen({ name: "select" })} />
         )}

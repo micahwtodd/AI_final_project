@@ -259,3 +259,21 @@ button.link { background: none; border: none; padding: 0; color: var(--steel); f
 .cite-row td { background: var(--panel-2); }
 .reference { margin: 0.6rem 0; }
 .reference ul { margin: 0.2rem 0; padding-left: 1.1rem; }
+
+/* safety lab */
+.lab-pill { cursor: pointer; }
+.topbar .lab-pill { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25); color: white; }
+.flag-btn { display: block; margin-top: 0.3rem; color: var(--muted); font-size: 0.75rem; }
+.flag-btn:hover:not(:disabled) { color: var(--red); }
+.lab-head { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; }
+.lab-actions { display: flex; gap: 0.5rem; }
+.lab-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-top: 0.8rem; }
+@media (max-width: 900px) { .lab-summary { grid-template-columns: 1fr 1fr; } }
+.stat { background: var(--panel-2); border-radius: 8px; padding: 0.6rem 0.8rem; display: flex; flex-direction: column; }
+.stat b { font-size: 1.6rem; color: var(--navy); }
+.stat span { font-size: 0.8rem; color: var(--muted); }
+.lab-table td { vertical-align: top; }
+.outcome { font-weight: 700; font-size: 0.85rem; }
+.outcome.good { color: var(--green); }
+.outcome.bad { color: var(--red); }
+.layers { margin: 0; padding-left: 1rem; }

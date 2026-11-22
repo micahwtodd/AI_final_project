@@ -236,6 +236,23 @@ export const api = {
   usage: (id: string) => call<Usage>(`/usage/${id}`),
   setBudget: (id: string, cap_usd: number) => call<Usage>(`/budget/${id}`, { cap_usd }),
   setMode: (id: string, agent_mode: AgentMode) => call<{ agent_mode: AgentMode }>(`/game/${id}/mode`, { agent_mode }),
+  flag: (event_id: string, session_id: string, note: string, text: string) => call<{ ok: boolean }>("/flag", { event_id, session_id, note, text }),
+  safety: () => call<SafetyLab>("/safety"),
+  runSafety: () => call<SafetyLab>("/safety/run", {}),
+};
+
+export type SafetyOutcome = { outcome: string; detail: string; input_tokens: number; cached_tokens: number; output_tokens: number; cost_usd: number };
+export type SafetyLab = {
+  generated: string | null;
+  seconds?: number;
+  total_cost_usd?: number;
+  attacks?: { rows: { id: string; label: string; kind: string; off: SafetyOutcome | null; on: SafetyOutcome; layers: string[]; extra_cost_usd: number }[];
+    attacks_blocked: number; attacks_total: number; clean_passed: number; clean_total: number };
+  teaching?: { rows: { id: string; agent: string; concept: string; question: string; expected: string; answer: string | null; correct: boolean; reason: string }[];
+    correct: number; total: number; pass_rate: number; cost_usd: number };
+  examiner?: { rows: { id: string; kind: string; text: string; expected: Record<string, boolean>; got: Record<string, boolean>; agree: Record<string, boolean>;
+    flag_expected: boolean; flagged: boolean; all_agree: boolean }[]; check_agreement_pct: number; samples_fully_agreeing: number; total: number;
+    key: { main_driver: string; second_factor: string }; cost_usd: number };
 };
 
 /** POST a question and read the Server-Sent Events stream until the reply arrives. */

@@ -11,6 +11,8 @@ type Turn = {
   pending?: boolean;
   stopped?: string | null;
   ticket?: Ticket | null;
+  runId?: string;
+  flagged?: boolean;
 };
 
 const SAMPLES = [
@@ -32,7 +34,7 @@ export const CAST: Record<string, { name: string; role: string; color: string }>
 function fromHistory(chat: ChatMsg[]): Turn[] {
   return chat.map((m) => ({
     role: m.role, text: m.text, agent: m.agent, agentName: m.agent_name, trace: [], subs: m.subs ?? [],
-    stopped: m.stopped ?? null, ticket: m.proposed_ticket ?? null,
+    stopped: m.stopped ?? null, ticket: m.proposed_ticket ?? null, runId: m.run_id,
   }));
 }
 
@@ -116,7 +118,7 @@ export function ChatPanel(props: {
         if (e.type === "usage") props.onUsage(e.detail);
         else if (e.type === "reply")
           update((t) => ({ ...t, text: e.detail.text, pending: false, stopped: e.detail.stopped, ticket: e.detail.proposed_ticket,
-            agent: e.agent, agentName: e.agent_name ?? t.agentName, subs: e.detail.subs ?? t.subs }));
+            agent: e.agent, agentName: e.agent_name ?? t.agentName, subs: e.detail.subs ?? t.subs, runId: e.run_id }));
         else if (e.type === "delegation" && e.detail.from)
           update((t) => ({ ...t, trace: [...t.trace, e], subs: [...t.subs, { agent: e.detail.from, agent_name: e.detail.from_name, text: e.detail.answer }] }));
         else if (e.type !== "start") update((t) => ({ ...t, trace: [...t.trace, e] }));
@@ -184,6 +186,16 @@ export function ChatPanel(props: {
                 </button>
                 {(openTrace === i || t.pending) && <ul className="trace-list">{t.trace.map((e, k) => <TraceLine key={k} e={e} />)}</ul>}
               </div>
+            )}
+            {t.role === "agent" && !t.pending && t.runId && t.agent !== "system" && (
+              <button className="link flag-btn" disabled={t.flagged}
+                onClick={async () => {
+                  const note = window.prompt("What seems wrong in this reply? (optional)") ?? "";
+                  await api.flag(t.runId!, props.gameId, note, t.text).catch(() => undefined);
+                  setTurns((all) => all.map((x, k) => (k === i ? { ...x, flagged: true } : x)));
+                }}>
+                {t.flagged ? "⚑ Flagged for review, thank you" : "⚑ This seems wrong"}
+              </button>
             )}
             {t.ticket && (
               <div className="proposed">

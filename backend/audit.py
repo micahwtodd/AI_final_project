@@ -34,6 +34,13 @@ def event(session_id: str, run_id: str, quarter: int, agent: str, type_: str, de
     return ev
 
 
+FLAGS = OUT / "flags.jsonl"
+
+
+def flag(record: dict) -> None:
+    _append(FLAGS, {"ts": round(time.time(), 3), **record})
+
+
 def usage(record: dict) -> None:
     _append(USAGE, {"ts": round(time.time(), 3), **record})
 

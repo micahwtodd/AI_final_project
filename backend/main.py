@@ -184,6 +184,35 @@ def budget(session_id: str, body: BudgetBody) -> dict:
     return game.set_budget(_session(session_id), body.cap_usd)
 
 
+class FlagBody(BaseModel):
+    event_id: str = Field(min_length=1, max_length=64)
+    session_id: str | None = None
+    note: str = Field("", max_length=1000)
+    text: str = Field("", max_length=4000)
+
+
+@app.post("/api/flag")
+def flag(body: FlagBody) -> dict:
+    """The learner flags a reply as wrong. Appended to output/flags.jsonl for review."""
+    audit.flag(body.model_dump())
+    return {"ok": True}
+
+
+@app.get("/api/safety")
+def safety_latest() -> dict:
+    from backend import safety_lab
+    return safety_lab.latest() or {"generated": None}
+
+
+@app.post("/api/safety/run")
+async def safety_run() -> dict:
+    """Runs all three Safety Lab tables live (about 40 seconds and $0.01)."""
+    from backend import safety_lab
+    if not agents.ai_available():
+        raise HTTPException(409, "The Safety Lab needs an API key. The last saved results are still shown.")
+    return await safety_lab.run_all()
+
+
 @app.get("/api/audit/{session_id}")
 def audit_trail(session_id: str) -> dict:
     _session(session_id)

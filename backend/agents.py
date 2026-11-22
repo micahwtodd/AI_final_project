@@ -26,7 +26,7 @@ from pydantic_ai.messages import ModelMessage, ToolCallPart
 from pydantic_ai.models.openai import OpenAIResponsesModel
 from pydantic_ai.providers.openai import OpenAIProvider
 
-from backend import audit, tools
+from backend import audit, safety, tools
 from backend.calibration import DISPLAY_NAMES
 from backend.env import MODEL_NAME, REPO_DIR, load_env, provider_config, redact
 from backend.pricing import cost_usd
@@ -357,7 +357,8 @@ async def _run_agent(kind: str, prompt: str, run: RunCtx, history: list[ModelMes
 _HISTORY: dict[str, list[list[ModelMessage]]] = {}
 
 
-async def ask(session, message: str, queue: asyncio.Queue, save: Callable[[Any], None], to: str | None = None) -> None:
+async def ask(session, message: str, queue: asyncio.Queue, save: Callable[[Any], None], to: str | None = None,
+              guard: bool = True) -> None:
     """Answer one learner question. Puts events on `queue` (and the audit trail)."""
     run_id = secrets.token_hex(4)
     quarter = min(session.state.quarter, 4)
@@ -379,8 +380,13 @@ async def ask(session, message: str, queue: asyncio.Queue, save: Callable[[Any],
     session.chat.append({"role": "user", "text": message, "run_id": run_id, "ts": t0, "to": lead})
     reply_text, terms = None, []
 
+    blocked = safety.guard_message(message) if guard else None  # code layer: before any model sees it
     try:
-        if not ai_available():
+        if blocked:
+            run.stopped = "blocked_input"
+            emit("system", "blocked", {"reason": blocked["category"], "detail": blocked["reason"],
+                                       "message": blocked["message"]})
+        elif not ai_available():
             run.stopped = "no_key"
             emit("system", "blocked", {"reason": "no_key", "message": OFFLINE_TEXT})
         else:
@@ -401,7 +407,8 @@ async def ask(session, message: str, queue: asyncio.Queue, save: Callable[[Any],
 
     stopped = run.stopped if reply_text is None else None
     if reply_text is None:
-        reply_text = {"no_key": OFFLINE_TEXT, "budget": BUDGET_TEXT}.get(
+        reply_text = {"no_key": OFFLINE_TEXT, "budget": BUDGET_TEXT,
+                      "blocked_input": blocked["message"] if blocked else ""}.get(
             stopped or "", "Sorry, I couldn't finish that answer. Please try again or rephrase.")
     speaker = lead if stopped is None else "system"
     ticket = run.proposed[-1] if run.proposed else None

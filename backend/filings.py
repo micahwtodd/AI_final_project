@@ -24,27 +24,52 @@ def _tokens(s: str) -> list[str]:
     return [w for w in re.findall(r"[a-z][a-z0-9\-]+|\d+(?:\.\d+)?%?", s.lower()) if w not in STOP]
 
 
-@lru_cache(maxsize=8)
+TEST_FILINGS: dict[str, tuple[str, bool]] = {}  # ticker -> (html, sanitize?) for Safety Lab fixtures
+
+
+def naive_text(html: str) -> str:
+    """What a pipeline WITHOUT the sanitizer sees: tags stripped, hidden text and comments kept."""
+    s = re.sub(r"(?is)<(script|style)\b.*?</\1>", " ", html)
+    s = s.replace("<!--", " ").replace("-->", " ")
+    s = re.sub(r"(?i)</?(p|div|tr|br|h\d|table|li)\b[^>]*>", "\n", s)
+    s = re.sub(r"(?i)</?t[dh]\b[^>]*>", " | ", s)
+    s = re.sub(r"<[^>]+>", " ", s)
+    return re.sub(r"[ \t]+", " ", s)
+
+
+@lru_cache(maxsize=16)
 def chunks_for(ticker: str, html: str | None = None) -> tuple[list[dict], dict]:
-    """Sanitized chunks of the latest 10-K, and a report of what the sanitizer removed or quarantined."""
+    """Sanitized chunks of the latest 10-K, and a report of what the sanitizer removed or quarantined.
+    Instruction-like paragraphs are quarantined one by one, so the real data around them survives."""
+    sanitize = True
+    if html is None and ticker in TEST_FILINGS:
+        html, sanitize = TEST_FILINGS[ticker]
     raw = html if html is not None else edgar.filing_document(ticker)
-    text, removed = safety.html_to_text(raw)
-    paras = [p.strip() for p in text.split("\n") if len(p.strip()) > 3]
+    if sanitize:
+        text, removed = safety.html_to_text(raw)
+    else:
+        text, removed = naive_text(raw), {"hidden_elements": 0, "comments": 0, "zero_width_chars": 0, "sanitizer": "off"}
     out, buf, quarantined = [], "", []
-    for para in paras:
+    for para in (p.strip() for p in text.split("\n")):
+        if len(para) <= 3:
+            continue
+        if sanitize and safety.looks_like_instructions(para):
+            quarantined.append({"text": para[:300]})
+            continue
         if len(buf) + len(para) + 1 > CHUNK_CHARS and buf:
             out.append(buf)
             buf = buf[-OVERLAP:]
         buf = f"{buf}\n{para}" if buf else para
     if buf:
         out.append(buf)
-    chunks = []
-    for i, c in enumerate(out):
-        if safety.looks_like_instructions(c):
-            quarantined.append({"chunk_id": i, "text": c[:300]})
-            continue
-        chunks.append({"chunk_id": i, "text": c})
+    chunks = [{"chunk_id": i, "text": c} for i, c in enumerate(out)]
     return chunks, {**removed, "chunks": len(chunks), "quarantined": quarantined}
+
+
+def register_test_filing(ticker: str, html: str, sanitize: bool = True) -> None:
+    TEST_FILINGS[ticker] = (html, sanitize)
+    chunks_for.cache_clear()
+    _index.cache_clear()
 
 
 def _idf(chunks: list[dict]) -> dict[str, float]:

@@ -50,6 +50,7 @@ class CalibRun:
     tokens: dict = field(default_factory=lambda: {"input": 0, "cached": 0, "cache_write": 0, "output": 0, "reasoning": 0, "requests": 0})
     by_agent: dict = field(default_factory=dict)
     retrieved: dict[int, str] = field(default_factory=dict)
+    tagged_override: dict | None = None  # Safety Lab fixtures (fictional companies have no EDGAR data)
     searches: int = 0
     events: list[dict] = field(default_factory=list)
 
@@ -91,6 +92,8 @@ def _agent() -> Agent:
     @agent.tool
     async def get_tagged_facts(ctx: RunContext[CalibRun]) -> dict:
         """Tagged XBRL facts already known for this company ($ billions), for scale."""
+        if ctx.deps.tagged_override is not None:
+            return ctx.deps.tagged_override
         f = tagged_facts(ctx.deps.ticker)
         keep = ("investments", "bonds_afs", "bonds_trading", "separate_account_assets", "policyholder_account_balances",
                 "future_policy_benefits")
@@ -105,8 +108,9 @@ def _agent() -> Agent:
     return agent
 
 
-async def run_sam(ticker: str, cap_usd: float = 0.10) -> tuple[SamFindings | None, CalibRun]:
-    run = CalibRun(id=f"calibration-{ticker}-{secrets.token_hex(3)}", ticker=ticker, budget_cap_usd=cap_usd)
+async def run_sam(ticker: str, cap_usd: float = 0.10, tagged_override: dict | None = None) -> tuple[SamFindings | None, CalibRun]:
+    run = CalibRun(id=f"calibration-{ticker}-{secrets.token_hex(3)}", ticker=ticker, budget_cap_usd=cap_usd,
+                   tagged_override=tagged_override)
     if not agents.ai_available():
         return None, run
     filings.chunks_for(ticker)  # warm the index
