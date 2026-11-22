@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pydantic_ai import Agent, UsageLimits  # noqa: E402
 
 from backend.agents import make_model  # noqa: E402
-from backend.env import MODEL_NAME, load_env  # noqa: E402
+from backend.env import MODEL_NAME, load_env, redact  # noqa: E402
 from backend.pricing import cost_usd  # noqa: E402
 
 
@@ -29,10 +29,14 @@ def main() -> int:
 
     agent = Agent(make_model(), instructions="You are a terse assistant. Reply in one sentence.")
     t0 = time.perf_counter()
-    result = agent.run_sync(
-        "In one sentence, what is a duration gap for a life insurer?",
-        usage_limits=UsageLimits(request_limit=2),
-    )
+    try:
+        result = agent.run_sync(
+            "In one sentence, what is a duration gap for a life insurer?",
+            usage_limits=UsageLimits(request_limit=2),
+        )
+    except Exception as e:  # show the reason, never the key or the raw traceback
+        print(f"\nCall failed: {type(e).__name__}: {redact(e)}")
+        return 1
     elapsed = time.perf_counter() - t0
     u = result.usage()
 

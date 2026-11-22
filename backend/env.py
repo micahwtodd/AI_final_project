@@ -14,6 +14,7 @@ folder are ever reported.
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -71,6 +72,21 @@ def load_env() -> EnvStatus:
 
     _status = EnvStatus(False, None, None, None)
     return _status
+
+
+# Anything that looks like an API key, including the masked forms providers echo
+# back in error messages (e.g. "sk-proj-****...abcd").
+_KEY_PATTERN = re.compile(r"\b(?:sk|pk|rk)-[A-Za-z0-9_\-*]{6,}")
+
+
+def redact(text: object) -> str:
+    """Remove key values and key-like strings from text before it is shown or logged."""
+    s = str(text)
+    for key_name, _ in PROVIDERS.values():
+        value = os.environ.get(key_name)
+        if value:
+            s = s.replace(value, "[REDACTED]")
+    return _KEY_PATTERN.sub("[REDACTED]", s)
 
 
 def provider_config() -> tuple[str, str, str] | None:
