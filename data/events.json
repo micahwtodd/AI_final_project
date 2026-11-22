@@ -1,5 +1,5 @@
 {
-  "_note": "Fixed four-quarter campaign. Magnitudes are stylized approximations of the historical quarter each card echoes, for Micah to verify or adjust. A shock is a vector of market moves, never a dollar loss; the engine turns it into profit and loss using each company's own balance sheet. ig_loss_pct is the credit loss on BBB-rated holdings; hy_default_pct is the default rate on below-investment-grade bonds (40% recovery).",
+  "_note": "Fixed four-quarter campaign. Magnitudes are stylized approximations of the historical quarter each card echoes, for Micah to verify or adjust. A shock is a vector of market moves, never a dollar loss; the engine turns it into profit and loss using each company's own balance sheet. ig_loss_pct is the credit loss rate on BBB-rated holdings (A-rated lose 15% of that rate, AAA none); hy_default_pct is the default rate on below-investment-grade bonds (40% recovery).",
   "cards": [
     {
       "id": "rate_spike",

@@ -95,7 +95,7 @@ class Action(BaseModel):
     """Absolute lever settings. Applying an Action trades the book to match it."""
     rate_hedge_pct: float = Field(0, ge=0, le=120, description="% of the duration gap closed with swaps")
     credit_shift_pct: float = Field(0, ge=-10, le=30, description="% of below-IG and BBB moved into governments")
-    equity_hedge_pct: float = Field(0, ge=0, le=100, description="% of net equity exposure (stocks, alternatives, guarantees) hedged with puts")
+    equity_hedge_pct: float = Field(0, ge=0, le=100, description="% of variable annuity guarantee equity exposure hedged with puts")
     fx_hedge_pct: float = Field(0, ge=0, le=100, description="% of foreign assets hedged with forwards")
     cash_buffer_pct: float = Field(3, ge=1, le=15, description="Cash as % of invested assets")
     collateralized: bool = Field(True, description="Daily collateral on derivatives")
@@ -174,7 +174,8 @@ class GameState(BaseModel):
     portfolio_yield: float  # the company's net investment yield at the start
     foreign_share: float
     liability_duration_scale: float = 1.0
-    ig_bbb_share: float = 0.45  # share of investment-grade corporates rated BBB
+    ig_aaa_share: float = 0.20  # share of investment-grade corporates rated AAA (no credit losses)
+    ig_bbb_share: float = 0.45  # share rated BBB; the rest is A-rated
     action: Action = Action()
     prt_decided: bool = False
     history: list[QuarterRecord] = []

@@ -85,10 +85,10 @@ def guarantee_equity_sensitivity(s: GameState) -> float:
     return s.guarantee_exposure * assumptions()["guarantee"]["k_eq"]
 
 
-def equity_exposure(s: GameState) -> float:
-    """Loss for a 100% equity fall before hedges: stocks and alternatives held plus guarantees, $bn."""
-    return (s.assets["equity"] * _ab("equity")["beta"] + s.assets["alts"] * _ab("alts")["beta"]
-            + guarantee_equity_sensitivity(s))
+def equity_holdings_exposure(s: GameState) -> float:
+    """Loss on stocks and alternatives held for a 100% equity fall, $bn. Deliberately not hedged:
+    insurers keep this equity risk premium to help fund future claims."""
+    return s.assets["equity"] * _ab("equity")["beta"] + s.assets["alts"] * _ab("alts")["beta"]
 
 
 def foreign_assets(s: GameState) -> float:
@@ -141,6 +141,7 @@ def build_state(profile: CompanyProfile, seed: int) -> GameState:
         market_rate=a["market"]["base_rate"], asset_yields=yields,
         portfolio_yield=profile.net_investment_yield, foreign_share=profile.foreign_share,
         action=Action(cash_buffer_pct=round(cash_pct, 1), collateralized=False, dealers=1),
+        ig_aaa_share=a["defaults_when_untagged"]["aaa_share_of_ig"],
         ig_bbb_share=a["defaults_when_untagged"]["bbb_share_of_ig"],
     )
     # scale liability durations so the starting unhedged gap is near the target (bounded)
@@ -165,7 +166,8 @@ def dashboard(s: GameState) -> Dashboard:
     gap = net / BP / A if A else 0.0
     cap = 100 * surplus(s) / capital_requirement(s)
     liq = 100 * liquid_assets_stressed(s) / max(stressed_outflow(s), 1e-9)
-    eq = equity_exposure(s) * (1 - s.action.equity_hedge_pct / 100 * (1 - s.hedges_lost_share))
+    eq = equity_holdings_exposure(s) + guarantee_equity_sensitivity(s) * (
+        1 - s.action.equity_hedge_pct / 100 * (1 - s.hedges_lost_share))
     fx = foreign_assets(s) * (1 - s.action.fx_hedge_pct / 100 * (1 - s.hedges_lost_share))
 
     def band(v: float, red: float, amber: float) -> str:
@@ -215,7 +217,7 @@ def quarterly_hedge_cost(s: GameState, a: Action) -> float:
     hc = assumptions()["hedge_costs_quarterly"]
     live = 1 - s.hedges_lost_share
     cost = abs(s.swap_dv01) * hc["swap_per_dv01"]
-    cost += a.equity_hedge_pct / 100 * live * equity_exposure(s) * hc["put_premium"]
+    cost += a.equity_hedge_pct / 100 * live * guarantee_equity_sensitivity(s) * hc["put_premium"]
     cost += a.fx_hedge_pct / 100 * live * foreign_assets(s) * hc["fx_forward"]
     if _hedge_on(a, s):
         A = total_assets(s)
@@ -247,7 +249,8 @@ def apply_action(state: GameState, action: Action, offers_prt: bool | None = Non
     delta = (action.credit_shift_pct - old.credit_shift_pct) / 100
     if delta:
         bbb_val = s.assets["ig_corp"] * s.ig_bbb_share
-        a_val = s.assets["ig_corp"] - bbb_val
+        aaa_val = s.assets["ig_corp"] * s.ig_aaa_share
+        a_val = s.assets["ig_corp"] - bbb_val  # AAA and A together; unchanged by the shift
         pool_hy = s.assets["below_ig"]
         pool = pool_hy + bbb_val
         if pool > 0 and delta > 0:
@@ -261,7 +264,9 @@ def apply_action(state: GameState, action: Action, offers_prt: bool | None = Non
             s.assets["below_ig"] += amt * pool_hy / pool
             s.assets["ig_corp"] += amt * bbb_val / pool
             bbb_val += amt * bbb_val / pool
-        s.ig_bbb_share = bbb_val / (a_val + bbb_val) if a_val + bbb_val > 0 else 0.0
+        total_ig = a_val + bbb_val
+        s.ig_bbb_share = bbb_val / total_ig if total_ig > 0 else 0.0
+        s.ig_aaa_share = aaa_val / total_ig if total_ig > 0 else 0.0
 
     # cash buffer
     _set_cash(s, action.cash_buffer_pct)
@@ -350,10 +355,11 @@ def apply_shock(state: GameState, shock: ShockVector) -> tuple[GameState, Attrib
     hcost = quarterly_hedge_cost(s, act)
     att["carry"], att["hedge_cost"] = carry, -hcost
     fx_base = foreign_assets(s)
-    eq_exposure = equity_exposure(s)
+    guar_eq_sens = guarantee_equity_sensitivity(s)
+    a_share = max(0.0, 1 - s.ig_aaa_share - s.ig_bbb_share)
 
     # ---- assets
-    spread_marks = {"ig_a": 0.0, "bbb": 0.0, "mortgage": 0.0, "below_ig": 0.0}
+    spread_marks = {"aaa": 0.0, "a": 0.0, "bbb": 0.0, "mortgage": 0.0, "below_ig": 0.0}
     for b in ASSET_BUCKETS:
         mv, p = s.assets[b], _ab(b)
         d = p["duration"]
@@ -362,14 +368,17 @@ def apply_shock(state: GameState, shock: ShockVector) -> tuple[GameState, Attrib
         cs = -mv * p["spread_duration"] * spread
         if b == "ig_corp":
             spread_marks["bbb"] += cs * s.ig_bbb_share
-            spread_marks["ig_a"] += cs * (1 - s.ig_bbb_share)
+            spread_marks["aaa"] += cs * s.ig_aaa_share
+            spread_marks["a"] += cs * a_share
         elif b == "mortgage":
             spread_marks["mortgage"] += cs
         elif b == "below_ig":
             spread_marks["below_ig"] += cs
         loss = 0.0
         if b == "ig_corp":
-            loss = mv * s.ig_bbb_share * shock.ig_loss_pct / 100  # credit losses hit the BBB tier
+            # BBB lose the card's rate, A-rated a fraction of it, AAA nothing
+            a_ratio = a["credit_tiers"]["a_default_ratio_to_bbb"]
+            loss = mv * (s.ig_bbb_share + a_ratio * a_share) * shock.ig_loss_pct / 100
         elif b == "below_ig":
             loss = mv * shock.hy_default_pct / 100 * (1 - a["market"]["hy_recovery"])
         elif b == "mortgage":
@@ -409,7 +418,7 @@ def apply_shock(state: GameState, shock: ShockVector) -> tuple[GameState, Attrib
 
     # ---- hedges (derivatives)
     swap_pnl = s.swap_dv01 * (-shock.rate_bp)
-    put_pnl = act.equity_hedge_pct / 100 * live * eq_exposure * max(0.0, -eq)
+    put_pnl = act.equity_hedge_pct / 100 * live * guar_eq_sens * max(0.0, -eq)
     fx_pnl = act.fx_hedge_pct / 100 * live * fx_base * shock.fx_pct / 100
     att["rates"] += swap_pnl
     att["equity"] += put_pnl

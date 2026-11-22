@@ -97,11 +97,14 @@
     "k_eq": 0.06,
     "k_rate": 4.0,
     "capital_factor": 0.04,
-    "_note": "Guarantee value change = exposure x (k_eq x -equity_move + k_rate x -rate_change). k_eq 0.06 means a 10% market fall adds 0.6% of guaranteed account value to the liability."
+    "_note": "Guarantee value change = exposure x (k_eq x -equity_move + k_rate x -rate_change). k_eq 0.06 means a 10% market fall adds 0.6% of guaranteed account value to the liability.",
+    "_hedge_note": "Equity puts hedge only the variable annuity guarantees. Stocks and alternatives held are left unhedged on purpose: hedging them would give up the equity risk premium insurers rely on to fund future claim payments."
   },
   "defaults_when_untagged": {
     "govt_share_of_bonds": 0.15,
     "below_ig_share_of_bonds": 0.07,
+    "aaa_share_of_ig": 0.2,
+    "a_share_of_ig": 0.35,
     "bbb_share_of_ig": 0.45,
     "mortgage_share_of_invested": 0.13,
     "life_share_of_future_policy_benefits": 0.5,
@@ -147,7 +150,8 @@
     "assets_received_as": "ig_corp"
   },
   "liability_spread_offset": {
-    "ig_a": 0.95,
+    "aaa": 0.95,
+    "a": 0.95,
     "bbb": 0.95,
     "mortgage": 0.95,
     "below_ig": 0.85
@@ -178,5 +182,9 @@
   "score": {
     "clip_max": 1.2,
     "breach_penalty": 10
+  },
+  "credit_tiers": {
+    "a_default_ratio_to_bbb": 0.15,
+    "_note": "Investment-grade corporates are split into AAA (no credit losses), A (credit losses at 15% of the BBB rate) and BBB (the card's ig_loss_pct). Shares of the IG bucket are defaults until Sam reads the credit-quality table in Project 6."
   }
 }
