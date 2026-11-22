@@ -1,6 +1,7 @@
 import type { Action, Reveal, Shock } from "../api";
 import { LEVERS, type LeverKey } from "../labels";
 import { PixelSprite } from "../components/PixelSprite";
+import { Confetti, CountUp } from "../components/Fx";
 
 type Row = { key?: string; label: string; value: number; mark?: "yes" | "no" };
 
@@ -57,6 +58,7 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
 
   return (
     <section className="reveal">
+      {((u?.points ?? 0) >= 75 || r.quarter_score >= 75) && <Confetti />}
       <div className="panel examiner">
         <div className="examiner-head">
           <PixelSprite name={(u?.points ?? 0) >= 50 ? "amara_pleased" : "amara_concerned"} size={72} title="Dr. Amara Okafor" />
@@ -68,7 +70,7 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
           </div>
           <div className="understanding-chip">
             <div className="small muted">Understanding this quarter</div>
-            <div className="u-points">{u ? u.points.toFixed(1) : "0"}<span>/100</span></div>
+            <div className="u-points"><CountUp value={u ? u.points : 0} format={(v) => v.toFixed(1)} /><span>/100</span></div>
             {u && u.attempts > 1 && <div className="small muted">second try: new checks count half</div>}
             {r.not_sure && <div className="small muted">“I'm not sure”: walkthrough, no points</div>}
           </div>
@@ -103,7 +105,7 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
               { label: "Doing nothing", value: r.comparison.nothing },
               { label: "Benchmark", value: r.comparison.benchmark },
             ]} />
-            <div className="score-chip">Results score this quarter <b>{r.quarter_score.toFixed(0)}</b> / 100</div>
+            <div className="score-chip">Results score this quarter <b><CountUp value={r.quarter_score} format={(v) => v.toFixed(0)} ms={1100} /></b> / 100</div>
             <h3 style={{ marginTop: "1rem" }}>What would have helped most</h3>
             <ul className="small">{r.improvement_facts.map((t) => <li key={t}>{t}</li>)}</ul>
           </div>

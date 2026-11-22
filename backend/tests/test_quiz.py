@@ -21,7 +21,7 @@ def key(form: str) -> dict:
 
 def test_forms_cover_the_same_eight_concepts_with_spread_answers():
     a, b = QUIZ["forms"]["A"], QUIZ["forms"]["B"]
-    assert len(a) == len(b) == 8
+    assert len(a) == len(b) == 5
     assert [i["concept"] for i in a] == [i["concept"] for i in b] == QUIZ["concepts"]
     assert {i["q"] for i in a}.isdisjoint({i["q"] for i in b})  # different wording
     for form in (a, b):
@@ -37,7 +37,7 @@ def test_form_hides_answers():
 def test_quiz_flow_saves_before_and_after_figures():
     gid = client.post("/api/game", json={"ticker": "LNC"}).json()["id"]
     pre = client.post(f"/api/quiz/{gid}/pre", json={"answers": key("A"), "confidence": CONF}).json()
-    assert pre["correct"] == 8 and pre["answers_key"] is None  # no key leaked before the game
+    assert pre["correct"] == 5 and pre["answers_key"] is None  # no key leaked before the game
     assert client.post(f"/api/quiz/{gid}/pre", json={"answers": {}, "confidence": CONF}).status_code == 409  # once only
     assert client.post(f"/api/quiz/{gid}/post", json={"answers": {}, "confidence": CONF}).status_code == 409  # not yet
     assert "pre" in client.get(f"/api/game/{gid}").json()["quiz_taken"]
@@ -52,7 +52,7 @@ def test_quiz_flow_saves_before_and_after_figures():
     assert ba["confidence_pre_avg"] == 3 and ba["confidence_post_avg"] == 5 and ba["confidence_change"] == 2
     session_file = REPO_DIR / "output" / "sessions" / f"{gid}.json"
     saved = json.loads(session_file.read_text(encoding="utf-8"))
-    assert saved["quiz"]["pre"]["correct"] == 8 and saved["confidence"]["post"]["C1"] == 5
+    assert saved["quiz"]["pre"]["correct"] == 5 and saved["confidence"]["post"]["C1"] == 5
 
 
 def test_confidence_must_be_complete_and_in_range():

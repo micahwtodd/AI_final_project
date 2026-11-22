@@ -1,5 +1,6 @@
 import { Fragment, useState } from "react";
 import type { Company } from "../api";
+import { PixelSprite } from "./PixelSprite";
 
 const BADGE: Record<string, { label: string; cls: string; tip: string }> = {
   tagged: { label: "Tagged", cls: "b-tagged", tip: "Read by code from the 10-K's tagged XBRL financial data" },
@@ -20,11 +21,11 @@ export function Dossier(props: { company: Company }) {
   return (
     <div className="dossier-box">
       <div className="dossier-intro">
-        <div className="sam-avatar" aria-hidden>SN</div>
+        <PixelSprite name="sam_neutral" size={56} className="sam-face" title="Sam Nakamura" />
         <div>
           <div className="cro-name">Sam Nakamura · Calibration Analyst</div>
           <div className="small">“It's in the notes.” Here is how I built this balance sheet from {c.name}'s FY{c.fiscal_year} 10-K
-            (accession {c.accession}). Every figure shows where it came from; click a row for the citation.</div>
+            (accession {c.accession}). Every figure shows where it came from; click a row for the citation. To change what the game uses, edit the inputs above.</div>
           <div className="badge-row">
             {Object.entries(BADGE).map(([k, b]) => (
               <span key={k} className={`badge ${b.cls}`} title={b.tip}>{b.label} {counts[k] ?? 0}</span>
@@ -62,12 +63,11 @@ export function Dossier(props: { company: Company }) {
           </ul>
         </div>
       )}
-      <div className="small muted">
-        Sanitizer: removed {c.sanitizer.hidden_elements ?? 0} hidden elements, {c.sanitizer.comments ?? 0} comments and{" "}
-        {c.sanitizer.zero_width_chars ?? 0} invisible characters; {c.sanitizer.quarantined ?? 0} instruction-like passages quarantined.
-        {c.rejections.length > 0 && ` Validation rejected ${c.rejections.length} reading${c.rejections.length > 1 ? "s" : ""}: `}
-        {c.rejections.map((r) => `${r.field} (${r.reason})`).join("; ")}
-      </div>
+      {c.rejections.length > 0 && (
+        <div className="small muted">
+          Readings I rejected after checking them: {c.rejections.map((r) => `${r.field} (${r.reason})`).join("; ")}.
+        </div>
+      )}
     </div>
   );
 }

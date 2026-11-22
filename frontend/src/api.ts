@@ -48,7 +48,10 @@ export type Company = {
   rejections: { field: string; reason: string; quote?: string }[];
   sanitizer: { hidden_elements?: number; comments?: number; zero_width_chars?: number; chunks?: number; quarantined?: number };
   dashboard: Dashboard;
+  inputs: GameInput[];
 };
+
+export type GameInput = { key: string; label: string; unit: "bn" | "pct" | "x"; min: number; max: number; value: number; group: string };
 
 export type DossierRow = {
   key: string; label: string; unit: "bn" | "pct"; value: number;
@@ -93,6 +96,7 @@ export type GameView = {
   usage: Usage;
   chat: ChatMsg[];
   quiz_taken: string[];
+  custom_inputs: string[];
 };
 
 export type Usage = {
@@ -230,7 +234,10 @@ async function call<T>(path: string, body?: unknown): Promise<T> {
 export const api = {
   health: () => call<Health>("/health"),
   companies: () => call<Company[]>("/companies"),
-  newGame: (ticker: string, seed: number, demo = false) => call<GameView>("/game", { ticker, seed, demo, agent_mode: "team" }),
+  newGame: (ticker: string, seed: number, demo = false, overrides: Record<string, number> = {}) =>
+    call<GameView>("/game", { ticker, seed, demo, agent_mode: "team", overrides }),
+  previewCompany: (ticker: string, overrides: Record<string, number>) =>
+    call<{ dashboard: Dashboard; inputs: GameInput[] }>(`/companies/${ticker}/preview`, { overrides }),
   game: (id: string) => call<GameView>(`/game/${id}`),
   preview: (id: string, action: Action) => call<Preview>(`/game/${id}/preview`, { action }),
   commit: (id: string, actions: Action) => call<{ view: GameView; after: Dashboard }>(`/game/${id}/commit`, { actions }),

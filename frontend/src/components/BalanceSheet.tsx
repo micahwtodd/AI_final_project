@@ -27,37 +27,50 @@ export function balanceSheet(d: Dashboard): { assets: Segment[]; claims: Segment
 
 const fmt = (v: number) => (v >= 100 ? `$${v.toFixed(0)}bn` : `$${v.toFixed(1)}bn`);
 
-// ---------------------------------------------------------------- stacked two-column bar
+// ---------------------------------------------------------------- two-column balance sheet bar
+// One solid column of assets; liabilities and equity as two blocks. The ring charts carry the detail.
 
 export function BalanceSheetBars(props: { dashboard: Dashboard; height?: number }) {
-  const { assets, claims, total } = balanceSheet(props.dashboard);
+  const { claims, total } = balanceSheet(props.dashboard);
+  const equity = claims.find((c) => c.key === "equity")?.value ?? 0;
+  const left: Segment[] = [{ key: "assets", label: "Assets", value: total, color: "#007AC1" }];
+  const right: Segment[] = [
+    { key: "liabilities", label: "Liabilities", value: total - equity, color: "#537D93" },
+    { key: "equity", label: "Equity", value: equity, color: EQUITY_COLOR },
+  ];
   const H = props.height ?? 320;
-  const colW = 96;
-  const gap = 56;
+  const colW = 104;
+  const gap = 48;
   const top = 26;
   const W = colW * 2 + gap + 8;
   const scale = (H - top - 4) / Math.max(total, 1e-9);
 
-  const column = (segs: Segment[], x: number, title: string) => {
+  const column = (segs: Segment[], x: number, title: string, delay: number) => {
     let y = top;
     return (
       <g>
         <text x={x + colW / 2} y={14} textAnchor="middle" className="bs-title">{title}</text>
-        {segs.map((s) => {
+        {segs.map((s, k) => {
           const h = s.value * scale;
-          const rect = (
-            <g key={s.key}>
-              <rect x={x} y={y} width={colW} height={Math.max(h, 0.5)} fill={s.color} stroke="#fff" strokeWidth={1}>
+          const ink = isLight(s.color) ? "#001F5B" : "#fff";
+          const cy = y + h / 2;
+          const g = (
+            <g key={s.key} className="bs-grow" style={{ animationDelay: `${delay + k * 0.12}s` }}>
+              <rect x={x} y={y} width={colW} height={Math.max(h, 0.5)} fill={s.color} stroke="#fff" strokeWidth={1.5} rx={3}>
                 <title>{`${s.label}: $${s.value.toFixed(2)}bn (${((100 * s.value) / total).toFixed(1)}%)`}</title>
               </rect>
-              {h >= 15 && (
-                <text x={x + colW / 2} y={y + h / 2 + 4} textAnchor="middle" className="bs-seg-label"
-                  fill={isLight(s.color) ? "#001F5B" : "#fff"}>{fmt(s.value)}</text>
-              )}
+              {h >= 36 ? (
+                <>
+                  <text x={x + colW / 2} y={cy - 3} textAnchor="middle" className="bs-seg-name" fill={ink}>{s.label}</text>
+                  <text x={x + colW / 2} y={cy + 13} textAnchor="middle" className="bs-seg-label" fill={ink}>{fmt(s.value)}</text>
+                </>
+              ) : h >= 14 ? (
+                <text x={x + colW / 2} y={cy + 4} textAnchor="middle" className="bs-seg-label" fill={ink}>{s.label} {fmt(s.value)}</text>
+              ) : null}
             </g>
           );
           y += h;
-          return rect;
+          return g;
         })}
       </g>
     );
@@ -66,9 +79,9 @@ export function BalanceSheetBars(props: { dashboard: Dashboard; height?: number 
   return (
     <div className="bs-bars">
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} role="img"
-        aria-label={`Balance sheet: assets $${total.toFixed(1)}bn; liabilities and equity $${total.toFixed(1)}bn`}>
-        {column(assets, 4, "Assets")}
-        {column(claims, 4 + colW + gap, "Liabilities + equity")}
+        aria-label={`Balance sheet: assets $${total.toFixed(1)}bn; liabilities $${(total - equity).toFixed(1)}bn and equity $${equity.toFixed(1)}bn`}>
+        {column(left, 4, "Assets", 0)}
+        {column(right, 4 + colW + gap, "Liabilities + equity", 0.15)}
       </svg>
       <div className="bs-total">Total ${total.toFixed(1)}bn</div>
     </div>

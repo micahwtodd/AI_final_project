@@ -1,26 +1,56 @@
-import { useState } from "react";
-import type { Company } from "../api";
+import { useEffect, useRef, useState } from "react";
+import { api, type Company, type Dashboard, type GameInput } from "../api";
 import { BalanceSheetPanel } from "../components/BalanceSheet";
 import { CompanyLogo } from "../components/CompanyLogo";
 import { Dossier } from "../components/Dossier";
+import { InputsEditor } from "../components/InputsEditor";
 
-export function CompanySelect(props: { companies: Company[]; busy: boolean; onStart: (ticker: string, seed: number) => void; onDemo: () => void }) {
+export function CompanySelect(props: { companies: Company[]; busy: boolean; onStart: (ticker: string, seed: number, overrides: Record<string, number>) => void; onDemo: () => void }) {
   const [picked, setPicked] = useState<string | null>(null);
   const [seed, setSeed] = useState(409);
   const chosen = props.companies.find((c) => c.ticker === picked);
+  const [overrides, setOverrides] = useState<Record<string, number>>({});
+  const [preview, setPreview] = useState<{ dashboard: Dashboard; inputs: GameInput[] } | null>(null);
+  const [inputErr, setInputErr] = useState<string | null>(null);
+  const panel = useRef<HTMLDivElement>(null);
+
+  // a new company starts from Sam's values; scroll its balance sheet into view
+  useEffect(() => {
+    setOverrides({});
+    setPreview(null);
+    setInputErr(null);
+    if (picked) setTimeout(() => panel.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+  }, [picked]);
+
+  // live preview of edited inputs (debounced)
+  useEffect(() => {
+    if (!picked) return;
+    if (Object.keys(overrides).length === 0) { setPreview(null); setInputErr(null); return; }
+    const t = setTimeout(() => {
+      api.previewCompany(picked, overrides)
+        .then((r) => { setPreview(r); setInputErr(null); })
+        .catch((e) => setInputErr(e instanceof Error ? e.message : String(e)));
+    }, 300);
+    return () => clearTimeout(t);
+  }, [picked, overrides]);
+  const edited = Object.keys(overrides).length;
 
   return (
     <section className="select">
-      <div className="hero">
-        <h1>Run a life insurer through a year of market stress</h1>
-        <p>
-          Pick a real, publicly traded insurer. Its balance sheet comes from its latest 10-K filing with the SEC. Each
-          quarter you read the news, decide how to protect the company, and sign a trade ticket. Then the market moves.
-        </p>
-        <div className="demo-row">
-          <button className="primary demo-btn" disabled={props.busy} onClick={props.onDemo}>▶ Demo mode</button>
-          <span className="small muted">One click: Jackson Financial, seed 409, the full team, with sample answers so you can see every feature without knowing insurance.</span>
+      <div className="hero hero-game">
+        <div className="hero-top">
+          <div>
+            <div className="hero-kicker">Six real insurers · real balance sheets · one brutal year</div>
+            <h1>Pick your insurer.</h1>
+          </div>
+          <button className="demo-btn" disabled={props.busy} onClick={props.onDemo} title="Jackson Financial with sample answers for every step">▶ Demo mode</button>
         </div>
+        <ol className="rules">
+          <li><span className="rule-n">1</span><b>Read the wire.</b> A hint of what's coming. Maybe.</li>
+          <li><span className="rule-n">2</span><b>Make your moves.</b> Hedge, de-risk, hold cash. Nothing's free.</li>
+          <li><span className="rule-n">3</span><b>Take the hit.</b> Stay above the capital and cash floors.</li>
+          <li><span className="rule-n">4</span><b>Explain it to Amara.</b> Get it right, score points.</li>
+        </ol>
       </div>
 
       <div className="company-grid">
@@ -43,36 +73,41 @@ export function CompanySelect(props: { companies: Company[]; busy: boolean; onSt
               <span>Surplus <b>${c.surplus_usd_bn.toFixed(1)}bn</b></span>
               <span>Cushion <b>{(100 * c.equity_to_assets).toFixed(1)}%</b> of assets</span>
             </div>
-            <div className="muted small">FY{c.fiscal_year} 10-K</div>
           </button>
         ))}
       </div>
 
       {chosen && (
-        <div className="panel dossier">
+        <div className="panel dossier" ref={panel} key={chosen.ticker}>
           <div className="dossier-head">
             <CompanyLogo ticker={chosen.ticker} name={chosen.name} />
             <h2>
               {chosen.name} <span className="muted">({chosen.ticker}) · general account balance sheet, FY{chosen.fiscal_year}</span>
             </h2>
           </div>
-          <BalanceSheetPanel dashboard={chosen.dashboard} />
+          <BalanceSheetPanel dashboard={preview?.dashboard ?? chosen.dashboard} />
+          {edited > 0 && <div className="custom-flag small">Using your edited inputs ({edited}). Sam's figures are under Advanced options.</div>}
           <p className="small muted">
-            Separate-account assets (${chosen.separate_account_assets_usd_bn.toFixed(0)}bn) belong to policyholders and are
-            left out, except the stock-market guarantees written on them: ${chosen.guarantee_exposure_usd_bn.toFixed(0)}bn of
-            account value carries a guarantee. Equity is shown excluding unrealized bond gains and losses (AOCI).
+            Excludes separate account assets, but includes general account guarantees written on them.
+            Equity is shown excluding unrealized bond gains and losses (AOCI).
           </p>
-          <Dossier company={chosen} />
-          <div className="start-row">
-            <label>
-              Seed{" "}
-              <input type="number" value={seed} onChange={(e) => setSeed(Number(e.target.value) || 0)} />
-            </label>
-            <span className="small muted">Same seed, same market shocks: runs can be compared.</span>
-            <button className="primary" disabled={props.busy} onClick={() => props.onStart(chosen.ticker, seed)}>
-              {props.busy ? "Starting…" : `Approve dossier and start with ${chosen.ticker}`}
+          <div className="start-row approve-row">
+            <button className="primary approve-btn" disabled={props.busy || !!inputErr} onClick={() => props.onStart(chosen.ticker, seed, overrides)}>
+              {props.busy ? "Starting…" : `Approve dossier and run ${chosen.name} →`}
             </button>
           </div>
+          <details className="advanced">
+            <summary>Advanced options <span className="muted small">· seed, edit inputs, Sam's sources</span></summary>
+            <div className="seed-row">
+              <label>
+                Seed{" "}
+                <input type="number" value={seed} onChange={(e) => setSeed(Number(e.target.value) || 0)} />
+              </label>
+              <span className="small muted">Same seed, same market shocks, so runs can be compared.</span>
+            </div>
+            <InputsEditor inputs={chosen.inputs} overrides={overrides} onChange={setOverrides} error={inputErr} />
+            <Dossier company={chosen} />
+          </details>
         </div>
       )}
     </section>

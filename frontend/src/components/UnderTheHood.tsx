@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import type { AgentMode, GameView } from "../api";
 
 /** One place for everything a grader needs: trace, experiments, safety lab, mode switch, budget cap. */
@@ -11,7 +11,24 @@ export function UnderTheHood(props: {
   capUsd: number | null;
 }) {
   const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<CSSProperties>({});
   const ref = useRef<HTMLDivElement>(null);
+  const btn = useRef<HTMLButtonElement>(null);
+  // Keep the menu inside the window wherever the button sits (the top bar wraps on narrow screens).
+  const place = () => {
+    const r = btn.current?.getBoundingClientRect();
+    if (!r) return;
+    const w = Math.min(340, window.innerWidth - 32);
+    const left = Math.max(16, Math.min(r.right - w, window.innerWidth - w - 16));
+    setPos({ position: "fixed", top: r.bottom + 6, left, width: w, right: "auto", maxHeight: window.innerHeight - r.bottom - 22, overflowY: "auto" });
+  };
+  useEffect(() => {
+    if (!open) return;
+    place();
+    window.addEventListener("resize", place);
+    window.addEventListener("scroll", place, true);
+    return () => { window.removeEventListener("resize", place); window.removeEventListener("scroll", place, true); };
+  }, [open]);
   useEffect(() => {
     const close = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
     document.addEventListener("mousedown", close);
@@ -22,9 +39,9 @@ export function UnderTheHood(props: {
 
   return (
     <div className="hood" ref={ref}>
-      <button className="pill hood-btn" aria-expanded={open} onClick={() => setOpen(!open)}>Under the hood ▾</button>
+      <button ref={btn} className="pill hood-btn" aria-expanded={open} onClick={() => setOpen(!open)}>Under the hood ▾</button>
       {open && (
-        <div className="hood-menu" role="menu">
+        <div className="hood-menu" role="menu" style={pos}>
           <button role="menuitem" disabled={!g} onClick={go(props.onTrace)}>
             <b>Trace</b><span>Every delegation, tool call, model call and cost in this session</span>
           </button>

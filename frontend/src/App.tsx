@@ -11,8 +11,11 @@ import { QuizScreen } from "./screens/QuizScreen";
 import { TraceScreen } from "./screens/TraceScreen";
 import { UnderTheHood } from "./components/UnderTheHood";
 import { GlossaryContext, type Glossary } from "./components/Term";
+import { WelcomeScreen } from "./screens/WelcomeScreen";
+import { CountUp } from "./components/Fx";
 
 type Screen =
+  | { name: "welcome" }
   | { name: "select" }
   | { name: "desk"; game: GameView }
   | { name: "shock"; game: GameView; shock: Shock; firstTry: { review: Review; question: string } | null }
@@ -24,7 +27,7 @@ type Screen =
   | { name: "quiz"; game: GameView; when: "pre" | "post" };
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>({ name: "select" });
+  const [screen, setScreen] = useState<Screen>({ name: "welcome" });
   const [companies, setCompanies] = useState<Company[]>([]);
   const [health, setHealth] = useState<Health | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +59,7 @@ export default function App() {
   const liveGame = screen.name === "trace" ? null : "game" in screen ? screen.game : screen.name === "reveal" ? screen.reveal.view : null;
   const [lastGame, setLastGame] = useState<GameView | null>(null);
   useEffect(() => { if (liveGame) setLastGame(liveGame); }, [liveGame]);
-  const game = liveGame ?? (screen.name === "select" ? null : lastGame);
+  const game = liveGame ?? (screen.name === "select" || screen.name === "welcome" ? null : lastGame);
 
   async function switchMode(m: "solo" | "team") {
     if (!game) return;
@@ -92,7 +95,7 @@ export default function App() {
             <span className="pill">{game.company}</span>
             <span className="pill">{quarterLabel}</span>
             <span className="pill">Seed {game.seed}</span>
-            <span className="pill strong">Surplus ${surplusShown.toFixed(2)}bn</span>
+            <span className="pill strong">Surplus <CountUp value={surplusShown} from={surplusShown} format={(v) => `$${v.toFixed(2)}bn`} /></span>
           </div>
         )}
         {game && usage && <UsageMeter gameId={game.id} usage={usage} onUsage={(u) => { setUsage(u); }} />}
@@ -111,13 +114,14 @@ export default function App() {
         </div>
       )}
 
-      <main>
+      <main key={screen.name} className="screen-in">
+        {screen.name === "welcome" && <WelcomeScreen onDone={() => setScreen({ name: "select" })} />}
         {screen.name === "select" && (
           <CompanySelect
             companies={companies}
             busy={busy}
-            onStart={async (ticker, seed) => {
-              const g = await run(() => api.newGame(ticker, seed));
+            onStart={async (ticker, seed, overrides) => {
+              const g = await run(() => api.newGame(ticker, seed, false, overrides));
               if (g) setScreen({ name: "quiz", game: g, when: "pre" });
             }}
             onDemo={async () => {

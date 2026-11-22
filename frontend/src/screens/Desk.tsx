@@ -7,6 +7,7 @@ import { BalanceSheetPanel } from "../components/BalanceSheet";
 import { Term } from "../components/Term";
 import { GuideBar } from "../components/GuideBar";
 import { DeskCat } from "../components/PixelSprite";
+import { QuarterSplash } from "../components/Fx";
 
 type Run = <T>(fn: () => Promise<T>) => Promise<T | undefined>;
 
@@ -57,6 +58,7 @@ export function Desk(props: {
 
   return (
     <section className="desk">
+      {g.card && <QuarterSplash id={g.id} quarter={g.card.quarter} title={g.card.title} era={g.card.era} />}
       {showGuide && <GuideBar step={guide} onNext={() => setGuide((x) => x + 1)} onHide={hideGuide} />}
       <div className="desk-left">
         {g.card && (

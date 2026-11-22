@@ -32,6 +32,11 @@ class NewGame(BaseModel):
     seed: int | None = None
     agent_mode: Literal["solo", "team"] = "team"
     demo: bool = False
+    overrides: dict[str, float] = {}
+
+
+class OverridesBody(BaseModel):
+    overrides: dict[str, float] = {}
 
 
 class ActionBody(BaseModel):
@@ -88,10 +93,23 @@ def companies() -> list[dict]:
     return game.companies()
 
 
+@app.post("/api/companies/{ticker}/preview")
+def preview_company(ticker: str, body: OverridesBody) -> dict:
+    """Balance sheet for a company with the learner's edited inputs (nothing is saved)."""
+    try:
+        return game.preview_profile(ticker.upper(), body.overrides)
+    except game.GameError as e:
+        raise HTTPException(422, str(e))
+    except FileNotFoundError:
+        raise HTTPException(404, f"No cached profile for {ticker}")
+
+
 @app.post("/api/game")
 def new_game(body: NewGame) -> dict:
     try:
-        s = game.new_game(body.ticker, body.seed, body.agent_mode, body.demo)
+        s = game.new_game(body.ticker, body.seed, body.agent_mode, body.demo, body.overrides)
+    except game.GameError as e:
+        raise HTTPException(422, str(e))
     except FileNotFoundError:
         raise HTTPException(404, f"No cached profile for {body.ticker}")
     return game.view(s)

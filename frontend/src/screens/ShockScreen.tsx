@@ -3,6 +3,7 @@ import type { Review, Shock } from "../api";
 import { fmtMove, fmtSigned } from "../labels";
 import { Meters } from "../components/Meters";
 import { PixelSprite } from "../components/PixelSprite";
+import { CountUp } from "../components/Fx";
 
 export function ShockScreen(props: {
   shock: Shock;
@@ -17,7 +18,7 @@ export function ShockScreen(props: {
 
   return (
     <section className="shock">
-      <div className="newspaper shake">
+      <div className="newspaper paper-in">
         <div className="paper-mast">THE MARKET DAILY · Q{s.quarter} · {s.era}</div>
         <h1 className="paper-headline">{s.headline}</h1>
         <p className="paper-body">{s.narrative}</p>
@@ -33,8 +34,8 @@ export function ShockScreen(props: {
               ))}
             </tbody>
           </table>
-          <div className={`big-change ${s.surplus_change < 0 ? "neg" : "pos"}`}>
-            Surplus {fmtSigned(s.surplus_change)} <span className="muted small">(${s.surplus_before.toFixed(2)}bn → ${s.surplus_after.toFixed(2)}bn)</span>
+          <div className={`big-change pop-late ${s.surplus_change < 0 ? "neg" : "pos"}`}>
+            Surplus <CountUp value={s.surplus_change} format={(v) => fmtSigned(v)} ms={1200} /> <span className="muted small">(${s.surplus_before.toFixed(2)}bn → ${s.surplus_after.toFixed(2)}bn)</span>
           </div>
         </div>
 

@@ -52,5 +52,5 @@ export function DeskCat(props: { status: "green" | "amber" | "red" | undefined; 
   const label = { nap: "Convexity the cat is napping: capital is healthy",
     alert: "Convexity the cat is on alert: capital is near the floor",
     hide: "Convexity the cat is hiding: capital is below the floor" }[state];
-  return <span className="desk-cat" title={label}><PixelSprite name={`cat_${state}`} size={props.size ?? 48} title={label} /></span>;
+  return <span className={`desk-cat cat-${state}`} key={state} title={label}><PixelSprite name={`cat_${state}`} size={props.size ?? 48} title={label} /></span>;
 }

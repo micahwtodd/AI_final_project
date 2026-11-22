@@ -52,6 +52,7 @@ class Session(BaseModel):
     confidence: dict[str, dict] = {}  # "pre" / "post" -> {C1: 1-5, ...}
     feedback: list[dict] = []
     proposed_ticket: dict | None = None
+    overrides: dict[str, float] = {}  # learner edits to the game inputs (Advanced options)
 
 
 _SESSIONS: dict[str, Session] = {}
@@ -123,7 +124,7 @@ def _profile_summary(p: CompanyProfile) -> dict:
             "liability_mix": p.liability_mix, "guarantee_exposure_usd_bn": p.guarantee_exposure_usd_bn,
             "separate_account_assets_usd_bn": p.separate_account_assets_usd_bn,
             "accession": p.accession, "foreign_share": p.foreign_share,
-            "dossier": dossier(p), "reference": {k: v.model_dump() for k, v in p.reference.items()},
+            "dossier": dossier(p), "inputs": game_inputs(p), "reference": {k: v.model_dump() for k, v in p.reference.items()},
             "rejections": p.rejections, "sanitizer": p.sanitizer,
             "dashboard": engine.dashboard(engine.build_state(p, DEFAULT_SEED)).model_dump()}
 
@@ -143,6 +144,90 @@ DOSSIER_FIELDS = [
     ("life_share_of_fpb", "Life share of future policy benefits", "pct"),
     ("net_investment_yield", "Net investment yield", "pct"),
 ]
+
+
+# ---------------------------------------------------------------- editable game inputs
+# The figures the engine actually runs on (derived by Sam and code from the 10-K). The learner may
+# override them under "Advanced options"; mixes are re-scaled to sum to 100%.
+
+INPUT_FIELDS: list[tuple[str, str, str, float, float]] = [  # key, label, unit, min, max
+    ("invested_assets_usd_bn", "Invested assets", "bn", 1, 3000),
+    ("surplus_usd_bn", "Surplus (equity excl. AOCI)", "bn", 0.1, 500),
+    ("guarantee_exposure_usd_bn", "Account value with stock-market guarantees", "bn", 0, 3000),
+    ("guarantee_value_usd_bn", "Net guarantee liability (negative = asset)", "bn", -200, 200),
+    ("net_investment_yield", "Net investment yield", "pct", 0, 0.15),
+    ("fx_exposed_share", "Currency-exposed share of assets", "pct", 0, 0.6),
+    ("ig_aaa_share", "AAA share of investment-grade corporates", "pct", 0, 1),
+    ("ig_bbb_share", "BBB share of investment-grade corporates", "pct", 0, 1),
+    ("alts_beta", "Stock-market sensitivity of alternatives", "x", 0, 1.5),
+]
+MIX_LABELS = {"asset_mix": "Asset mix", "liability_mix": "Liability mix"}
+
+
+def _effective(p: CompanyProfile, key: str) -> float:
+    d = engine.assumptions()["defaults_when_untagged"]
+    if key == "fx_exposed_share":
+        return p.fx_exposed_share if p.fx_exposed_share is not None else p.foreign_share
+    if key == "ig_aaa_share":
+        return p.ig_aaa_share if p.ig_aaa_share is not None else d["aaa_share_of_ig"]
+    if key == "ig_bbb_share":
+        return p.ig_bbb_share if p.ig_bbb_share is not None else d["bbb_share_of_ig"]
+    return float(getattr(p, key))
+
+
+def game_inputs(p: CompanyProfile) -> list[dict]:
+    """Editable inputs with their current values. Mix keys look like 'asset_mix.govt'."""
+    from backend.models import ASSET_LABELS, LIABILITY_LABELS
+    rows = [{"key": k, "label": lbl, "unit": u, "min": lo, "max": hi, "value": round(_effective(p, k), 6), "group": "Company"}
+            for k, lbl, u, lo, hi in INPUT_FIELDS]
+    for mix, labels in (("asset_mix", ASSET_LABELS), ("liability_mix", LIABILITY_LABELS)):
+        for b, v in getattr(p, mix).items():
+            rows.append({"key": f"{mix}.{b}", "label": labels.get(b, b), "unit": "pct", "min": 0, "max": 1,
+                         "value": round(v, 6), "group": MIX_LABELS[mix]})
+    return rows
+
+
+def apply_overrides(p: CompanyProfile, overrides: dict[str, float] | None) -> CompanyProfile:
+    """A copy of the profile with the learner's edits applied and checked. Raises GameError on bad input."""
+    if not overrides:
+        return p
+    known = {r["key"]: r for r in game_inputs(p)}
+    upd: dict = {}
+    mixes = {"asset_mix": dict(p.asset_mix), "liability_mix": dict(p.liability_mix)}
+    for key, val in overrides.items():
+        if key not in known:
+            raise GameError(f"Unknown input: {key}")
+        r = known[key]
+        try:
+            v = float(val)
+        except (TypeError, ValueError):
+            raise GameError(f"{r['label']}: not a number")
+        if not r["min"] <= v <= r["max"]:
+            raise GameError(f"{r['label']} must be between {r['min']} and {r['max']}.")
+        if "." in key:
+            mix, b = key.split(".", 1)
+            mixes[mix][b] = v
+        else:
+            upd[key] = v
+    for mix, m in mixes.items():
+        tot = sum(m.values())
+        if tot <= 0:
+            raise GameError(f"{MIX_LABELS[mix]} must add up to more than zero.")
+        upd[mix] = {b: v / tot for b, v in m.items()}
+    q = p.model_copy(update=upd)
+    if _effective(q, "ig_aaa_share") + _effective(q, "ig_bbb_share") > 1:
+        raise GameError("AAA and BBB shares of investment-grade corporates cannot add up to more than 100%.")
+    if q.invested_assets_usd_bn - q.surplus_usd_bn - q.guarantee_value_usd_bn <= 0:
+        raise GameError("Surplus is too large for these assets: liabilities would be zero or negative.")
+    return q.model_copy(update={"equity_to_assets": q.surplus_usd_bn / q.invested_assets_usd_bn})
+
+
+def preview_profile(ticker: str, overrides: dict[str, float] | None) -> dict:
+    from backend.calibration import TICKERS
+    if ticker not in TICKERS:
+        raise FileNotFoundError(ticker)
+    p = apply_overrides(load_profile(ticker), overrides)
+    return {"dashboard": engine.dashboard(engine.build_state(p, DEFAULT_SEED)).model_dump(), "inputs": game_inputs(p)}
 
 
 def dossier(p: CompanyProfile) -> list[dict]:
@@ -172,6 +257,7 @@ def view(s: Session) -> dict:
         "usage": usage_view(s),
         "chat": s.chat[-40:],
         "quiz_taken": sorted(s.quiz),
+        "custom_inputs": sorted(s.overrides),
     }
 
 
@@ -202,15 +288,18 @@ def _history_row(r: QuarterRecord, s: Session) -> dict:
 
 # ---------------------------------------------------------------- actions
 
-def new_game(ticker: str, seed: int | None = None, agent_mode: str = "team", demo: bool = False) -> Session:
-    profile = load_profile(ticker)
+def new_game(ticker: str, seed: int | None = None, agent_mode: str = "team", demo: bool = False,
+             overrides: dict[str, float] | None = None) -> Session:
+    profile = apply_overrides(load_profile(ticker), overrides)
     seed = DEFAULT_SEED if seed is None else int(seed)
     st = engine.build_state(profile, seed)
     s = Session(id=secrets.token_hex(6), ticker=profile.ticker, seed=seed, agent_mode=agent_mode,
-                demo=demo, created_at=time.time(), start_state=st, state=st)
+                demo=demo, created_at=time.time(), start_state=st, state=st, overrides=dict(overrides or {}))
     s.timings["started"] = time.time()
     with _LOCK:
         _SESSIONS[s.id] = s
+    if s.overrides:
+        audit.event(s.id, "setup", 0, "learner", "input_overrides", s.overrides)
     _save(s)
     return s
 
@@ -460,7 +549,7 @@ def submit_quiz(s: Session, when: str, answers: dict[str, str], confidence: dict
     correct = sum(by_concept.values())
     conf = {c["id"]: int(confidence[c["id"]]) for c in q["confidence"] if c["id"] in confidence}
     if any(not 1 <= v <= 5 for v in conf.values()) or len(conf) != len(q["confidence"]):
-        raise GameError("Please rate all six statements from 1 to 5.")
+        raise GameError(f"Please rate all {len(q['confidence'])} statements from 1 to 5.")
     s.quiz[when] = {"answers": {k: v for k, v in answers.items() if k in {i["id"] for i in items}},
                     "correct": correct, "total": len(items), "score": round(100 * correct / len(items), 1),
                     "by_concept": by_concept, "ts": time.time()}

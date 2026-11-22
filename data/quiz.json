@@ -4,11 +4,8 @@
     "duration_gap",
     "surrenders",
     "spread_vs_default",
-    "forced_selling",
-    "fx_hedge_cost",
     "guarantees_equity",
-    "collateral_counterparty",
-    "pension_risk_transfer"
+    "collateral_counterparty"
   ],
   "forms": {
     "A": [
@@ -49,30 +46,6 @@
         "answer": "B"
       },
       {
-        "id": "A4",
-        "concept": "forced_selling",
-        "q": "Why does an insurer keep a cash buffer even though cash earns little?",
-        "options": {
-          "A": "Cash always beats bonds",
-          "B": "To avoid paying claims",
-          "C": "Regulators require all assets in cash",
-          "D": "To pay surrenders and margin calls without selling bonds at a discount in a stressed market"
-        },
-        "answer": "D"
-      },
-      {
-        "id": "A5",
-        "concept": "fx_hedge_cost",
-        "q": "What is the main trade-off of hedging foreign bonds with currency forwards?",
-        "options": {
-          "A": "It only matters for stocks",
-          "B": "It removes all risk for free",
-          "C": "It doubles currency risk",
-          "D": "It protects against a stronger dollar but costs a little every quarter"
-        },
-        "answer": "D"
-      },
-      {
         "id": "A6",
         "concept": "guarantees_equity",
         "q": "We wrote guarantees on variable annuities. The stock market falls 20%. What happens?",
@@ -93,18 +66,6 @@
           "B": "When the hedge had grown very valuable",
           "C": "Bank failures never cause losses",
           "D": "When we used one bank and took no collateral"
-        },
-        "answer": "A"
-      },
-      {
-        "id": "A8",
-        "concept": "pension_risk_transfer",
-        "q": "A company asks us to take over its pension plan. What do we take on?",
-        "options": {
-          "A": "Long-dated promises to retirees plus premium to invest, which uses capital",
-          "B": "No liabilities, only fees",
-          "C": "Short-term liabilities only",
-          "D": "Stock-market guarantees"
         },
         "answer": "A"
       }
@@ -147,30 +108,6 @@
         "answer": "B"
       },
       {
-        "id": "B4",
-        "concept": "forced_selling",
-        "q": "Markets freeze and we must raise cash quickly. Which asset can usually be sold with the smallest discount?",
-        "options": {
-          "A": "Commercial mortgage loans",
-          "B": "Government bonds",
-          "C": "Junk bonds",
-          "D": "Private equity"
-        },
-        "answer": "B"
-      },
-      {
-        "id": "B5",
-        "concept": "fx_hedge_cost",
-        "q": "We hedge 100% of our foreign bonds against the dollar. What did we give up?",
-        "options": {
-          "A": "All our interest income",
-          "B": "The quarterly cost of the hedge, and any gain if the dollar had weakened",
-          "C": "Nothing",
-          "D": "Our credit quality"
-        },
-        "answer": "B"
-      },
-      {
         "id": "B6",
         "concept": "guarantees_equity",
         "q": "Why do insurers buy put options against the stock market?",
@@ -193,18 +130,6 @@
           "D": "We must post cash collateral now, even though the loss is only on paper"
         },
         "answer": "D"
-      },
-      {
-        "id": "B8",
-        "concept": "pension_risk_transfer",
-        "q": "After accepting a pension deal, what should we usually do to stay matched?",
-        "options": {
-          "A": "Nothing",
-          "B": "Shorten our assets",
-          "C": "Lengthen our assets or add rate protection, because the new promises are long",
-          "D": "Sell all bonds"
-        },
-        "answer": "C"
       }
     ]
   },
@@ -228,10 +153,98 @@
     {
       "id": "C5",
       "text": "I can explain why collateral matters when a dealer fails."
-    },
-    {
-      "id": "C6",
-      "text": "I can weigh the cost of a hedge against the risk it removes."
     }
-  ]
+  ],
+  "_retired": {
+    "_note": "Dropped at Gate 1 (Micah: limit to 5 questions and 5 confidence ratings). Kept for reference; not used.",
+    "concepts": [
+      "forced_selling",
+      "fx_hedge_cost",
+      "pension_risk_transfer"
+    ],
+    "forms": {
+      "A": [
+        {
+          "id": "A4",
+          "concept": "forced_selling",
+          "q": "Why does an insurer keep a cash buffer even though cash earns little?",
+          "options": {
+            "A": "Cash always beats bonds",
+            "B": "To avoid paying claims",
+            "C": "Regulators require all assets in cash",
+            "D": "To pay surrenders and margin calls without selling bonds at a discount in a stressed market"
+          },
+          "answer": "D"
+        },
+        {
+          "id": "A5",
+          "concept": "fx_hedge_cost",
+          "q": "What is the main trade-off of hedging foreign bonds with currency forwards?",
+          "options": {
+            "A": "It only matters for stocks",
+            "B": "It removes all risk for free",
+            "C": "It doubles currency risk",
+            "D": "It protects against a stronger dollar but costs a little every quarter"
+          },
+          "answer": "D"
+        },
+        {
+          "id": "A8",
+          "concept": "pension_risk_transfer",
+          "q": "A company asks us to take over its pension plan. What do we take on?",
+          "options": {
+            "A": "Long-dated promises to retirees plus premium to invest, which uses capital",
+            "B": "No liabilities, only fees",
+            "C": "Short-term liabilities only",
+            "D": "Stock-market guarantees"
+          },
+          "answer": "A"
+        }
+      ],
+      "B": [
+        {
+          "id": "B4",
+          "concept": "forced_selling",
+          "q": "Markets freeze and we must raise cash quickly. Which asset can usually be sold with the smallest discount?",
+          "options": {
+            "A": "Commercial mortgage loans",
+            "B": "Government bonds",
+            "C": "Junk bonds",
+            "D": "Private equity"
+          },
+          "answer": "B"
+        },
+        {
+          "id": "B5",
+          "concept": "fx_hedge_cost",
+          "q": "We hedge 100% of our foreign bonds against the dollar. What did we give up?",
+          "options": {
+            "A": "All our interest income",
+            "B": "The quarterly cost of the hedge, and any gain if the dollar had weakened",
+            "C": "Nothing",
+            "D": "Our credit quality"
+          },
+          "answer": "B"
+        },
+        {
+          "id": "B8",
+          "concept": "pension_risk_transfer",
+          "q": "After accepting a pension deal, what should we usually do to stay matched?",
+          "options": {
+            "A": "Nothing",
+            "B": "Shorten our assets",
+            "C": "Lengthen our assets or add rate protection, because the new promises are long",
+            "D": "Sell all bonds"
+          },
+          "answer": "C"
+        }
+      ]
+    },
+    "confidence": [
+      {
+        "id": "C6",
+        "text": "I can weigh the cost of a hedge against the risk it removes."
+      }
+    ]
+  }
 }

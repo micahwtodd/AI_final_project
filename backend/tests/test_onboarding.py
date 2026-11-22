@@ -50,3 +50,38 @@ def test_sprite_sheet_shape():
         assert f"cat_{state}" in sprites
     for rows in sprites.values():
         assert all(re.fullmatch(r"[0-9a-f]+", r) for r in rows)
+
+
+# ---------------------------------------------------------------- Gate 1 changes: editable game inputs, 5-item quiz
+
+def test_companies_list_editable_inputs():
+    jxn = next(c for c in client.get("/api/companies").json() if c["ticker"] == "JXN")
+    keys = {r["key"] for r in jxn["inputs"]}
+    assert {"surplus_usd_bn", "invested_assets_usd_bn", "asset_mix.govt", "liability_mix.annuities"} <= keys
+
+
+def test_preview_with_overrides_changes_balance_sheet():
+    base = client.post("/api/companies/JXN/preview", json={"overrides": {}}).json()["dashboard"]
+    r = client.post("/api/companies/JXN/preview", json={"overrides": {"surplus_usd_bn": 8.0, "asset_mix.govt": 0.2}})
+    assert r.status_code == 200
+    d = r.json()["dashboard"]
+    assert abs(d["surplus_usd_bn"] - 8.0) < 0.05 and d["asset_values"]["govt"] > 3 * base["asset_values"]["govt"]
+
+
+def test_bad_overrides_rejected():
+    assert client.post("/api/companies/JXN/preview", json={"overrides": {"surplus_usd_bn": 400}}).status_code == 422
+    assert client.post("/api/companies/JXN/preview", json={"overrides": {"not_a_field": 1}}).status_code == 422
+    assert client.post("/api/companies/XYZ/preview", json={"overrides": {}}).status_code == 404
+    assert client.post("/api/game", json={"ticker": "JXN", "overrides": {"alts_beta": 9}}).status_code == 422
+
+
+def test_new_game_uses_overrides():
+    g = client.post("/api/game", json={"ticker": "JXN", "seed": 409, "overrides": {"surplus_usd_bn": 9.5}}).json()
+    assert g["custom_inputs"] == ["surplus_usd_bn"]
+    assert abs(g["dashboard"]["surplus_usd_bn"] - 9.5) < 0.2  # cash top-up to the floor can move it slightly
+
+
+def test_quiz_has_five_questions_and_five_ratings():
+    for when in ("pre", "post"):
+        f = client.get(f"/api/quiz/{when}").json()
+        assert len(f["questions"]) == 5 and len(f["confidence"]) == 5
