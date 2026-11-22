@@ -8,6 +8,7 @@ import { Term } from "../components/Term";
 import { GuideBar } from "../components/GuideBar";
 import { DeskCat } from "../components/PixelSprite";
 import { QuarterSplash } from "../components/Fx";
+import { play } from "../sound";
 
 type Run = <T>(fn: () => Promise<T>) => Promise<T | undefined>;
 
@@ -62,8 +63,8 @@ export function Desk(props: {
       {showGuide && <GuideBar step={guide} onNext={() => setGuide((x) => x + 1)} onHide={hideGuide} />}
       <div className="desk-left">
         {g.card && (
-          <div className={`panel wire${focus(0)}`}>
-            <div className="wire-tag">NEWS WIRE · Q{g.card.quarter}</div>
+          <div className={`panel wire${focus(0)}${g.card.quarter === 4 ? " boss-wire" : ""}`}>
+            <div className="wire-tag">NEWS WIRE · Q{g.card.quarter}{g.card.quarter === 4 && <span className="boss-tag">⚠ BOSS ROUND · FINAL QUARTER</span>}</div>
             <h2>{g.card.title}</h2>
             <p className="wire-text">{g.card.signal_text}</p>
             <p className="small muted">A hint, not a forecast. The market may move more, less, or not at all.</p>
@@ -165,7 +166,7 @@ export function Desk(props: {
             <button className="primary" disabled={props.busy || signed || needsPrt}
               onClick={async () => {
                 const r = await props.run(() => api.commit(g.id, draft));
-                if (r) props.onUpdate(r.view);
+                if (r) { play("register"); props.onUpdate(r.view); }
               }}>
               {signed ? "Ticket signed ✓" : needsPrt ? "Decide on the pension deal" : "Sign trade ticket"}
             </button>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { PixelSprite, spriteFor } from "./PixelSprite";
+import { play } from "../sound";
 import { api, askStream, type Action, type AgentEvent, type AgentMode, type ChatMsg, type Colleague, type SubAnswer, type Ticket, type Usage } from "../api";
 
 type Turn = {
@@ -49,6 +50,46 @@ function short(v: unknown): string {
 
 function who(agent: string) {
   return CAST[agent]?.name.split(" ").slice(-2).join(" ") ?? agent;
+}
+
+/** Who is working right now in a pending turn, and on what: drives the typing line and the cast chips. */
+function activity(t: Turn): { agent: string; doing: string } {
+  let agent = t.agent ?? "cro";
+  let doing = "typing";
+  for (const e of t.trace) {
+    if (e.type === "delegation" && e.detail.to) { agent = e.detail.to; doing = "reading the question"; }
+    else if (e.type === "delegation" && e.detail.from) { agent = t.agent ?? "cro"; doing = `reading ${CAST[e.detail.from]?.name.split(" ")[0] ?? "the"}'s answer`; }
+    else if (e.type === "tool_call" && !String(e.detail.tool).startsWith("ask_")) {
+      agent = e.agent;
+      doing = `checking the ${String(e.detail.tool).replace(/^get_/, "").replace(/_/g, " ")}`;
+    } else if (e.type === "spend") { agent = e.agent; doing = "typing"; }
+  }
+  return { agent, doing };
+}
+
+function TypingLine({ t }: { t: Turn }) {
+  const a = activity(t);
+  const face = spriteFor(a.agent);
+  return (
+    <div className="typing" aria-live="polite">
+      {face && <span className="typing-face"><PixelSprite name={face} size={24} /></span>}
+      <span><b>{a.agent === "cro" || a.agent === "solo" ? "Amara" : CAST[a.agent]?.name.split(" ")[0] ?? "A colleague"}</b> is {a.doing}</span>
+      <span className="dots3"><i /><i /><i /></span>
+    </div>
+  );
+}
+
+/** Small factual reactions under a finished reply. */
+function Reactions({ t }: { t: Turn }) {
+  const chips: string[] = [];
+  const n = new Set(t.trace.filter((e) => e.type === "delegation" && e.detail.to).map((e) => e.detail.to)).size;
+  if (n) chips.push(`🤝 ${n} colleague${n > 1 ? "s" : ""} consulted`);
+  const tools = t.trace.filter((e) => e.type === "tool_call" && !String(e.detail.tool).startsWith("ask_")).length;
+  if (tools) chips.push(`📊 ${tools} engine check${tools > 1 ? "s" : ""}`);
+  if (t.ticket) chips.push("📝 drafted a ticket for you");
+  if (t.stopped) chips.push("⛔ stopped early");
+  if (!chips.length) return null;
+  return <div className="reactions">{chips.map((c, i) => <span key={i} className="reaction" style={{ animationDelay: `${i * 0.12}s` }}>{c}</span>)}</div>;
 }
 
 function TraceLine({ e }: { e: AgentEvent }) {
@@ -121,9 +162,11 @@ export function ChatPanel(props: {
     try {
       await askStream(props.gameId, msg, (e) => {
         if (e.type === "usage") props.onUsage(e.detail);
-        else if (e.type === "reply")
+        else if (e.type === "reply") {
+          play("click");
           update((t) => ({ ...t, text: e.detail.text, pending: false, stopped: e.detail.stopped, ticket: e.detail.proposed_ticket,
             agent: e.agent, agentName: e.agent_name ?? t.agentName, subs: e.detail.subs ?? t.subs, runId: e.run_id }));
+        }
         else if (e.type === "delegation" && e.detail.from)
           update((t) => ({ ...t, trace: [...t.trace, e], subs: [...t.subs, { agent: e.detail.from, agent_name: e.detail.from_name, text: e.detail.answer }] }));
         else if (e.type !== "start") update((t) => ({ ...t, trace: [...t.trace, e] }));
@@ -138,6 +181,9 @@ export function ChatPanel(props: {
   }
 
   const blocked = props.usage.blocked;
+  const live = turns.length && turns[turns.length - 1].pending ? turns[turns.length - 1] : null;
+  const liveAgent = live ? activity(live).agent : null;
+  const answered = new Set(live ? live.subs.map((s) => s.agent) : []);
   const delegations = (t: Turn) => t.trace.filter((e) => e.type === "delegation" && e.detail.to).length;
 
   return (
@@ -154,10 +200,11 @@ export function ChatPanel(props: {
           {(["team", "actuary", "portfolio_manager", "trader"] as Colleague[]).map((c) => {
             const k = c === "team" ? "cro" : c;
             return (
-              <button key={c} className={`cast-chip ${to === c ? "on" : ""}`} style={{ borderColor: CAST[k].color }}
+              <button key={c} className={`cast-chip ${to === c ? "on" : ""} ${liveAgent === k ? "working" : ""} ${answered.has(k) ? "answered" : ""}`} style={{ borderColor: CAST[k].color }}
                 onClick={() => setTo(c)} disabled={busy} title={c === "team" ? "Amara routes your question to the right specialists" : `Ask ${CAST[k].name} directly`}>
                 <PixelSprite name={spriteFor(k)!} size={22} className="chip-face" />
                 {c === "team" ? "Amara (routes to team)" : `${CAST[k].name.split(" ")[0]} · ${CAST[k].role}`}
+                {answered.has(k) && <span className="chip-check">✓</span>}
               </button>
             );
           })}
@@ -172,16 +219,16 @@ export function ChatPanel(props: {
           <div key={i} className={`msg ${t.role}`} style={t.role === "agent" ? { borderLeftColor: CAST[t.agent ?? "system"]?.color } : undefined}>
             {t.role === "agent" && (
               <div className="msg-name" style={{ color: CAST[t.agent ?? "system"]?.color }}>
-                {spriteFor(t.agent, t.stopped ? "concerned" : "neutral") && <PixelSprite name={spriteFor(t.agent, t.stopped ? "concerned" : "neutral")!} size={28} className="msg-face" />}
+                {spriteFor(t.agent) && <PixelSprite name={spriteFor(t.agent, t.stopped ? "concerned" : t.ticket ? "pleased" : "neutral")!} size={28} className={`msg-face ${t.pending ? "" : "arrive"}`} />}
                 {t.agentName ?? "Colleague"}
               </div>
             )}
             {t.subs.length > 0 && (
               <div className="subs">
                 {t.subs.map((s, k) => (
-                  <div key={k} className="sub-msg" style={{ borderLeftColor: CAST[s.agent]?.color }}>
+                  <div key={k} className="sub-msg sub-in" style={{ borderLeftColor: CAST[s.agent]?.color }}>
                     <div className="msg-name" style={{ color: CAST[s.agent]?.color }}>
-                      {spriteFor(s.agent) && <PixelSprite name={spriteFor(s.agent)!} size={22} className="msg-face" />}
+                      {spriteFor(s.agent) && <PixelSprite name={spriteFor(s.agent)!} size={22} className="msg-face arrive" />}
                       {s.agent_name}
                     </div>
                     <div className="msg-text">{s.text}</div>
@@ -189,7 +236,8 @@ export function ChatPanel(props: {
                 ))}
               </div>
             )}
-            <div className="msg-text">{t.pending && !t.text ? <span className="spinner" aria-label="thinking" /> : t.text}</div>
+            <div className="msg-text">{t.pending && !t.text ? <TypingLine t={t} /> : t.text}</div>
+            {t.role === "agent" && !t.pending && <Reactions t={t} />}
             {t.role === "agent" && t.trace.length > 0 && (
               <div className="trace">
                 <button className="link" onClick={() => setOpenTrace(openTrace === i ? null : i)}>

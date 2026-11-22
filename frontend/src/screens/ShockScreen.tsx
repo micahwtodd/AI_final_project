@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Review, Shock } from "../api";
 import { fmtMove, fmtSigned } from "../labels";
 import { Meters } from "../components/Meters";
 import { PixelSprite } from "../components/PixelSprite";
 import { CountUp } from "../components/Fx";
+import { MarketTape } from "../components/MarketTape";
+import { play } from "../sound";
 
 export function ShockScreen(props: {
   shock: Shock;
@@ -15,10 +17,18 @@ export function ShockScreen(props: {
   const [text, setText] = useState("");
   const words = text.trim().split(/\s+/).filter(Boolean).length;
   const second = props.firstTry !== null;
+  const breach = s.dashboard_after.status.capital === "red" || s.dashboard_after.status.liquidity === "red";
+  useEffect(() => {
+    if (second) return;
+    const t = setTimeout(() => play(breach || s.surplus_change < 0 ? "alarm" : "bell"), 500);
+    return () => clearTimeout(t);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <section className="shock">
+    <section className={`shock ${s.quarter === 4 ? "boss" : ""}`}>
+      <MarketTape moves={s.market_moves} quarter={s.quarter} boss={s.quarter === 4} />
       <div className="newspaper paper-in">
+        {s.quarter === 4 && <div className="extra-edition">EXTRA EDITION</div>}
         <div className="paper-mast">THE MARKET DAILY · Q{s.quarter} · {s.era}</div>
         <h1 className="paper-headline">{s.headline}</h1>
         <p className="paper-body">{s.narrative}</p>

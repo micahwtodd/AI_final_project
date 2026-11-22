@@ -14,7 +14,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from backend import audit, engine
+from backend import achievements, audit, engine
 from backend.calibration import DISPLAY_NAMES, load_profile
 from backend.env import REPO_DIR, redact
 from backend.models import Action, CompanyProfile, GameState, QuarterRecord
@@ -258,6 +258,7 @@ def view(s: Session) -> dict:
         "chat": s.chat[-40:],
         "quiz_taken": sorted(s.quiz),
         "custom_inputs": sorted(s.overrides),
+        "achievements": achievements.evaluate(s),
     }
 
 
@@ -435,6 +436,7 @@ def reveal_payload(s: Session, rec: QuarterRecord) -> dict:
         "attempts": s.explain_attempts.get(rec.quarter, []),
         "understanding": s.understanding.get(rec.quarter),
         "finished": s.phase == "finished",
+        "badges_new": achievements.new_badges(s, rec.quarter),
         "view": view(s),
     }
 
@@ -504,6 +506,9 @@ def debrief(s: Session) -> dict:
         "minutes_played": round((s.timings.get("finished", time.time()) - s.timings.get("started", s.created_at)) / 60, 1),
         "history": [_history_row(r, s) for r in hist],
         "before_after": before_after(s),
+        "achievements": achievements.evaluate(s),
+        "badge_catalog": [{"id": k, **v} for k, v in achievements.BADGES.items()],
+        "report_card": achievements.report_card(s, sc["results_score"], understanding_score(s)["understanding_score"]),
     }
 
 

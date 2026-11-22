@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { api, type BeforeAfter, type Debrief, type GameView } from "../api";
+import { BadgeShelf, ReportCardPanel } from "../components/Badges";
+import { Confetti } from "../components/Fx";
 
 export function DebriefScreen(props: { debrief: Debrief; game: GameView; onRestart: () => void }) {
   const d = props.debrief;
@@ -13,6 +15,8 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
 
   return (
     <section className="debrief-screen">
+      {d.report_card && (d.report_card.grade.startsWith("A") || d.report_card.grade.startsWith("B")) && <Confetti pieces={110} />}
+      {d.report_card && <ReportCardPanel rc={d.report_card} results={d.results_score} understanding={d.understanding_score} />}
       <div className="muted center-text">Year-end debrief · {props.game.company} · seed {props.game.seed} · {d.minutes_played} minutes played</div>
       <div className="two-col">
         <div className="panel center">
@@ -67,6 +71,7 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
 
       <BeforeAfterPanel ba={d.before_after} />
 
+      {d.badge_catalog && <BadgeShelf catalog={d.badge_catalog} earned={d.achievements?.earned ?? []} />}
       <div className="panel no-print">
         <h3>Your feedback</h3>
         <FeedbackBox gameId={props.game.id} />

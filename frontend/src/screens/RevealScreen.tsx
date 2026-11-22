@@ -2,6 +2,7 @@ import type { Action, Reveal, Shock } from "../api";
 import { LEVERS, type LeverKey } from "../labels";
 import { PixelSprite } from "../components/PixelSprite";
 import { Confetti, CountUp } from "../components/Fx";
+import { BadgeUnlocks } from "../components/Badges";
 
 type Row = { key?: string; label: string; value: number; mark?: "yes" | "no" };
 
@@ -59,6 +60,7 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
   return (
     <section className="reveal">
       {((u?.points ?? 0) >= 75 || r.quarter_score >= 75) && <Confetti />}
+      <BadgeUnlocks badges={r.badges_new ?? []} />
       <div className="panel examiner">
         <div className="examiner-head">
           <PixelSprite name={(u?.points ?? 0) >= 50 ? "amara_pleased" : "amara_concerned"} size={72} title="Dr. Amara Okafor" />

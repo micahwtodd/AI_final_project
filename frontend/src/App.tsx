@@ -13,6 +13,8 @@ import { UnderTheHood } from "./components/UnderTheHood";
 import { GlossaryContext, type Glossary } from "./components/Term";
 import { WelcomeScreen } from "./screens/WelcomeScreen";
 import { CountUp } from "./components/Fx";
+import { StreakChips } from "./components/Badges";
+import { useSoundSwitch } from "./sound";
 
 type Screen =
   | { name: "welcome" }
@@ -70,6 +72,7 @@ export default function App() {
     if (screen.name === "desk") setScreen({ name: "desk", game: g2 });
   }
   const [usage, setUsage] = useState<Usage | null>(null);
+  const [sound, setSound] = useSoundSwitch();
   useEffect(() => {
     if (game?.usage) setUsage(game.usage);
   }, [game?.id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -95,10 +98,15 @@ export default function App() {
             <span className="pill">{game.company}</span>
             <span className="pill">{quarterLabel}</span>
             <span className="pill">Seed {game.seed}</span>
+            <StreakChips a={game.achievements} />
             <span className="pill strong">Surplus <CountUp value={surplusShown} from={surplusShown} format={(v) => `$${v.toFixed(2)}bn`} /></span>
           </div>
         )}
         {game && usage && <UsageMeter gameId={game.id} usage={usage} onUsage={(u) => { setUsage(u); }} />}
+        <button className={`pill sound-btn ${sound ? "on" : ""}`} onClick={() => setSound(!sound)}
+          aria-pressed={sound} title={sound ? "Sound effects on (click to mute)" : "Sound effects off (click to turn on)"}>
+          {sound ? "🔊 Sound on" : "🔇 Sound off"}
+        </button>
         <UnderTheHood game={game} capUsd={usage?.budget_cap_usd ?? null} onMode={switchMode}
           onTrace={() => game && setScreen({ name: "trace", game, back: screen })}
           onSafety={() => setScreen({ name: "safety", back: screen })}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { play } from "../sound";
 
 // Overlays go straight onto <body>: the screen transition animates a transform, which would
 // otherwise pin position:fixed overlays to the page instead of the window.
@@ -60,18 +61,30 @@ const seen = new Set<string>();
 export function QuarterSplash(props: { id: string; quarter: number; title: string; era?: string }) {
   const key = `${props.id}-${props.quarter}`;
   const [show, setShow] = useState(!seen.has(key));
+  const boss = props.quarter === 4;
   useEffect(() => {
     seen.add(key);
     if (!show) return;
-    const t = setTimeout(() => setShow(false), reduced() ? 900 : 5000); // fallback; normally ends with the sweep
+    play(boss ? "alarm" : "whoosh");
+    const t = setTimeout(() => setShow(false), reduced() ? 900 : boss ? 7000 : 5000); // fallback; normally ends with the sweep
     return () => clearTimeout(t);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   if (!show) return null;
   return createPortal(
-    <div className="q-splash" onClick={() => setShow(false)} role="status">
-      <div className="q-splash-band" onAnimationEnd={(e) => { if (e.animationName === "band-in") setShow(false); }}>
-        <div className="q-splash-q">QUARTER {props.quarter} <span>of 4</span></div>
-        <div className="q-splash-title">{props.title}</div>
+    <div className={`q-splash ${boss ? "boss" : ""}`} onClick={() => setShow(false)} role="status">
+      <div className="q-splash-band" onAnimationEnd={(e) => { if (e.animationName === "band-in" || e.animationName === "boss-in") setShow(false); }}>
+        {boss ? (
+          <>
+            <div className="q-splash-boss">⚠ FINAL QUARTER ⚠</div>
+            <div className="q-splash-q">BOSS ROUND</div>
+            <div className="q-splash-title">{props.title}. Survive this one.</div>
+          </>
+        ) : (
+          <>
+            <div className="q-splash-q">QUARTER {props.quarter} <span>of 4</span></div>
+            <div className="q-splash-title">{props.title}</div>
+          </>
+        )}
         {props.era && <div className="q-splash-era">{props.era}</div>}
       </div>
     </div>,

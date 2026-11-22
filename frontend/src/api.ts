@@ -77,6 +77,11 @@ export type HistoryRow = {
   score?: number;
 };
 
+export type Badge = { id: string; quarter: number; name: string; icon: string; text: string };
+export type Achievements = { earned: Badge[]; streaks: { floor: number; explain: number }; available: number };
+export type ReportCard = { grade: string; overall: number; title: string; why: string; breaches: number; avg_hedge_pct: number;
+  weights: { results: number; understanding: number } };
+
 export type GameView = {
   id: string;
   ticker: string;
@@ -97,6 +102,7 @@ export type GameView = {
   chat: ChatMsg[];
   quiz_taken: string[];
   custom_inputs: string[];
+  achievements: Achievements;
 };
 
 export type Usage = {
@@ -166,6 +172,7 @@ export type Shock = {
 
 export type Reveal = {
   quarter: number;
+  badges_new: Badge[];
   attribution: { key: string; label: string; value: number }[];
   total: number;
   comparison: { you: number; nothing: number; benchmark: number };
@@ -194,6 +201,9 @@ export type ExplainResult =
   | { final: false; attempt: number; review: Review; marker: string; question: string };
 
 export type Debrief = {
+  achievements: Achievements;
+  badge_catalog: Omit<Badge, "quarter">[];
+  report_card: ReportCard;
   understanding_score: number;
   understanding_per_quarter: Record<string, number>;
   results_score: number;
