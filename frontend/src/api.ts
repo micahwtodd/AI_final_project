@@ -91,6 +91,7 @@ export type GameView = {
   start_surplus_usd_bn: number;
   usage: Usage;
   chat: ChatMsg[];
+  quiz_taken: string[];
 };
 
 export type Usage = {
@@ -200,6 +201,7 @@ export type Debrief = {
   lessons: { quarter: number; title: string; lesson: string }[];
   minutes_played: number;
   history: HistoryRow[];
+  before_after: BeforeAfter;
 };
 
 export type Health = { ok: boolean; key_found: boolean; provider: string | null; model: string };
@@ -236,9 +238,30 @@ export const api = {
   usage: (id: string) => call<Usage>(`/usage/${id}`),
   setBudget: (id: string, cap_usd: number) => call<Usage>(`/budget/${id}`, { cap_usd }),
   setMode: (id: string, agent_mode: AgentMode) => call<{ agent_mode: AgentMode }>(`/game/${id}/mode`, { agent_mode }),
+  quizForm: (when: "pre" | "post") => call<QuizForm>(`/quiz/${when}`),
+  submitQuiz: (id: string, when: "pre" | "post", answers: Record<string, string>, confidence: Record<string, number>) =>
+    call<QuizResult>(`/quiz/${id}/${when}`, { answers, confidence }),
+  feedback: (id: string, text: string) => call<{ ok: boolean }>(`/game/${id}/feedback`, { text }),
+  summary: (id: string) => call<Record<string, unknown>>(`/game/${id}/summary`),
   flag: (event_id: string, session_id: string, note: string, text: string) => call<{ ok: boolean }>("/flag", { event_id, session_id, note, text }),
   safety: () => call<SafetyLab>("/safety"),
   runSafety: () => call<SafetyLab>("/safety/run", {}),
+};
+
+export type QuizForm = {
+  when: "pre" | "post"; form: string;
+  questions: { id: string; concept: string; q: string; options: Record<string, string> }[];
+  confidence: { id: string; text: string }[];
+};
+export type QuizResult = { when: string; correct: number; total: number; score: number; by_concept: Record<string, boolean>;
+  confidence_avg: number; answers_key: Record<string, string> | null };
+export type BeforeAfter = {
+  quiz_pre: { correct: number; total: number; score: number } | null;
+  quiz_post: { correct: number; total: number; score: number } | null;
+  quiz_change_pts: number | null; confidence_pre_avg: number | null; confidence_post_avg: number | null; confidence_change: number | null;
+  concepts: { concept: string; pre: boolean | null; post: boolean | null }[];
+  confidence_items: { id: string; text: string; pre: number | null; post: number | null }[];
+  minutes_played: number;
 };
 
 export type SafetyOutcome = { outcome: string; detail: string; input_tokens: number; cached_tokens: number; output_tokens: number; cost_usd: number };

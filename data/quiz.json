@@ -1,0 +1,237 @@
+{
+  "_note": "Before-and-after quiz. Form A before the game, form B after: same eight concepts, different wording and scenarios. Draft for Micah to verify. Option order shuffled with a fixed seed so correct answers are spread across A to D.",
+  "concepts": [
+    "duration_gap",
+    "surrenders",
+    "spread_vs_default",
+    "forced_selling",
+    "fx_hedge_cost",
+    "guarantees_equity",
+    "collateral_counterparty",
+    "pension_risk_transfer"
+  ],
+  "forms": {
+    "A": [
+      {
+        "id": "A1",
+        "concept": "duration_gap",
+        "q": "An insurer's liabilities are longer (more rate-sensitive) than its assets. Interest rates fall by 1 percentage point. What happens to its surplus?",
+        "options": {
+          "A": "It does not change",
+          "B": "It falls",
+          "C": "It rises",
+          "D": "It depends only on stock prices"
+        },
+        "answer": "B"
+      },
+      {
+        "id": "A2",
+        "concept": "surrenders",
+        "q": "Competitors start offering annuities that pay much more than ours because market rates jumped. What should we expect?",
+        "options": {
+          "A": "Our annuities become more valuable to keep",
+          "B": "Nothing, surrenders are not linked to rates",
+          "C": "More policyholders cash out (surrender), so we need cash",
+          "D": "Fewer policyholders cash out"
+        },
+        "answer": "C"
+      },
+      {
+        "id": "A3",
+        "concept": "spread_vs_default",
+        "q": "Credit spreads widen sharply, but none of our bond issuers defaults. Which statement is true?",
+        "options": {
+          "A": "Only government bonds lose value",
+          "B": "Bond prices fall; if we hold to maturity and nobody defaults, much of that can come back",
+          "C": "We have a permanent loss on every bond",
+          "D": "We have no loss at all"
+        },
+        "answer": "B"
+      },
+      {
+        "id": "A4",
+        "concept": "forced_selling",
+        "q": "Why does an insurer keep a cash buffer even though cash earns little?",
+        "options": {
+          "A": "Cash always beats bonds",
+          "B": "To avoid paying claims",
+          "C": "Regulators require all assets in cash",
+          "D": "To pay surrenders and margin calls without selling bonds at a discount in a stressed market"
+        },
+        "answer": "D"
+      },
+      {
+        "id": "A5",
+        "concept": "fx_hedge_cost",
+        "q": "What is the main trade-off of hedging foreign bonds with currency forwards?",
+        "options": {
+          "A": "It only matters for stocks",
+          "B": "It removes all risk for free",
+          "C": "It doubles currency risk",
+          "D": "It protects against a stronger dollar but costs a little every quarter"
+        },
+        "answer": "D"
+      },
+      {
+        "id": "A6",
+        "concept": "guarantees_equity",
+        "q": "We wrote guarantees on variable annuities. The stock market falls 20%. What happens?",
+        "options": {
+          "A": "The guarantees cost us more",
+          "B": "Policyholders lose their guarantee",
+          "C": "Nothing, guarantees ignore markets",
+          "D": "The guarantees cost us less"
+        },
+        "answer": "A"
+      },
+      {
+        "id": "A7",
+        "concept": "collateral_counterparty",
+        "q": "A bank owes us money on a hedge and then fails. When is our loss smallest?",
+        "options": {
+          "A": "When we collected collateral daily and spread hedges across several banks",
+          "B": "When the hedge had grown very valuable",
+          "C": "Bank failures never cause losses",
+          "D": "When we used one bank and took no collateral"
+        },
+        "answer": "A"
+      },
+      {
+        "id": "A8",
+        "concept": "pension_risk_transfer",
+        "q": "A company asks us to take over its pension plan. What do we take on?",
+        "options": {
+          "A": "Long-dated promises to retirees plus premium to invest, which uses capital",
+          "B": "No liabilities, only fees",
+          "C": "Short-term liabilities only",
+          "D": "Stock-market guarantees"
+        },
+        "answer": "A"
+      }
+    ],
+    "B": [
+      {
+        "id": "B1",
+        "concept": "duration_gap",
+        "q": "Our assets have a duration of 6 years and our liabilities 10 years, both about the same size. Which rate move hurts us?",
+        "options": {
+          "A": "Neither",
+          "B": "Rates falling",
+          "C": "Rates rising",
+          "D": "Both equally"
+        },
+        "answer": "B"
+      },
+      {
+        "id": "B2",
+        "concept": "surrenders",
+        "q": "Rates fall and our annuities now credit more than new products on the market. What happens to surrenders?",
+        "options": {
+          "A": "They tend to rise sharply",
+          "B": "They always stay exactly the same",
+          "C": "They tend to fall: staying is attractive",
+          "D": "They are forced to zero by law"
+        },
+        "answer": "C"
+      },
+      {
+        "id": "B3",
+        "concept": "spread_vs_default",
+        "q": "Which loss is permanent?",
+        "options": {
+          "A": "A bond price drop caused by wider spreads",
+          "B": "A bond issuer defaulting and paying back only part of the money",
+          "C": "None of them",
+          "D": "A government bond price change"
+        },
+        "answer": "B"
+      },
+      {
+        "id": "B4",
+        "concept": "forced_selling",
+        "q": "Markets freeze and we must raise cash quickly. Which asset can usually be sold with the smallest discount?",
+        "options": {
+          "A": "Commercial mortgage loans",
+          "B": "Government bonds",
+          "C": "Junk bonds",
+          "D": "Private equity"
+        },
+        "answer": "B"
+      },
+      {
+        "id": "B5",
+        "concept": "fx_hedge_cost",
+        "q": "We hedge 100% of our foreign bonds against the dollar. What did we give up?",
+        "options": {
+          "A": "All our interest income",
+          "B": "The quarterly cost of the hedge, and any gain if the dollar had weakened",
+          "C": "Nothing",
+          "D": "Our credit quality"
+        },
+        "answer": "B"
+      },
+      {
+        "id": "B6",
+        "concept": "guarantees_equity",
+        "q": "Why do insurers buy put options against the stock market?",
+        "options": {
+          "A": "Because puts never cost anything",
+          "B": "To bet that stocks will rise",
+          "C": "To raise yield",
+          "D": "To offset the extra cost of guarantees when stocks fall"
+        },
+        "answer": "D"
+      },
+      {
+        "id": "B7",
+        "concept": "collateral_counterparty",
+        "q": "Our swaps lose value when rates rise, and they are collateralized daily. Rates jump. What happens?",
+        "options": {
+          "A": "The swaps are cancelled",
+          "B": "Nothing until the swaps mature",
+          "C": "The bank pays us",
+          "D": "We must post cash collateral now, even though the loss is only on paper"
+        },
+        "answer": "D"
+      },
+      {
+        "id": "B8",
+        "concept": "pension_risk_transfer",
+        "q": "After accepting a pension deal, what should we usually do to stay matched?",
+        "options": {
+          "A": "Nothing",
+          "B": "Shorten our assets",
+          "C": "Lengthen our assets or add rate protection, because the new promises are long",
+          "D": "Sell all bonds"
+        },
+        "answer": "C"
+      }
+    ]
+  },
+  "confidence": [
+    {
+      "id": "C1",
+      "text": "I can explain what a rate mismatch (duration gap) is and which way it hurts."
+    },
+    {
+      "id": "C2",
+      "text": "I can explain why surrenders rise when interest rates climb."
+    },
+    {
+      "id": "C3",
+      "text": "I can explain the difference between a spread move and a default."
+    },
+    {
+      "id": "C4",
+      "text": "I can explain how stock-market guarantees react when markets fall."
+    },
+    {
+      "id": "C5",
+      "text": "I can explain why collateral matters when a dealer fails."
+    },
+    {
+      "id": "C6",
+      "text": "I can weigh the cost of a hedge against the risk it removes."
+    }
+  ]
+}

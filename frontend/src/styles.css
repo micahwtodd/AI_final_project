@@ -277,3 +277,24 @@ button.link { background: none; border: none; padding: 0; color: var(--steel); f
 .outcome.good { color: var(--green); }
 .outcome.bad { color: var(--red); }
 .layers { margin: 0; padding-left: 1rem; }
+
+/* quiz */
+.quiz-list { padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.9rem; }
+.quiz-q { font-weight: 600; color: var(--navy); margin-bottom: 0.35rem; }
+.quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; }
+@media (max-width: 800px) { .quiz-opts { grid-template-columns: 1fr; } }
+.quiz-opt { display: flex; gap: 0.4rem; align-items: flex-start; padding: 0.4rem 0.6rem; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+.quiz-opt.on { border-color: var(--blue); background: #e8f3fb; }
+.quiz-opt input, .conf-dot input { position: absolute; opacity: 0; pointer-events: none; }
+.conf-table td { vertical-align: middle; }
+.conf-scale { display: flex; gap: 0.3rem; white-space: nowrap; }
+.conf-dot { width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 700; color: var(--navy); }
+.conf-dot.on { background: var(--blue); border-color: var(--blue); color: white; }
+.quiz-opt:focus-within, .conf-dot:focus-within { outline: 2px solid var(--blue); outline-offset: 1px; }
+
+/* print: the session summary */
+@media print {
+  .topbar, .footer, .no-print, .lab-pill { display: none !important; }
+  body, .app, main { background: white; }
+  .panel { box-shadow: none; break-inside: avoid; }
+}

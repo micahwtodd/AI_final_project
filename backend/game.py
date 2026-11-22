@@ -47,6 +47,10 @@ class Session(BaseModel):
     tokens: dict[str, int] = {"input": 0, "cached": 0, "cache_write": 0, "output": 0, "reasoning": 0, "requests": 0}
     by_agent: dict[str, dict] = {}
     chat: list[dict] = []  # transcript for display (the model's memory is kept in agents.py)
+    # learning measures (Project 8)
+    quiz: dict[str, dict] = {}  # "pre" / "post" -> {answers, score, correct, total, by_concept, ts}
+    confidence: dict[str, dict] = {}  # "pre" / "post" -> {C1: 1-5, ...}
+    feedback: list[dict] = []
     proposed_ticket: dict | None = None
 
 
@@ -167,6 +171,7 @@ def view(s: Session) -> dict:
         "start_surplus_usd_bn": round(engine.surplus(s.start_state), 3),
         "usage": usage_view(s),
         "chat": s.chat[-40:],
+        "quiz_taken": sorted(s.quiz),
     }
 
 
@@ -407,6 +412,7 @@ def debrief(s: Session) -> dict:
         "text": text, "lessons": [{"quarter": q, "title": engine.card_for(q).title, "lesson": engine.card_for(q).lesson} for q in range(1, 5)],
         "minutes_played": round((s.timings.get("finished", time.time()) - s.timings.get("started", s.created_at)) / 60, 1),
         "history": [_history_row(r, s) for r in hist],
+        "before_after": before_after(s),
     }
 
 
@@ -417,3 +423,94 @@ def companies() -> list[dict]:
 
 def dumps(obj) -> str:  # for debugging
     return json.dumps(obj, indent=1, default=str)
+
+
+# ---------------------------------------------------------------- quiz, confidence, feedback (Project 8)
+
+QUIZ_PATH = REPO_DIR / "data" / "quiz.json"
+FORM_FOR = {"pre": "A", "post": "B"}
+
+
+def _quiz_data() -> dict:
+    return json.loads(QUIZ_PATH.read_text(encoding="utf-8"))
+
+
+def quiz_form(when: str) -> dict:
+    """The questions for 'pre' (form A) or 'post' (form B), without the answers."""
+    q = _quiz_data()
+    form = FORM_FOR[when]
+    return {"when": when, "form": form,
+            "questions": [{k: v for k, v in item.items() if k != "answer"} for item in q["forms"][form]],
+            "confidence": q["confidence"]}
+
+
+def submit_quiz(s: Session, when: str, answers: dict[str, str], confidence: dict[str, int]) -> dict:
+    """Marked in code. Each form can be taken once per session."""
+    if when not in FORM_FOR:
+        raise GameError("Unknown quiz.")
+    if when in s.quiz:
+        raise GameError("This quiz was already taken.")
+    if when == "post" and s.phase != "finished":
+        raise GameError("The after-game quiz opens once the four quarters are played.")
+    q = _quiz_data()
+    items = q["forms"][FORM_FOR[when]]
+    by_concept = {i["concept"]: answers.get(i["id"]) == i["answer"] for i in items}
+    correct = sum(by_concept.values())
+    conf = {c["id"]: int(confidence[c["id"]]) for c in q["confidence"] if c["id"] in confidence}
+    if any(not 1 <= v <= 5 for v in conf.values()) or len(conf) != len(q["confidence"]):
+        raise GameError("Please rate all six statements from 1 to 5.")
+    s.quiz[when] = {"answers": {k: v for k, v in answers.items() if k in {i["id"] for i in items}},
+                    "correct": correct, "total": len(items), "score": round(100 * correct / len(items), 1),
+                    "by_concept": by_concept, "ts": time.time()}
+    s.confidence[when] = conf
+    s.timings[f"quiz_{when}"] = time.time()
+    _save(s)
+    return {"when": when, **{k: v for k, v in s.quiz[when].items() if k != "answers"},
+            "confidence_avg": round(sum(conf.values()) / len(conf), 2),
+            "answers_key": {i["id"]: i["answer"] for i in items} if when == "post" else None}
+
+
+def add_feedback(s: Session, text: str) -> dict:
+    text = (text or "").strip()[:2000]
+    if not text:
+        raise GameError("Feedback is empty.")
+    s.feedback.append({"text": text, "ts": time.time()})
+    _save(s)
+    return {"ok": True, "count": len(s.feedback)}
+
+
+def before_after(s: Session) -> dict:
+    """The learning figures saved per session: quiz and confidence before and after, and time played."""
+    q = _quiz_data()
+    pre, post = s.quiz.get("pre"), s.quiz.get("post")
+    cp, co = s.confidence.get("pre", {}), s.confidence.get("post", {})
+    avg = lambda d: round(sum(d.values()) / len(d), 2) if d else None  # noqa: E731
+    concepts = []
+    for c in q["concepts"]:
+        concepts.append({"concept": c, "pre": (pre or {}).get("by_concept", {}).get(c), "post": (post or {}).get("by_concept", {}).get(c)})
+    items = []
+    for c in q["confidence"]:
+        items.append({"id": c["id"], "text": c["text"], "pre": cp.get(c["id"]), "post": co.get(c["id"])})
+    start = s.timings.get("started", s.created_at)
+    end = s.timings.get("finished", time.time())
+    return {
+        "quiz_pre": pre and {k: pre[k] for k in ("correct", "total", "score")},
+        "quiz_post": post and {k: post[k] for k in ("correct", "total", "score")},
+        "quiz_change_pts": round(post["score"] - pre["score"], 1) if pre and post else None,
+        "confidence_pre_avg": avg(cp), "confidence_post_avg": avg(co),
+        "confidence_change": round(avg(co) - avg(cp), 2) if cp and co else None,
+        "concepts": concepts, "confidence_items": items,
+        "minutes_played": round((end - start) / 60, 1),
+    }
+
+
+def summary(s: Session) -> dict:
+    """Printable session summary: everything the impact section needs for one learner."""
+    out = {"session_id": s.id, "company": DISPLAY_NAMES.get(s.ticker, s.ticker), "ticker": s.ticker, "seed": s.seed,
+           "agent_mode": s.agent_mode, "phase": s.phase, "before_after": before_after(s),
+           "usage": usage_view(s), "feedback": s.feedback}
+    if s.phase == "finished":
+        d = debrief(s)
+        out.update({k: d[k] for k in ("results_score", "understanding_score", "understanding_per_quarter", "per_quarter",
+                                       "start_surplus", "end_surplus", "nothing_end_surplus", "benchmark_end_surplus")})
+    return out

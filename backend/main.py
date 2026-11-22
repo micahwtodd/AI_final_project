@@ -184,6 +184,36 @@ def budget(session_id: str, body: BudgetBody) -> dict:
     return game.set_budget(_session(session_id), body.cap_usd)
 
 
+class QuizBody(BaseModel):
+    answers: dict[str, str] = {}
+    confidence: dict[str, int] = {}
+
+
+class FeedbackBody(BaseModel):
+    text: str = Field(min_length=1, max_length=2000)
+
+
+@app.get("/api/quiz/{when}")
+def quiz_form(when: Literal["pre", "post"]) -> dict:
+    """Form A (before) or form B (after), without the answers."""
+    return game.quiz_form(when)
+
+
+@app.post("/api/quiz/{session_id}/{when}")
+def quiz_submit(session_id: str, when: Literal["pre", "post"], body: QuizBody) -> dict:
+    return _run(game.submit_quiz, _session(session_id), when, body.answers, body.confidence)
+
+
+@app.post("/api/game/{session_id}/feedback")
+def feedback(session_id: str, body: FeedbackBody) -> dict:
+    return _run(game.add_feedback, _session(session_id), body.text)
+
+
+@app.get("/api/game/{session_id}/summary")
+def summary(session_id: str) -> dict:
+    return game.summary(_session(session_id))
+
+
 class FlagBody(BaseModel):
     event_id: str = Field(min_length=1, max_length=64)
     session_id: str | None = None

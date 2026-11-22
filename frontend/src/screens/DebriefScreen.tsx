@@ -1,4 +1,5 @@
-import type { Debrief, GameView } from "../api";
+import { useState } from "react";
+import { api, type BeforeAfter, type Debrief, type GameView } from "../api";
 
 export function DebriefScreen(props: { debrief: Debrief; game: GameView; onRestart: () => void }) {
   const d = props.debrief;
@@ -60,9 +61,66 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
               <p className="small">{l.lesson}</p>
             </div>
           ))}
-          <button className="primary wide" onClick={props.onRestart}>Play again</button>
+          <button className="primary wide no-print" onClick={props.onRestart}>Play again</button>
         </div>
       </div>
+
+      <BeforeAfterPanel ba={d.before_after} />
+
+      <div className="panel no-print">
+        <h3>Your feedback</h3>
+        <FeedbackBox gameId={props.game.id} />
+        <button className="ghost wide" onClick={() => window.print()}>Print session summary</button>
+      </div>
     </section>
+  );
+}
+
+const CONCEPT_LABELS: Record<string, string> = {
+  duration_gap: "Rate mismatch (duration gap)", surrenders: "Surrenders when rates rise", spread_vs_default: "Spread move vs default",
+  forced_selling: "Forced selling and cash", fx_hedge_cost: "Cost of currency hedging", guarantees_equity: "Guarantees and stock markets",
+  collateral_counterparty: "Collateral and counterparties", pension_risk_transfer: "Pension risk transfer",
+};
+
+function BeforeAfterPanel({ ba }: { ba: BeforeAfter }) {
+  if (!ba.quiz_pre) {
+    return <div className="panel small muted">The before-the-game quiz was skipped, so there are no before-and-after figures for this session.</div>;
+  }
+  const mark = (v: boolean | null) => (v === null ? "–" : v ? "✓" : "✗");
+  return (
+    <div className="panel before-after">
+      <h3>What you learned: before and after</h3>
+      <div className="lab-summary">
+        <div className="stat"><b>{ba.quiz_pre.correct}/8 → {ba.quiz_post ? `${ba.quiz_post.correct}/8` : "–"}</b><span>quiz score{ba.quiz_change_pts !== null ? ` (${ba.quiz_change_pts >= 0 ? "+" : ""}${ba.quiz_change_pts} pts)` : ""}</span></div>
+        <div className="stat"><b>{ba.confidence_pre_avg?.toFixed(1)} → {ba.confidence_post_avg?.toFixed(1) ?? "–"}</b><span>average confidence (1 to 5)</span></div>
+        <div className="stat"><b>{ba.minutes_played}</b><span>minutes played</span></div>
+      </div>
+      <div className="two-col" style={{ marginTop: "0.8rem" }}>
+        <table className="table small">
+          <thead><tr><th>Concept</th><th>Before</th><th>After</th></tr></thead>
+          <tbody>{ba.concepts.map((c) => (
+            <tr key={c.concept}><td>{CONCEPT_LABELS[c.concept] ?? c.concept}</td><td>{mark(c.pre)}</td><td>{mark(c.post)}</td></tr>
+          ))}</tbody>
+        </table>
+        <table className="table small">
+          <thead><tr><th>Confidence</th><th>Before</th><th>After</th></tr></thead>
+          <tbody>{ba.confidence_items.map((c) => (
+            <tr key={c.id}><td>{c.text}</td><td>{c.pre ?? "–"}</td><td>{c.post ?? "–"}</td></tr>
+          ))}</tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function FeedbackBox({ gameId }: { gameId: string }) {
+  const [text, setText] = useState("");
+  const [sent, setSent] = useState(false);
+  return sent ? <p className="small">Thank you, your feedback was saved.</p> : (
+    <div>
+      <textarea rows={3} value={text} onChange={(e) => setText(e.target.value)}
+        placeholder="What helped you learn? What was confusing? What would you change?" />
+      <button className="primary" disabled={!text.trim()} onClick={async () => { await api.feedback(gameId, text); setSent(true); }}>Send feedback</button>
+    </div>
   );
 }

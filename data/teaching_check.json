@@ -1,25 +1,265 @@
 {
-  "_note": "Teaching-accuracy check: 20 concept questions, each sent to the colleague who owns the topic, who must answer with one letter. Code marks it against this key. Draft for Micah to approve.",
+  "_note": "Teaching-accuracy check: 20 concept questions, each sent to the colleague who owns the topic, who must answer with one letter. Code marks it against this key. Draft for Micah to approve. Option order shuffled with a fixed seed so correct answers are spread across A to D.",
   "questions": [
-    {"id": "T01", "agent": "actuary", "concept": "duration", "q": "A bond portfolio has a duration of 6 years. If interest rates rise by 1 percentage point, its value will roughly:", "options": {"A": "rise about 6%", "B": "fall about 6%", "C": "fall about 1%", "D": "not change"}, "answer": "B"},
-    {"id": "T02", "agent": "actuary", "concept": "duration_gap", "q": "Our liabilities are more rate-sensitive (longer duration) than our assets. Which move hurts surplus?", "options": {"A": "Rates rise", "B": "Rates fall", "C": "Neither, rates do not matter", "D": "Only a rise in credit spreads"}, "answer": "B"},
-    {"id": "T03", "agent": "actuary", "concept": "surrender", "q": "Market rates climb well above the rate credited on our annuities. What typically happens?", "options": {"A": "Surrenders fall", "B": "Surrenders rise as policyholders chase higher rates", "C": "Policyholders must stay until maturity", "D": "Annuity values rise"}, "answer": "B"},
-    {"id": "T04", "agent": "actuary", "concept": "variable_annuity_guarantee", "q": "Stock markets fall 20%. What happens to the value of the guarantees we wrote on variable annuities?", "options": {"A": "It falls, because accounts are smaller", "B": "It rises: we are more likely to have to pay", "C": "It is unaffected by markets", "D": "It becomes zero"}, "answer": "B"},
-    {"id": "T05", "agent": "actuary", "concept": "pension_risk_transfer", "q": "We take on a pension risk transfer deal. What does it add to our balance sheet?", "options": {"A": "Short liabilities and no cash", "B": "Long-duration liabilities, plus premium to invest", "C": "Stock-market guarantees", "D": "Only fee income with no liabilities"}, "answer": "B"},
-    {"id": "T06", "agent": "actuary", "concept": "surrender_charge", "q": "What is the main job of a surrender charge or market value adjustment?", "options": {"A": "To raise the crediting rate", "B": "To protect the insurer from part of the loss when policyholders leave after rates rise", "C": "To pay brokers", "D": "To hedge foreign exchange"}, "answer": "B"},
-    {"id": "T07", "agent": "portfolio_manager", "concept": "credit_spread", "q": "Corporate credit spreads widen but no company defaults. What happens to the prices of the corporate bonds we own?", "options": {"A": "They rise", "B": "They fall", "C": "They stay the same because nobody defaulted", "D": "Only junk bonds change"}, "answer": "B"},
-    {"id": "T08", "agent": "portfolio_manager", "concept": "default", "q": "What is the key difference between a credit-spread loss and a default loss?", "options": {"A": "There is none", "B": "A spread loss can reverse if spreads tighten; a default is a permanent loss", "C": "A default can reverse; a spread loss is permanent", "D": "Spread losses only affect government bonds"}, "answer": "B"},
-    {"id": "T09", "agent": "portfolio_manager", "concept": "investment_grade", "q": "Which bonds are below investment grade?", "options": {"A": "AAA", "B": "A", "C": "BBB", "D": "BB and lower"}, "answer": "D"},
-    {"id": "T10", "agent": "portfolio_manager", "concept": "forced_selling", "q": "Surrenders spike in a frozen market and we have little cash. What is the main risk?", "options": {"A": "Our bonds automatically default", "B": "We must sell assets quickly at a discount (forced selling)", "C": "Interest rates fall", "D": "Our liabilities disappear"}, "answer": "B"},
-    {"id": "T11", "agent": "portfolio_manager", "concept": "liquidity_ratio", "q": "Our liquidity ratio falls below 100%. What does that mean in this game?", "options": {"A": "We are insolvent", "B": "Cash and easily sold government bonds would not cover the cash we might need in a 90-day stress", "C": "Our capital is too high", "D": "Our bonds are all junk"}, "answer": "B"},
-    {"id": "T12", "agent": "portfolio_manager", "concept": "alternatives", "q": "Why does this game leave alternatives (including stocks) unhedged?", "options": {"A": "They cannot be hedged", "B": "Hedging them would give up the extra expected return that helps fund future claims", "C": "They never fall in value", "D": "Regulators forbid hedging"}, "answer": "B"},
-    {"id": "T13", "agent": "trader", "concept": "interest_rate_swap", "q": "We receive fixed on an interest rate swap. When do we gain?", "options": {"A": "When rates rise", "B": "When rates fall", "C": "When stocks rise", "D": "When the dollar rises"}, "answer": "B"},
-    {"id": "T14", "agent": "trader", "concept": "margin_call", "q": "We hold collateralized swaps that lose value when rates rise. Rates jump. What happens?", "options": {"A": "Nothing until the swap matures", "B": "We must post cash collateral now (a margin call)", "C": "The dealer pays us", "D": "The swap is cancelled"}, "answer": "B"},
-    {"id": "T15", "agent": "trader", "concept": "put_option", "q": "What is the trade-off of buying put options to protect the stock-market guarantees?", "options": {"A": "No cost, full protection", "B": "They pay out in a market fall but cost a premium every quarter even if markets rise", "C": "They make us lose more in a fall", "D": "They only protect against rate moves"}, "answer": "B"},
-    {"id": "T16", "agent": "trader", "concept": "fx_hedge", "q": "We hold foreign bonds and the US dollar strengthens. Without a currency hedge, what happens to those bonds' value in dollars?", "options": {"A": "It rises", "B": "It falls", "C": "It is unchanged", "D": "It depends only on interest rates"}, "answer": "B"},
-    {"id": "T17", "agent": "trader", "concept": "collateral", "q": "Our largest dealer fails. When does that cost us least?", "options": {"A": "When we used one dealer and no collateral", "B": "When we had daily collateral and spread trades across several dealers", "C": "When we had no hedges with gains owed to us and no collateral", "D": "Dealer failures never cost anything"}, "answer": "B"},
-    {"id": "T18", "agent": "trader", "concept": "hedge_ratio", "q": "Why do most insurers not hedge 100% of every risk?", "options": {"A": "Hedging is illegal", "B": "Full hedging costs the most and gives up gains; a large share is usually enough", "C": "Hedges never work", "D": "Risks always offset"}, "answer": "B"},
-    {"id": "T19", "agent": "cro", "concept": "surplus", "q": "What is surplus?", "options": {"A": "Total assets", "B": "What the company owns minus what it owes", "C": "Annual premium", "D": "Cash in the bank"}, "answer": "B"},
-    {"id": "T20", "agent": "cro", "concept": "asset_liability_management", "q": "What is the core idea of asset liability management?", "options": {"A": "Maximize yield regardless of liabilities", "B": "Choose investments that behave like the promises to policyholders, so market moves change both sides similarly", "C": "Hold only cash", "D": "Sell as many policies as possible"}, "answer": "B"}
+    {
+      "id": "T01",
+      "agent": "actuary",
+      "concept": "duration",
+      "q": "A bond portfolio has a duration of 6 years. If interest rates rise by 1 percentage point, its value will roughly:",
+      "options": {
+        "A": "rise about 6%",
+        "B": "not change",
+        "C": "fall about 1%",
+        "D": "fall about 6%"
+      },
+      "answer": "D"
+    },
+    {
+      "id": "T02",
+      "agent": "actuary",
+      "concept": "duration_gap",
+      "q": "Our liabilities are more rate-sensitive (longer duration) than our assets. Which move hurts surplus?",
+      "options": {
+        "A": "Only a rise in credit spreads",
+        "B": "Rates fall",
+        "C": "Neither, rates do not matter",
+        "D": "Rates rise"
+      },
+      "answer": "B"
+    },
+    {
+      "id": "T03",
+      "agent": "actuary",
+      "concept": "surrender",
+      "q": "Market rates climb well above the rate credited on our annuities. What typically happens?",
+      "options": {
+        "A": "Annuity values rise",
+        "B": "Policyholders must stay until maturity",
+        "C": "Surrenders rise as policyholders chase higher rates",
+        "D": "Surrenders fall"
+      },
+      "answer": "C"
+    },
+    {
+      "id": "T04",
+      "agent": "actuary",
+      "concept": "variable_annuity_guarantee",
+      "q": "Stock markets fall 20%. What happens to the value of the guarantees we wrote on variable annuities?",
+      "options": {
+        "A": "It becomes zero",
+        "B": "It is unaffected by markets",
+        "C": "It falls, because accounts are smaller",
+        "D": "It rises: we are more likely to have to pay"
+      },
+      "answer": "D"
+    },
+    {
+      "id": "T05",
+      "agent": "actuary",
+      "concept": "pension_risk_transfer",
+      "q": "We take on a pension risk transfer deal. What does it add to our balance sheet?",
+      "options": {
+        "A": "Stock-market guarantees",
+        "B": "Short liabilities and no cash",
+        "C": "Only fee income with no liabilities",
+        "D": "Long-duration liabilities, plus premium to invest"
+      },
+      "answer": "D"
+    },
+    {
+      "id": "T06",
+      "agent": "actuary",
+      "concept": "surrender_charge",
+      "q": "What is the main job of a surrender charge or market value adjustment?",
+      "options": {
+        "A": "To hedge foreign exchange",
+        "B": "To protect the insurer from part of the loss when policyholders leave after rates rise",
+        "C": "To raise the crediting rate",
+        "D": "To pay brokers"
+      },
+      "answer": "B"
+    },
+    {
+      "id": "T07",
+      "agent": "portfolio_manager",
+      "concept": "credit_spread",
+      "q": "Corporate credit spreads widen but no company defaults. What happens to the prices of the corporate bonds we own?",
+      "options": {
+        "A": "They fall",
+        "B": "They stay the same because nobody defaulted",
+        "C": "They rise",
+        "D": "Only junk bonds change"
+      },
+      "answer": "A"
+    },
+    {
+      "id": "T08",
+      "agent": "portfolio_manager",
+      "concept": "default",
+      "q": "What is the key difference between a credit-spread loss and a default loss?",
+      "options": {
+        "A": "A spread loss can reverse if spreads tighten; a default is a permanent loss",
+        "B": "There is none",
+        "C": "A default can reverse; a spread loss is permanent",
+        "D": "Spread losses only affect government bonds"
+      },
+      "answer": "A"
+    },
+    {
+      "id": "T09",
+      "agent": "portfolio_manager",
+      "concept": "investment_grade",
+      "q": "Which bonds are below investment grade?",
+      "options": {
+        "A": "BBB",
+        "B": "AAA",
+        "C": "BB and lower",
+        "D": "A"
+      },
+      "answer": "C"
+    },
+    {
+      "id": "T10",
+      "agent": "portfolio_manager",
+      "concept": "forced_selling",
+      "q": "Surrenders spike in a frozen market and we have little cash. What is the main risk?",
+      "options": {
+        "A": "Our liabilities disappear",
+        "B": "Interest rates fall",
+        "C": "We must sell assets quickly at a discount (forced selling)",
+        "D": "Our bonds automatically default"
+      },
+      "answer": "C"
+    },
+    {
+      "id": "T11",
+      "agent": "portfolio_manager",
+      "concept": "liquidity_ratio",
+      "q": "Our liquidity ratio falls below 100%. What does that mean in this game?",
+      "options": {
+        "A": "Our capital is too high",
+        "B": "We are insolvent",
+        "C": "Cash and easily sold government bonds would not cover the cash we might need in a 90-day stress",
+        "D": "Our bonds are all junk"
+      },
+      "answer": "C"
+    },
+    {
+      "id": "T12",
+      "agent": "portfolio_manager",
+      "concept": "alternatives",
+      "q": "Why does this game leave alternatives (including stocks) unhedged?",
+      "options": {
+        "A": "Regulators forbid hedging",
+        "B": "They never fall in value",
+        "C": "Hedging them would give up the extra expected return that helps fund future claims",
+        "D": "They cannot be hedged"
+      },
+      "answer": "C"
+    },
+    {
+      "id": "T13",
+      "agent": "trader",
+      "concept": "interest_rate_swap",
+      "q": "We receive fixed on an interest rate swap. When do we gain?",
+      "options": {
+        "A": "When rates rise",
+        "B": "When stocks rise",
+        "C": "When rates fall",
+        "D": "When the dollar rises"
+      },
+      "answer": "C"
+    },
+    {
+      "id": "T14",
+      "agent": "trader",
+      "concept": "margin_call",
+      "q": "We hold collateralized swaps that lose value when rates rise. Rates jump. What happens?",
+      "options": {
+        "A": "We must post cash collateral now (a margin call)",
+        "B": "Nothing until the swap matures",
+        "C": "The swap is cancelled",
+        "D": "The dealer pays us"
+      },
+      "answer": "A"
+    },
+    {
+      "id": "T15",
+      "agent": "trader",
+      "concept": "put_option",
+      "q": "What is the trade-off of buying put options to protect the stock-market guarantees?",
+      "options": {
+        "A": "They make us lose more in a fall",
+        "B": "They only protect against rate moves",
+        "C": "No cost, full protection",
+        "D": "They pay out in a market fall but cost a premium every quarter even if markets rise"
+      },
+      "answer": "D"
+    },
+    {
+      "id": "T16",
+      "agent": "trader",
+      "concept": "fx_hedge",
+      "q": "We hold foreign bonds and the US dollar strengthens. Without a currency hedge, what happens to those bonds' value in dollars?",
+      "options": {
+        "A": "It depends only on interest rates",
+        "B": "It rises",
+        "C": "It falls",
+        "D": "It is unchanged"
+      },
+      "answer": "C"
+    },
+    {
+      "id": "T17",
+      "agent": "trader",
+      "concept": "collateral",
+      "q": "Our largest dealer fails. When does that cost us least?",
+      "options": {
+        "A": "When we had no hedges with gains owed to us and no collateral",
+        "B": "When we had daily collateral and spread trades across several dealers",
+        "C": "Dealer failures never cost anything",
+        "D": "When we used one dealer and no collateral"
+      },
+      "answer": "B"
+    },
+    {
+      "id": "T18",
+      "agent": "trader",
+      "concept": "hedge_ratio",
+      "q": "Why do most insurers not hedge 100% of every risk?",
+      "options": {
+        "A": "Hedging is illegal",
+        "B": "Hedges never work",
+        "C": "Risks always offset",
+        "D": "Full hedging costs the most and gives up gains; a large share is usually enough"
+      },
+      "answer": "D"
+    },
+    {
+      "id": "T19",
+      "agent": "cro",
+      "concept": "surplus",
+      "q": "What is surplus?",
+      "options": {
+        "A": "Cash in the bank",
+        "B": "Annual premium",
+        "C": "Total assets",
+        "D": "What the company owns minus what it owes"
+      },
+      "answer": "D"
+    },
+    {
+      "id": "T20",
+      "agent": "cro",
+      "concept": "asset_liability_management",
+      "q": "What is the core idea of asset liability management?",
+      "options": {
+        "A": "Hold only cash",
+        "B": "Choose investments that behave like the promises to policyholders, so market moves change both sides similarly",
+        "C": "Sell as many policies as possible",
+        "D": "Maximize yield regardless of liabilities"
+      },
+      "answer": "B"
+    }
   ]
 }

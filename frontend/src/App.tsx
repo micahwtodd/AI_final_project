@@ -7,6 +7,7 @@ import { ShockScreen } from "./screens/ShockScreen";
 import { RevealScreen } from "./screens/RevealScreen";
 import { DebriefScreen } from "./screens/DebriefScreen";
 import { SafetyLab } from "./screens/SafetyLab";
+import { QuizScreen } from "./screens/QuizScreen";
 
 type Screen =
   | { name: "select" }
@@ -14,7 +15,8 @@ type Screen =
   | { name: "shock"; game: GameView; shock: Shock; firstTry: { review: Review; question: string } | null }
   | { name: "reveal"; reveal: Reveal; shock: Shock }
   | { name: "debrief"; game: GameView; debrief: Debrief }
-  | { name: "safety"; back: Screen };
+  | { name: "safety"; back: Screen }
+  | { name: "quiz"; game: GameView; when: "pre" | "post" };
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>({ name: "select" });
@@ -92,7 +94,7 @@ export default function App() {
             busy={busy}
             onStart={async (ticker, seed) => {
               const g = await run(() => api.newGame(ticker, seed));
-              if (g) setScreen({ name: "desk", game: g });
+              if (g) setScreen({ name: "quiz", game: g, when: "pre" });
             }}
           />
         )}
@@ -129,6 +131,10 @@ export default function App() {
             onNext={async () => {
               const g = screen.reveal.view;
               if (screen.reveal.finished) {
+                if (g.quiz_taken.includes("pre") && !g.quiz_taken.includes("post")) {
+                  setScreen({ name: "quiz", game: g, when: "post" });
+                  return;
+                }
                 const d = await run(() => api.debrief(g.id));
                 if (d) setScreen({ name: "debrief", game: g, debrief: d });
               } else {
@@ -138,6 +144,25 @@ export default function App() {
           />
         )}
         {screen.name === "safety" && <SafetyLab onBack={() => setScreen(screen.back)} />}
+        {screen.name === "quiz" && (
+          <QuizScreen
+            key={screen.when}
+            gameId={screen.game.id}
+            when={screen.when}
+            company={screen.game.company}
+            onSkip={() => setScreen({ name: "desk", game: screen.game })}
+            onDone={async () => {
+              const g = screen.game;
+              if (screen.when === "pre") {
+                const fresh = await run(() => api.game(g.id));
+                if (fresh) setScreen({ name: "desk", game: fresh });
+              } else {
+                const d = await run(() => api.debrief(g.id));
+                if (d) setScreen({ name: "debrief", game: g, debrief: d });
+              }
+            }}
+          />
+        )}
         {screen.name === "debrief" && (
           <DebriefScreen debrief={screen.debrief} game={screen.game} onRestart={() => setScreen({ name: "select" })} />
         )}
