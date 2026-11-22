@@ -71,7 +71,7 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
             {r.marker === "keywords" && <div className="small muted">Marked by the keyword checker (AI examiner offline).</div>}
           </div>
           <div className="understanding-chip">
-            <div className="small muted">Understanding this quarter</div>
+            <div className="small muted">Executive Summary this quarter</div>
             <div className="u-points"><CountUp value={u ? u.points : 0} format={(v) => v.toFixed(1)} /><span>/100</span></div>
             {u && u.attempts > 1 && <div className="small muted">second try: new checks count half</div>}
             {r.not_sure && <div className="small muted">“I'm not sure”: walkthrough, no points</div>}

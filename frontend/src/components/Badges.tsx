@@ -58,7 +58,7 @@ export function ReportCardPanel(props: { rc: ReportCard; results: number; unders
         <h1 className="rc-title">“{rc.title}”</h1>
         <p>{rc.why}</p>
         <div className="small muted">
-          Grade = 60% results ({props.results.toFixed(0)}) + 40% understanding ({props.understanding.toFixed(0)}) = {rc.overall.toFixed(1)}.
+          Grade = 60% results ({props.results.toFixed(0)}) + 40% Executive Summary ({props.understanding.toFixed(0)}) = {rc.overall.toFixed(1)}.
           {rc.breaches > 0 && ` ${rc.breaches} floor breach${rc.breaches > 1 ? "es" : ""}.`}
         </div>
       </div>

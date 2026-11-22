@@ -7,7 +7,7 @@ from backend import engine
 
 BADGES: dict[str, dict] = {
     "called_it": {"name": "Called It", "icon": "🎯", "text": "Named the main driver of the quarter."},
-    "full_marks": {"name": "Full Marks", "icon": "💯", "text": "Scored 100 understanding points in a quarter."},
+    "full_marks": {"name": "Full Marks", "icon": "💯", "text": "Scored 100 on the Executive Summary in a quarter."},
     "better_than_nothing": {"name": "Better Than Nothing", "icon": "👍", "text": "Your trades beat doing nothing."},
     "beat_benchmark": {"name": "Beat the Benchmark", "icon": "🏆", "text": "Matched or beat the expert benchmark."},
     "three_above_floor": {"name": "Three Above the Floor", "icon": "🛡️",
@@ -78,7 +78,7 @@ def grade_for(overall: float) -> str:
 
 
 def report_card(s, results: float, understanding: float) -> dict:
-    """A letter grade (60% results, 40% understanding) and a title that describes how you played."""
+    """A letter grade (60% results, 40% Executive Summary, stored as "understanding") and a title that describes how you played."""
     hist = s.state.history
     overall = round(0.6 * results + 0.4 * understanding, 1)
     breaches = sum(r.capital_breach + r.liquidity_breach for r in hist)

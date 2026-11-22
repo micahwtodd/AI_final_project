@@ -89,6 +89,7 @@ const SLIDES: Slide[] = [
         <div><b>Results</b><div>Beat doing nothing and get close to the expert's benchmark.</div></div></div>
       <div className="score-cat"><span className="score-n">2</span>
         <div><b>The Executive Summary</b><div>Explain what really happened in your own words, and Vera will critique you.</div></div></div>
+      <p className="intro-warn">Every hedge costs money, so be thoughtful.</p>
     </div>,
     art: <PixelSprite name="vera_pleased" size={150} title="Vera Atrisk" />,
   },
