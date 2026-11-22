@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { play } from "../sound";
+import { SEASONS, SEASON_ICON } from "../labels";
 
 // Overlays go straight onto <body>: the screen transition animates a transform, which would
 // otherwise pin position:fixed overlays to the page instead of the window.
@@ -75,13 +76,13 @@ export function QuarterSplash(props: { id: string; quarter: number; title: strin
       <div className="q-splash-band" onAnimationEnd={(e) => { if (e.animationName === "band-in" || e.animationName === "boss-in") setShow(false); }}>
         {boss ? (
           <>
-            <div className="q-splash-boss">⚠ FINAL QUARTER ⚠</div>
+            <div className="q-splash-boss">⚠ FINAL QUARTER · WINTER ⚠</div>
             <div className="q-splash-q">BOSS ROUND</div>
             <div className="q-splash-title">{props.title}. Survive this one.</div>
           </>
         ) : (
           <>
-            <div className="q-splash-q">QUARTER {props.quarter} <span>of 4</span></div>
+            <div className="q-splash-q">QUARTER {props.quarter} <span>of 4 · {SEASON_ICON[SEASONS[props.quarter]]} {SEASONS[props.quarter]}</span></div>
             <div className="q-splash-title">{props.title}</div>
           </>
         )}

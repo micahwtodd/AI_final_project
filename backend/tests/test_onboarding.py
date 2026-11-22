@@ -52,7 +52,7 @@ def test_art_files_exist_with_the_right_sizes():
             assert _png_size(art / f"{who}_{mood}.png") == (64, 64)
     for state in ["nap", "alert", "hide"]:
         assert _png_size(art / f"cat_{state}.png") == (48, 48)
-    for v in ["day", "storm"]:
+    for v in ["day"] + [f"{s}{st}" for s in ("spring", "summer", "fall", "winter") for st in ("", "_storm")]:
         assert _png_size(art / f"office_{v}.png") == (480, 270)
 
 

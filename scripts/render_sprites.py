@@ -63,6 +63,7 @@ R = {
     "desk": ramp("#0a1326", "#13213f", "#1d3160", "#2a4480", "#3d5ca3"),
 }
 INK = hx("#1b1f3b")
+BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]
 WHITE = hx("#ffffff")
 EYE_WHITE = hx("#f4f1ea")
 
@@ -529,64 +530,104 @@ def bonnie(mood: str) -> Image.Image:
 
 
 def swap(mood: str) -> Image.Image:
+    """Swap Dogg: a crunchy old hippie trader. Long silver hair, tie-dye headband, beard, round tinted glasses."""
     s = Sprite(64, 64)
-    skin, hair = R["skin_warm"], R["hair_black"]
-    s.region("hood", ellipse(CX, 48, 15, 5), R["navy"], hl=False)
-    base_body(s, skin, R["navy"], shirt=False, lapels=False)
-    for x in (28, 35):  # drawstrings with gold tips
-        for y in range(48, 58):
-            s.px(x, y, R["shirt"][3] if y < 57 else R["gold"][3])
-    for i, x in enumerate(range(25, 39)):  # gold chain
-        y = 48 + round(3.5 * math.sin(math.pi * (x - 25) / 13))
-        s.px(x, y, R["gold"][4 if i % 2 else 2])
-    s.region("hair_base", ellipse(CX, 17, 14.5, 7.5), hair, hl=False)
-    for i, x0 in enumerate(range(17, 46, 4)):  # short twists: small rounded clumps, each lit from the top left
-        s.region("twist%d" % i, ellipse(x0 + 1.5, 11 + (i % 2) * 0.8, 2.4, 3.5), hair)
-    for p, r in list(s.owner.items()):
-        if r == "hair_base":
-            s.tone(*p, 1 if p[1] >= 18 else 2)
-    band = {(x, y) for x in range(14, 50) for y in range(6, 17)
-            if abs(((x - CX) / 17.2) ** 2 + ((y - 21) / 13.5) ** 2 - 1) < 0.11}
-    s.region("band", band, R["headset"])
-    for sx in (-1, 1):
-        s.region("cup%d" % sx, ellipse(CX + sx * 14.2, 30, 3.6, 4.6), R["headset"])
-        s.px(round(CX + sx * 14.2) - (1 if sx < 0 else 0), 28, R["pru_blue"][4])
-    for i in range(8):  # mic boom
-        s.px(45 - i, 34 + i // 2, R["headset"][3])
-    s.px(37, 38, R["headset"][0])
-    s.px(36, 38, R["headset"][1])
+    skin, hair = R["skin_tan"], R["hair_grey"]
+    s.region("hair_back", {p for p in ellipse(CX, 28, 17.5, 22) if p[1] <= 56}, hair, hl=False)
+    base_body(s, skin, R["shirt"], shirt=False, lapels=False)
+    torso = s.pts_of("torso")
+    dye = ["#e85d5d", "#f2a541", "#f5dd5b", "#6cc46a", "#4f9de0", "#9b6ad6"]
+    for (x, y) in torso:  # a tie-dye swirl
+        ang = math.atan2(y - 56, x - CX)
+        k = int((ang * 3 + math.hypot(x - CX, y - 56) / 3)) % len(dye)
+        col = hx(dye[k])
+        if x > CX + 12:
+            col = mix(col, INK, 0.25)
+        s.px(x, y, col)
+    vest = R["orange"]
+    suede = [mix(c, hx("#8a6a48"), 0.65) for c in vest]
+    for sx in (-1, 1):  # a fringed suede vest
+        side = {(x, y) for (x, y) in torso if (x - CX) * sx > 7 + (y - 47) * 0.15}
+        s.region("vest%d" % sx, side, suede)
+        for (x, y) in side:
+            s.detail.pop((x, y), None)
+        for x in range(min(p[0] for p in side), max(p[0] for p in side) + 1):
+            if x % 2 == 0:
+                s.px(x, 63, suede[1])
+    s.px(31, 52, R["shirt"][4])  # peace pendant on a cord
+    s.px(32, 52, R["shirt"][4])
+    s.px(31, 53, R["shirt"][2])
+    s.px(32, 53, R["shirt"][2])
+    for x, y in ((28, 48), (29, 49), (30, 50), (35, 48), (34, 49), (33, 50)):
+        s.px(x, y, hx("#6b4a2a"))
+    s.region("hair_crown", ellipse(CX, 16, 16.5, 9.5), hair, hl=False)
+    shade_hair(s, ("hair_back", "hair_crown"), sheen=(27, 13, 13, 6),
+               strands=[((31, 8), (31, 15)), ((22, 14), (16, 40)), ((19, 20), (15, 48)), ((41, 14), (47, 40)), ((44, 20), (48, 48))])
+    for x in range(17, 47):  # tie-dye headband
+        for y in (17, 18):
+            s.px(x, y, mix(hx(dye[(x // 3) % len(dye)]), INK, 0.15 if y == 18 else 0))
     cast_shadow(s, from_prefix=("hair",))
-    eyes(s, hx("#6b4a22"), mood, skin=skin)
-    brows(s, hair[0], mood)
-    nose_mouth(s, skin, hx("#7a3e34"), mood)
+    for x in range(24, 40, 3):  # forehead and crow's feet lines
+        s.px(x, 21, skin[2])
+    for x, y in ((19, 29), (19, 31), (44, 29), (44, 31)):
+        s.px(x, y, skin[1])
+    eyes(s, hx("#5a7a4a"), mood, skin=skin)
+    brows(s, hair[1], mood)
+    beard = poly([(18.5, 32), (22, 31), (26, 35), (37, 35), (41, 31), (44.5, 32), (43, 42), (37, 49), (31.5, 51), (26, 49), (20, 42)])
+    s.region("beard", beard, hair)
+    shade_hair(s, ("beard",), strands=[((24, 38), (27, 47)), ((31, 40), (31, 50)), ((39, 38), (36, 47))])
+    s.region("stache", poly([(25, 35.5), (38, 35.5), (37.5, 38), (31.5, 37), (25.5, 38)]), hair)
+    nose_mouth(s, skin, hx("#7a3e34"), mood, mouth_y=39)
+    for x in range(28, 36):  # the beard hides the chin: draw the mouth into it
+        for y in (40, 41, 42):
+            if (x, y) in s.detail and s.owner.get((x, y)) == "beard" and y > 40:
+                s.detail.pop((x, y))
+    for cx in (23.5, 39.5):  # round, orange-tinted granny glasses
+        for (x, y) in ellipse(cx, 29.5, 4, 3.6):
+            base = s.detail.get((x, y))
+            under = base if base is not None else s.ramps[s.owner[(x, y)]][3] if (x, y) in s.owner else hx("#ffffff")
+            s.px(x, y, mix(under, hx("#f2a03a"), 0.35))
+        for a in range(0, 360, 12):
+            s.px(round(cx + 4.3 * math.cos(math.radians(a))), round(29.5 + 3.9 * math.sin(math.radians(a))), R["gold"][1])
+        s.px(round(cx) - 2, 27, WHITE)
+    for x in range(28, 36):
+        s.px(x, 28, R["gold"][1])
     if mood == "concerned":
         sweat(s)
     return s.render(badge_bg(), clip=in_badge())
 
 
 def seamore(mood: str) -> Image.Image:
+    """Seamore Tenkays: a young analyst with a neat side part, round gold glasses and a bow tie."""
     s = Sprite(64, 64)
-    skin, hair = R["skin_fair"], R["hair_plum"]
-    s.region("hair_back", ellipse(CX, 25, 17.5, 16.5) - rect(0, 42, 63, 63), hair, hl=False)
+    skin = R["skin_fair"]
+    hair = ramp("#1e140e", "#3a2618", "#57391f", "#76502c", "#9a6c3e")
     base_body(s, skin, R["slate"])
-    s.region("hair_crown", ellipse(CX, 16, 16.5, 10), hair, hl=False)
-    bangs = rect(18, 15, 45, 23) | {(x, 24) for x in range(18, 46) if x % 3 != 1}
-    s.region("hair_bangs", bangs, hair, hl=False)
-    for sx in (-1, 1):
-        xs = range(15, 20) if sx < 0 else range(44, 49)
-        side = {(x, y) for x in xs for y in range(20, 41)}
-        side |= {(x, 41) for x in (range(17, 21) if sx < 0 else range(43, 47))}
-        s.region("hair_side%d" % sx, side, hair, hl=False)
-    shade_hair(s, ("hair_back", "hair_crown", "hair_bangs", "hair_side-1", "hair_side1"), sheen=(28, 14, 14, 6),
-               strands=[((24, 16), (23, 24)), ((30, 15), (30, 24)), ((36, 16), (37, 24)), ((41, 17), (42, 24)),
-                        ((17, 26), (18, 40)), ((46, 26), (45, 40))])
-    cast_shadow(s)
+    s.region("hair_crown", ellipse(CX, 15, 15.5, 8.5), hair, hl=False)
+    s.region("hair_swoop", {(x, y) for x in range(24, 46) for y in range(15, 21) if y <= 20 - (x - 24) * 0.18}, hair, hl=False)
+    for sx in (-1, 1):  # short sides and sideburns
+        xs = range(17, 21) if sx < 0 else range(43, 47)
+        s.region("hair_side%d" % sx, {(x, y) for x in xs for y in range(17, 28)}, hair, hl=False)
+    shade_hair(s, ("hair_crown", "hair_swoop", "hair_side-1", "hair_side1"), sheen=(33, 11, 11, 4.5),
+               strands=[((25, 8), (25, 17)), ((30, 9), (40, 18)), ((35, 9), (44, 16))])
+    cast_shadow(s, from_prefix=("hair",))
+    bow = poly([(26, 45), (31, 47), (26, 50)]) | poly([(37, 45), (32, 47), (37, 50)])
+    s.region("bow", bow, R["pru_blue"])
+    s.region("knot", rect(31, 46, 32, 48), R["navy"])
     s.px(41, 53, R["gold"][3])  # a small pin on the lapel
     s.px(42, 53, R["gold"][1])
     eyes(s, hx("#3f7a55"), mood, skin=skin)
-    brows(s, hair[1], mood)
+    brows(s, hair[0], mood)
+    for side, x0 in EYES.items():  # a heavier brow
+        for x in (range(x0, x0 + 3) if side == "L" else range(x0 + 1, x0 + 4)):
+            y = min((yy for (xx, yy) in s.detail if xx == x and EYE_Y - 4 <= yy <= EYE_Y - 1), default=None)
+            if y is not None:
+                s.px(x, y - 1, hair[1])
     nose_mouth(s, skin, hx("#b4625e"), mood)
-    for cx in (23.5, 39.5):  # big round gold glasses
+    for x in range(22, 42):  # a firmer jaw
+        if s.owner.get((x, 42)) == "face":
+            s.tone(x, 42, 2)
+    for cx in (23.5, 39.5):  # round gold glasses
         for a in range(0, 360, 10):
             x = round(cx + 5.3 * math.cos(math.radians(a)))
             y = round(30 + 4.6 * math.sin(math.radians(a)))
@@ -679,47 +720,81 @@ def cat(state: str) -> Image.Image:
     return s.render(outline=True)
 
 
-# ---------------------------------------------------------------- the office background (480x270)
-
-BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]
+# ---------------------------------------------------------------- the office background (480x270), by season
 
 
-def office(variant: str = "day") -> Image.Image:
+SEASONS = {
+    # sky top/bottom, clouds, far city, tree colors (base, light), weather
+    "day": dict(sky=("#3a6fb8", "#d4ecfa"), cloud=("#ffffff", "#d6e8f5"), far="#93b2cc",
+                trees=("#2f6b3a", "#3f8a48"), weather=None),
+    "spring": dict(sky=("#5f9fdc", "#e4f4fb"), cloud=("#ffffff", "#dceaf4"), far="#9dbad2",
+                   trees=("#e59ab4", "#f6c6d6"), weather="showers"),
+    "summer": dict(sky=("#1f6fd0", "#bfe6ff"), cloud=("#ffffff", "#e2f1fb"), far="#8fb0d0",
+                   trees=("#24713a", "#3d9a4c"), weather="sun"),
+    "fall": dict(sky=("#6f8fb8", "#f6d9b4"), cloud=("#fff3e2", "#e8cfb0"), far="#a7a9b8",
+                 trees=("#c8551f", "#f0a030"), weather="leaves"),
+    "winter": dict(sky=("#76879e", "#e3e9f0"), cloud=("#f4f6f9", "#cfd7e2"), far="#a9b5c4",
+                   trees=("#c9d6e2", "#f2f6fa"), weather="snow"),
+}
+
+
+def office(season: str = "day", storm: bool = False) -> Image.Image:
     W, H = 480, 270
+    cfg = SEASONS[season]
     img = Image.new("RGB", (W, H))
     p = img.load()
     rnd = random.Random(409)
-    storm = variant == "storm"
-    sky_top = hx("#3a6fb8" if not storm else "#1c2236")
-    sky_bot = hx("#d4ecfa" if not storm else "#5a5f78")
     win_top, win_bot, floor_y = 22, 192, 192
+    dark = hx("#1a1f33")
+
+    def stormy(col, k=0.45):
+        return mix(col, dark, k) if storm else col
+
+    sky_top, sky_bot = stormy(hx(cfg["sky"][0]), 0.55), stormy(hx(cfg["sky"][1]), 0.5)
     for y in range(win_top, win_bot):  # dithered sky gradient
         t = (y - win_top) / (win_bot - win_top)
         for x in range(W):
             a = mix(sky_top, sky_bot, t)
             b = mix(sky_top, sky_bot, min(1, t + 0.05))
             p[x, y] = b if (t * 20) % 1 * 16 > BAYER[y % 4][x % 4] else a
-    for _ in range(9):  # clouds
-        cx, cy, w = rnd.randint(0, W), rnd.randint(32, 90), rnd.randint(18, 42)
-        lit, shade = (WHITE, hx("#d6e8f5")) if not storm else (hx("#8a8fa6"), hx("#5c6178"))
+    if cfg["weather"] == "sun" and not storm:  # summer sun with a soft glow
+        for (x, y) in ellipse(410, 52, 34, 34):
+            if 0 <= x < W and win_top <= y < win_bot:
+                p[x, y] = mix(p[x, y], hx("#fff4c2"), 0.35)
+        for (x, y) in ellipse(410, 52, 15, 15):
+            if win_top <= y < win_bot:
+                p[x, y] = hx("#fff7d6") if (x - 405) ** 2 + (y - 47) ** 2 > 30 else WHITE
+    if cfg["weather"] == "showers" and not storm:  # a spring rainbow
+        bands = ["#e85d5d", "#f2a541", "#f5dd5b", "#6cc46a", "#4f9de0", "#7b68c8"]
+        for (x, y) in [(x, y) for x in range(W) for y in range(win_top, win_bot)]:
+            d = math.hypot(x - 240, (y - 230) * 1.0)
+            k = int((d - 150) // 3)
+            if 0 <= k < len(bands):
+                p[x, y] = mix(p[x, y], hx(bands[k]), 0.45)
+    lit, shade = stormy(hx(cfg["cloud"][0]), 0.4), stormy(hx(cfg["cloud"][1]), 0.45)
+    for _ in range(12 if storm else 8):  # clouds
+        cx, cy, w = rnd.randint(0, W), rnd.randint(30, 92 if storm else 84), rnd.randint(18, 46 if storm else 40)
         for (x, y) in ellipse(cx, cy, w, 5) | ellipse(cx - w * 0.3, cy - 4, w * 0.45, 5) | ellipse(cx + w * 0.25, cy - 3, w * 0.35, 4):
             if 0 <= x < W and win_top <= y < win_bot:
                 p[x, y] = lit if y < cy + 1 else shade
+    roofs: list[tuple[int, int, int]] = []  # (x0, x1, top) for snow caps
     x = 0
     while x < W:  # far skyline
         w = rnd.randint(10, 26)
         top = rnd.randint(118, 150)
-        base = hx("#93b2cc" if not storm else "#3e4560")
+        base = stormy(hx(cfg["far"]), 0.5)
+        roofs.append((x, min(W, x + w), top))
         for xx in range(x, min(W, x + w)):
             for yy in range(top, win_bot):
-                lit = (yy - top) % 4 == 2 and (xx - x) % 3 == 1
+                win_lit = (yy - top) % 4 == 2 and (xx - x) % 3 == 1
                 if storm:
-                    p[xx, yy] = mix(base, hx("#f7e7a8"), 0.55) if lit and (xx * 7 + yy) % 5 < 2 else base
+                    p[xx, yy] = mix(base, hx("#f7e7a8"), 0.55) if win_lit and (xx * 7 + yy) % 5 < 2 else base
                 else:
-                    p[xx, yy] = mix(base, WHITE, 0.25) if lit else base
+                    p[xx, yy] = mix(base, WHITE, 0.25) if win_lit else base
         x += w + rnd.randint(1, 4)
 
     def tower(x0, w, top, body, light, glass=True):
+        roofs.append((x0, x0 + w, top))
         for xx in range(x0, x0 + w):
             for yy in range(top, win_bot):
                 if not 0 <= xx < W:
@@ -731,44 +806,86 @@ def office(variant: str = "day") -> Image.Image:
                         col = mix(col, hx("#9cc4ea"), 0.35)
                     if (xx - x0) % 9 == 0:
                         col = mix(col, hx("#cfe6ff"), 0.35)
+                    if season == "fall" and not storm:
+                        col = mix(col, hx("#f2b06a"), 0.18)  # warm reflections
                 else:
                     col = hx(light) if (xx - x0) % 4 == 0 else hx(body)
                     if (yy - top) % 4 in (1, 2) and (xx - x0) % 4 != 0:
                         col = hx("#6c7f96")
                         if storm and (xx * 3 + yy) % 7 < 2:
                             col = hx("#e8c96a")
-                if storm:
-                    col = mix(col, hx("#1a1f33"), 0.45)
-                p[xx, yy] = col
+                p[xx, yy] = stormy(col)
 
-    tower(28, 46, 70, "#c9b89a", "#efe3cc", glass=False)  # a classic stone tower
-    tower(168, 30, 54, "#1f3d66", "#6f9fd4")  # twin glass towers
+    tower(28, 46, 70, "#c9b89a", "#efe3cc", glass=False)
+    tower(168, 30, 54, "#1f3d66", "#6f9fd4")
     tower(196, 34, 62, "#1a3459", "#5f8fc4")
+    roofs.append((250, 300, 128))
     for xx in range(250, 300):  # brick block with a roof garden
         for yy in range(128, win_bot):
             col = hx("#a8553a") if (yy % 5 and xx % 6) else hx("#7a3a28")
             if yy < 131:
-                col = hx("#4f9a48") if (xx + yy) % 3 else hx("#3c7a38")
-            p[xx, yy] = mix(col, hx("#1a1f33"), 0.45) if storm else col
+                col = hx(cfg["trees"][0]) if (xx + yy) % 3 else hx(cfg["trees"][1])
+            p[xx, yy] = stormy(col)
     tower(360, 40, 84, "#2a4a75", "#7aa8d8")
     tower(420, 30, 104, "#c2b08f", "#e6dac2", glass=False)
+    if season == "winter":  # snow on every roof
+        for x0, x1, top in roofs:
+            for xx in range(max(0, x0), min(W, x1)):
+                for yy in range(top, top + 2 + (xx % 3 == 0)):
+                    if win_top <= yy < win_bot:
+                        p[xx, yy] = stormy(hx("#f6f9fc"), 0.3)
+    tb, tl = hx(cfg["trees"][0]), hx(cfg["trees"][1])
     for xx in range(W):  # tree tops at the bottom of the view
-        h = 178 + round(4 * math.sin(xx / 7) + 3 * math.sin(xx / 3.1))
+        h = 176 + round(4 * math.sin(xx / 7) + 3 * math.sin(xx / 3.1))
         for yy in range(h, win_bot):
-            col = hx("#2f6b3a") if (xx + yy) % 4 else hx("#3f8a48")
-            p[xx, yy] = mix(col, hx("#10141f"), 0.5) if storm else col
-    if storm:  # rain and one lightning bolt
-        for _ in range(420):
+            col = tl if (xx + yy) % 4 == 0 or yy < h + 2 else tb
+            if season == "spring" and (xx * 7 + yy * 3) % 11 == 0:
+                col = hx("#7fbf6a")  # fresh green among the blossoms
+            if season == "fall" and (xx * 5 + yy) % 9 == 0:
+                col = hx("#e8c23a")
+            if season == "winter" and yy > h + 3:
+                col = hx("#7d8a7a") if (xx + yy) % 3 else hx("#5d6b5c")
+            p[xx, yy] = stormy(col, 0.5)
+
+    # weather outside the glass
+    wx = cfg["weather"]
+    if wx in ("showers",) or (storm and wx in ("sun", "leaves")):
+        n = 520 if storm else 160
+        for _ in range(n):
             x0, y0 = rnd.randint(0, W - 1), rnd.randint(win_top, win_bot - 1)
-            for k in range(5):
+            for k in range(6 if storm else 4):
                 xx, yy = x0 - k // 2, y0 + k
                 if 0 <= xx < W and win_top <= yy < win_bot:
-                    p[xx, yy] = mix(p[xx, yy], hx("#b9c6e6"), 0.6)
-        x0 = 330
-        for y in range(win_top, 120):
+                    p[xx, yy] = mix(p[xx, yy], hx("#c9d6f0"), 0.6 if storm else 0.4)
+    if wx == "showers":  # pink petals drifting
+        for _ in range(50 if not storm else 90):
+            x0, y0 = rnd.randint(0, W - 2), rnd.randint(win_top + 4, win_bot - 4)
+            p[x0, y0] = hx("#f7b6cb")
+            p[x0 + 1, y0] = hx("#fbd3e0")
+    if wx == "leaves":
+        for _ in range(70 if not storm else 160):
+            x0, y0 = rnd.randint(0, W - 3), rnd.randint(win_top + 4, win_bot - 4)
+            col = hx(rnd.choice(["#d9541e", "#f0a030", "#b8371a", "#e8c23a"]))
+            p[x0, y0] = col
+            p[x0 + 1, y0] = col
+            p[x0 + 1, y0 + 1] = mix(col, dark, 0.3)
+    if wx == "snow":
+        for _ in range(260 if not storm else 700):
+            x0, y0 = rnd.randint(0, W - 1), rnd.randint(win_top, win_bot - 1)
+            p[x0, y0] = hx("#ffffff")
+            if storm and x0 + 1 < W:
+                p[x0 + 1, y0] = hx("#e6edf5")
+    if wx == "sun" and not storm:  # summer birds
+        for bx, by in ((120, 60), (134, 54), (300, 48), (312, 56)):
+            for dx, dy in ((-2, -1), (-1, 0), (0, 1), (1, 0), (2, -1)):
+                p[bx + dx, by + dy] = hx("#2a3550")
+    if storm and wx in ("showers", "sun"):  # lightning
+        x0 = 330 if wx == "showers" else 120
+        for y in range(win_top, 122):
             x0 += rnd.choice((-1, 0, 1, 1))
             for dx in (0, 1):
                 p[x0 + dx, y] = hx("#fff6c8")
+
     frame, frame_hi = hx("#1e2633"), hx("#3a4658")  # window mullions and transom
     for xx in range(0, W, 80):
         for dx in range(4):
@@ -781,6 +898,23 @@ def office(variant: str = "day") -> Image.Image:
         for yy in range(win_top + 2, win_bot):
             if (xx - yy * 0.6) % 160 < 10 and (xx % 80) > 4:
                 p[xx, yy] = mix(p[xx, yy], WHITE, 0.12)
+    if season == "winter":  # frost in the bottom corners of each pane
+        for x0 in range(0, W, 80):
+            for k in range(18):
+                for j in range(18 - k):
+                    for xx in (x0 + 4 + j, x0 + 79 - j):
+                        yy = win_bot - 1 - k
+                        if 0 <= xx < W and (j + k) % 2 == 0 and rnd.random() < 0.75:
+                            p[xx, yy] = mix(p[xx, yy], hx("#eef6ff"), 0.7)
+        bulbs = ["#ff5a5a", "#ffd34a", "#5be37d", "#5ab4ff"]  # string lights along the transom
+        for i, xx in enumerate(range(3, W, 7)):
+            yy = 64 + round(2 * math.sin(xx / 9))
+            p[xx, yy] = hx(bulbs[i % 4])
+            p[xx, yy + 1] = mix(hx(bulbs[i % 4]), dark, 0.3)
+            for k in range(7):
+                if xx + k < W:
+                    p[xx + k, 64 + round(2 * math.sin((xx + k) / 9)) - 1] = hx("#2a3a28")
+
     for yy in range(0, win_top):  # ceiling, light strips, market ticker
         for xx in range(W):
             p[xx, yy] = mix(hx("#141a26"), hx("#1f2736"), yy / win_top)
@@ -794,6 +928,8 @@ def office(variant: str = "day") -> Image.Image:
     xx = 2
     while xx < W - 8:
         col = rnd.choice([hx("#5be37d"), hx("#ff6b7d"), hx("#ffc72c")])
+        if storm:
+            col = rnd.choice([hx("#ff6b7d"), hx("#ff6b7d"), hx("#ffc72c")])  # a red tape on shock days
         for k in range(rnd.randint(3, 7)):
             for yy in range(14, 17):
                 if (xx * 5 + k * 3 + yy) % 10 < 7:
@@ -815,27 +951,59 @@ def office(variant: str = "day") -> Image.Image:
 
     d = ImageDraw.Draw(img)
 
-    def plant(x0):
-        for (lx, ly, r) in ((0, 214, 9), (-8, 222, 7), (8, 220, 7), (-4, 204, 6), (5, 206, 6), (0, 196, 5)):
-            d.ellipse([x0 + lx - r, ly - r * 0.7, x0 + lx + r, ly + r * 0.7], fill=hx("#2f7a3c"))
-            d.ellipse([x0 + lx - r + 2, ly - r * 0.7 + 1, x0 + lx + r - 4, ly], fill=hx("#4aa55a"))
-        d.line([x0, 236, x0, 210], fill=hx("#5a3b22"))
+    def pot(x0):
         d.rectangle([x0 - 7, 236, x0 + 7, 262], fill=hx("#e8e2d6"))
         d.rectangle([x0 - 7, 236, x0 + 7, 238], fill=WHITE)
         d.rectangle([x0 + 3, 239, x0 + 7, 262], fill=hx("#c9c1b2"))
 
-    plant(18)
-    plant(462)
+    def plant(x0, leaf=("#2f7a3c", "#4aa55a"), flowers=None):
+        d.line([x0, 236, x0, 210], fill=hx("#5a3b22"))
+        for (lx, ly, r) in ((0, 214, 9), (-8, 222, 7), (8, 220, 7), (-4, 204, 6), (5, 206, 6), (0, 196, 5)):
+            d.ellipse([x0 + lx - r, ly - r * 0.7, x0 + lx + r, ly + r * 0.7], fill=hx(leaf[0]))
+            d.ellipse([x0 + lx - r + 2, ly - r * 0.7 + 1, x0 + lx + r - 4, ly], fill=hx(leaf[1]))
+        for (fx, fy) in (flowers or []):
+            d.rectangle([x0 + fx - 1, fy - 1, x0 + fx + 1, fy + 1], fill=hx("#ffd34a" if season == "summer" else "#f25c7a"))
+            d.point((x0 + fx, fy), fill=hx("#6b3a12" if season == "summer" else "#ffe0e8"))
+        pot(x0)
+
+    if season == "winter":  # poinsettias
+        plant(18, ("#9e1b2c", "#d3313f"))
+        plant(462, ("#9e1b2c", "#d3313f"))
+    elif season == "fall":
+        plant(18, ("#8a4a1a", "#c8742a"))
+        plant(462, ("#2f7a3c", "#4aa55a"))
+    elif season == "spring":  # tulips
+        plant(18, flowers=[(-6, 200), (0, 194), (6, 199), (-2, 207), (4, 210)])
+        plant(462, flowers=[(-5, 201), (2, 195), (7, 205)])
+    elif season == "summer":  # sunflowers
+        plant(18, flowers=[(-5, 199), (3, 194), (7, 205)])
+        plant(462, flowers=[(-4, 197), (5, 201)])
+    else:
+        plant(18)
+        plant(462)
     d.rectangle([300, 226, 430, 232], fill=hx("#6b4226"))  # walnut desk with two chart monitors
     d.rectangle([300, 226, 430, 227], fill=hx("#8c5a36"))
     d.rectangle([306, 233, 312, 266], fill=hx("#4a2d1a"))
     d.rectangle([418, 233, 424, 266], fill=hx("#4a2d1a"))
-    for mx, up in ((322, True), (370, False)):
+    for mx, up in ((322, not storm), (370, False)):
         d.rectangle([mx, 196, mx + 40, 222], fill=hx("#0d1220"))
         d.rectangle([mx + 2, 198, mx + 38, 220], fill=hx("#11203a"))
         pts = [(mx + 3 + i * 5, 212 + (-i if up else i) + (2 if i % 2 else 0)) for i in range(8)]
         d.line(pts, fill=hx("#5be37d" if up else "#ff6b7d"))
         d.rectangle([mx + 18, 222, mx + 22, 226], fill=hx("#2a2f3c"))
+    if season == "fall":  # a pumpkin by the desk
+        d.ellipse([280, 250, 298, 264], fill=hx("#d9681e"))
+        d.ellipse([284, 250, 294, 264], fill=hx("#f08a2e"))
+        d.rectangle([288, 246, 290, 250], fill=hx("#4a6a2a"))
+    if season == "summer":  # an iced tea on the desk
+        d.rectangle([412, 216, 418, 225], fill=hx("#c98a3a"))
+        d.rectangle([412, 216, 418, 217], fill=hx("#f3e2c2"))
+        d.line([416, 212, 417, 216], fill=hx("#5be37d"))
+    if season == "winter":  # a mug of cocoa with steam
+        d.rectangle([412, 219, 418, 225], fill=hx("#e8e2d6"))
+        d.rectangle([418, 221, 419, 223], fill=hx("#e8e2d6"))
+        for k, (sx, sy) in enumerate(((414, 216), (415, 214), (414, 212))):
+            d.point((sx, sy), fill=hx("#cfd7e2"))
     d.rectangle([44, 228, 150, 252], fill=hx("#5a2f22"))  # leather sofa
     d.rectangle([44, 214, 150, 230], fill=hx("#6e3a2a"))
     d.rectangle([44, 214, 150, 216], fill=hx("#8a4d38"))
@@ -843,10 +1011,22 @@ def office(variant: str = "day") -> Image.Image:
     d.rectangle([144, 220, 154, 254], fill=hx("#4a261b"))
     for sx in (80, 114):
         d.line([sx, 230, sx, 250], fill=hx("#4a261b"))
+    if season == "winter":  # a plaid blanket on the sofa
+        for xx in range(96, 140):
+            for yy in range(216, 236):
+                if (xx // 4 + yy // 4) % 2 == 0:
+                    img.putpixel((xx, yy), hx("#b8304a") if (xx + yy) % 2 else hx("#8f2238"))
     return img
 
 
 # ---------------------------------------------------------------- build + contact sheets
+
+OFFICES = [("day", False)] + [(s, st) for s in ("spring", "summer", "fall", "winter") for st in (False, True)]
+
+
+def office_name(season: str, storm: bool) -> str:
+    return f"office_{season}" + ("_storm" if storm else "")
+
 
 def build() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
@@ -859,9 +1039,12 @@ def build() -> None:
         sprites[f"cat_{state}"] = cat(state)
     for name, im in sprites.items():
         im.save(OUT / f"{name}.png", optimize=True)
-    offices = {v: office(v) for v in ("day", "storm")}
-    for v, im in offices.items():
-        im.save(OUT / f"office_{v}.png", optimize=True)
+    offices = {office_name(s, st): office(s, st) for s, st in OFFICES}
+    for name, im in offices.items():
+        im.save(OUT / f"{name}.png", optimize=True)
+    old = OUT / "office_storm.png"
+    if old.exists():
+        old.unlink()  # replaced by the seasonal storm scenes
 
     scale, pad, cols = 6, 18, 6
     cell = 64 * scale + pad
@@ -877,11 +1060,11 @@ def build() -> None:
         sheet.paste(big, (x, y), big)
         dr.text((x, y + 64 * scale + 2), name, fill=hx("#0d1f3c"), font=font)
     sheet.save(EVIDENCE / "sprites_contact_sheet.png")
-    both = Image.new("RGB", (480 * 2 + 10, 270), WHITE)
-    both.paste(offices["day"], (0, 0))
-    both.paste(offices["storm"], (490, 0))
-    both.resize((both.width * 2, both.height * 2), Image.NEAREST).save(EVIDENCE / "office_backgrounds.png")
-    print(f"{len(sprites)} sprites + 2 office backgrounds -> {OUT}")
+    grid = Image.new("RGB", (480 * 3 + 20, 270 * 3 + 20), WHITE)
+    for i, name in enumerate(offices):
+        grid.paste(offices[name], ((i % 3) * 490, (i // 3) * 280))
+    grid.save(EVIDENCE / "office_backgrounds.png")
+    print(f"{len(sprites)} sprites + {len(offices)} office scenes -> {OUT}")
 
 
 if __name__ == "__main__":

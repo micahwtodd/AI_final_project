@@ -12,6 +12,7 @@ import { TraceScreen } from "./screens/TraceScreen";
 import { UnderTheHood } from "./components/UnderTheHood";
 import { GlossaryContext, type Glossary } from "./components/Term";
 import { WelcomeScreen } from "./screens/WelcomeScreen";
+import { SEASONS } from "./labels";
 import { KnowledgeIntro } from "./screens/KnowledgeIntro";
 import { CountUp } from "./components/Fx";
 import { StreakChips } from "./components/Badges";
@@ -38,6 +39,18 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [glossary, setGlossary] = useState<Glossary>({});
   const [lastPick, setLastPick] = useState<{ ticker: string; seed: number } | null>(null);  // so Back returns to the same company
+
+  // The office outside changes with the quarter: spring, summer, fall, winter; shock screens are stormy.
+  const sceneArt = (() => {
+    if (screen.name === "desk") return `office_${SEASONS[Math.min(4, screen.game.card?.quarter ?? screen.game.quarter)]}`;
+    if (screen.name === "shock") return `office_${SEASONS[screen.shock.quarter]}_storm`;
+    if (screen.name === "reveal") return `office_${SEASONS[screen.shock.quarter]}`;
+    if (screen.name === "debrief" || (screen.name === "quiz" && screen.when === "post")) return "office_winter";
+    return "office_day";
+  })();
+  useEffect(() => {  // preload every scene so a new quarter never flashes blank
+    ["day", ...SEASONS.slice(1).flatMap((s) => [s, `${s}_storm`])].forEach((n) => { const i = new Image(); i.src = `/art/office_${n}.png`; });
+  }, []);
 
   // Each new screen opens at the top, so the headline is the first thing the learner sees.
   useEffect(() => { window.scrollTo(0, 0); }, [screen.name]);
@@ -91,7 +104,7 @@ export default function App() {
 
   return (
     <GlossaryContext.Provider value={glossary}>
-    <div className={`app scene-${screen.name}`}>
+    <div className={`app scene-${screen.name}`} style={{ ["--scene" as string]: `url("/art/${sceneArt}.png")` }}>
       <header className="topbar">
         <div className="brand" onClick={() => setScreen({ name: "select" })} title="Back to company select">
           RISK DESK

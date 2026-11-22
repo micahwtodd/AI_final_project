@@ -55,7 +55,7 @@ const SLIDES: Slide[] = [
     art: null,
   },
   {
-    kicker: "Behind the scenes", title: "Seamore read the 10-K. The cat watches the results.",
+    kicker: "Behind the scenes", title: "Seamore reads the 10-Ks with the company cat, Convexity.",
     body: <div className="intro-team">
       <Face name="seamore_neutral" who="Seamore Tenkays" role="Calibration Analyst"
         line="Read the company's latest 10-K annual report and cited every number. These are real financial metrics!" />

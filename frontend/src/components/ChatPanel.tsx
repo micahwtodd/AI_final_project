@@ -140,12 +140,8 @@ export function ChatPanel(props: {
     void endRef.current?.scrollIntoView({ block: "nearest" });
   }, [turns]);
 
-  async function switchMode(m: AgentMode) {
-    if (m === mode || busy) return;
-    const r = await api.setMode(props.gameId, m);
-    setMode(r.agent_mode);
-    setTo("team");
-  }
+  // Team / Solo is switched from the Under the hood menu; when it changes, start addressing the whole team again.
+  useEffect(() => { setTo("team"); }, [mode]);
 
   async function send(q: string) {
     const msg = q.trim();
@@ -187,10 +183,6 @@ export function ChatPanel(props: {
     <div className="panel chat">
       <div className="chat-head">
         <h3>Ask your {mode === "team" ? "team" : "colleague"}</h3>
-        <div className="seg" role="group" aria-label="Agent mode">
-          <button className={mode === "team" ? "on" : ""} onClick={() => switchMode("team")} disabled={busy}>Team</button>
-          <button className={mode === "solo" ? "on" : ""} onClick={() => switchMode("solo")} disabled={busy}>Solo</button>
-        </div>
       </div>
       {mode === "team" ? (
         <div className="cast-row">
@@ -207,7 +199,7 @@ export function ChatPanel(props: {
           })}
         </div>
       ) : (
-        <div className="small muted">Solo mode: one agent, Vera Atrisk, holds every tool. Switch to Team to hear specialists with different views.</div>
+        <div className="small muted">Solo mode (a comparison setting): Vera answers alone with every tool. Switch back to Team under Under the hood to hear the specialists.</div>
       )}
       {blocked && <div className="banner warn-banner">Budget cap reached: the AI colleagues are offline for this session. The game continues.</div>}
       <div className="chat-log">

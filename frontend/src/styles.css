@@ -663,13 +663,12 @@ details.bs-details[open] > summary { margin-bottom: 0.6rem; }
 /* ---------------------------------------------------------------- pixel-art office scene behind every screen */
 .app { position: relative; z-index: 0; background: transparent; }
 body { background: #1b2433; }
-.app::before { content: ""; position: fixed; inset: 0; z-index: -2; background: url("/art/office_day.png") center bottom / cover no-repeat;
+.app::before { content: ""; position: fixed; inset: 0; z-index: -2; background: var(--scene, url("/art/office_day.png")) center bottom / cover no-repeat;
   image-rendering: pixelated; }
 .app::after { content: ""; position: fixed; inset: 0; z-index: -1; background: rgba(243, 246, 250, 0.55); transition: background 0.4s; }
 /* the scene shows in full on the welcome, intro, company and knowledge screens */
 .app.scene-welcome::after, .app.scene-select::after, .app.scene-knowledge::after { background: rgba(8, 20, 45, 0.12); }
 /* market shocks happen in a storm */
-.app.scene-shock::before { background-image: url("/art/office_storm.png"); }
 .app.scene-shock::after { background: rgba(20, 24, 40, 0.3); }
 .app.scene-reveal::after, .app.scene-debrief::after, .app.scene-quiz::after { background: rgba(243, 246, 250, 0.62); }
 .footer { background: rgba(255, 255, 255, 0.88); }

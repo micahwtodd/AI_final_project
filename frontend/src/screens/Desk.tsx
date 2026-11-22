@@ -9,6 +9,7 @@ import { GuideBar } from "../components/GuideBar";
 import { DeskCat } from "../components/PixelSprite";
 import { QuarterSplash } from "../components/Fx";
 import { play } from "../sound";
+import { SEASONS, SEASON_ICON } from "../labels";
 
 type Run = <T>(fn: () => Promise<T>) => Promise<T | undefined>;
 
@@ -75,7 +76,7 @@ export function Desk(props: {
       <div className="desk-mid">
         {g.card && (
           <div className={`panel wire${focus(0)}${g.card.quarter === 4 ? " boss-wire" : ""}`}>
-            <div className="wire-tag">NEWS WIRE · Q{g.card.quarter}{g.card.quarter === 4 && <span className="boss-tag">⚠ BOSS ROUND · FINAL QUARTER</span>}</div>
+            <div className="wire-tag">NEWS WIRE · Q{g.card.quarter} · {SEASON_ICON[SEASONS[g.card.quarter]]} {SEASONS[g.card.quarter].toUpperCase()}{g.card.quarter === 4 && <span className="boss-tag">⚠ BOSS ROUND · FINAL QUARTER</span>}</div>
             <h2>{g.card.title}</h2>
             <p className="wire-text">{g.card.signal_text}</p>
           </div>

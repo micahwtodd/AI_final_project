@@ -17,6 +17,9 @@ export const LIABILITY_LABELS: Record<string, string> = {
   guarantee: "Stock-market guarantees (VA guarantees)",
 };
 
+export const SEASONS = ["", "spring", "summer", "fall", "winter"] as const;
+export const SEASON_ICON: Record<string, string> = { spring: "🌸", summer: "☀️", fall: "🍂", winter: "❄️" };
+
 export const LEVERS = {
   rate_hedge_pct: {
     term: "interest_rate_swap",
