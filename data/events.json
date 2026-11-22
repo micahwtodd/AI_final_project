@@ -1,5 +1,5 @@
 {
-  "_note": "Fixed four-quarter campaign. Magnitudes are stylized approximations of the historical quarter each card echoes, for Micah to verify or adjust. A shock is a vector of market moves, never a dollar loss; the engine turns it into profit and loss using each company's own balance sheet. ig_loss_pct is the credit loss rate on BBB-rated holdings (A-rated lose 15% of that rate, AAA none); hy_default_pct is the default rate on below-investment-grade bonds (40% recovery).",
+  "_note": "Fixed four-quarter campaign. Magnitudes are stylized approximations of the historical quarter each card echoes, for Micah to verify or adjust. A shock is a vector of market moves, never a dollar loss; the engine turns it into profit and loss using each company's own balance sheet. ig_loss_pct is the credit loss rate on BBB-rated holdings (A-rated lose 15% of that rate, AAA none); hy_default_pct is the default rate on below-investment-grade bonds (40% recovery). sample_answer is shown only in Demo mode (Jackson, seed 409) so a grader can see the marking without knowing insurance; it is written for a quarter played with no trades.",
   "cards": [
     {
       "id": "rate_spike",
@@ -39,7 +39,8 @@
         "margin_call",
         "liquidity_ratio"
       ],
-      "source_note": "Stylized on 2022: US 10-year Treasury yield rose roughly 2.3 percentage points over the year, with the S&P 500 down about 19% and the dollar index up about 8%. The quarter here compresses part of that move. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it."
+      "source_note": "Stylized on 2022: US 10-year Treasury yield rose roughly 2.3 percentage points over the year, with the S&P 500 down about 19% and the dollar index up about 8%. The quarter here compresses part of that move. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it.",
+      "sample_answer": "Interest rates jumped. Our liabilities and guarantees are more rate-sensitive than our assets, so their value fell more than our bonds did, which lifted surplus. Stocks fell too, which made the market guarantees more expensive. Stock-market insurance would have softened that."
     },
     {
       "id": "fx_shock",
@@ -80,7 +81,8 @@
         "capital_ratio"
       ],
       "source_note": "Stylized on 2022, when the US dollar index rose to its highest level in about 20 years and the yen fell roughly 25% against the dollar at its weakest. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it.",
-      "offers_prt_deal": true
+      "offers_prt_deal": true,
+      "sample_answer": "Rates rose a little again, and because our liabilities are longer than our assets that helped surplus slightly. The stronger dollar cut the value of our foreign assets. Currency protection would have helped with that part."
     },
     {
       "id": "credit_crunch",
@@ -125,7 +127,8 @@
         "forced_selling",
         "put_option"
       ],
-      "source_note": "Stylized on Q4 2008: 10-year Treasury yields fell about 1.6 points, investment-grade spreads widened to roughly 6 points and high-yield spreads to about 20 points at the peak, and the S&P 500 fell about 22% in the quarter. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it."
+      "source_note": "Stylized on Q4 2008: 10-year Treasury yields fell about 1.6 points, investment-grade spreads widened to roughly 6 points and high-yield spreads to about 20 points at the peak, and the S&P 500 fell about 22% in the quarter. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it.",
+      "sample_answer": "Rates fell sharply. Our liabilities and guarantees are longer than our assets, so they rose in value more than our bonds, which hurt surplus. Stocks crashed too, raising the guarantees. More rate protection with swaps would have helped most."
     },
     {
       "id": "dealer_down",
@@ -165,7 +168,8 @@
         "isda_csa",
         "replacement_cost"
       ],
-      "source_note": "Stylized on Lehman Brothers' bankruptcy in September 2008, when counterparties with uncollateralized derivatives faced losses and had to replace hedges in a volatile market. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it."
+      "source_note": "Stylized on Lehman Brothers' bankruptcy in September 2008, when counterparties with uncollateralized derivatives faced losses and had to replace hedges in a volatile market. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode; a typical draw (1.0x) is about 70% of it.",
+      "sample_answer": "Rates fell again, and with liabilities longer than assets that hurt surplus. Stocks dropped as well, which raised the guarantees. Because our hedges were small, the dealer failure itself cost us little."
     }
   ]
 }

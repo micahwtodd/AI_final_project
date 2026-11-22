@@ -79,6 +79,7 @@ export type GameView = {
   ticker: string;
   company: string;
   seed: number;
+  demo: boolean;
   agent_mode: AgentMode;
   quarter: number;
   phase: "position" | "explain" | "finished";
@@ -156,6 +157,7 @@ export type Shock = {
   dashboard_before: Dashboard;
   dashboard_after: Dashboard;
   question: string;
+  sample_answer: string | null;
 };
 
 export type Reveal = {
@@ -228,7 +230,7 @@ async function call<T>(path: string, body?: unknown): Promise<T> {
 export const api = {
   health: () => call<Health>("/health"),
   companies: () => call<Company[]>("/companies"),
-  newGame: (ticker: string, seed: number) => call<GameView>("/game", { ticker, seed }),
+  newGame: (ticker: string, seed: number, demo = false) => call<GameView>("/game", { ticker, seed, demo, agent_mode: "team" }),
   game: (id: string) => call<GameView>(`/game/${id}`),
   preview: (id: string, action: Action) => call<Preview>(`/game/${id}/preview`, { action }),
   commit: (id: string, actions: Action) => call<{ view: GameView; after: Dashboard }>(`/game/${id}/commit`, { actions }),

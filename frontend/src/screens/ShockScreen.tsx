@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Review, Shock } from "../api";
 import { fmtMove, fmtSigned } from "../labels";
 import { Meters } from "../components/Meters";
+import { PixelSprite } from "../components/PixelSprite";
 
 export function ShockScreen(props: {
   shock: Shock;
@@ -38,7 +39,10 @@ export function ShockScreen(props: {
         </div>
 
         <div className="panel cro">
-          <div className="cro-name">Dr. Amara Okafor · Chief Risk Officer</div>
+          <div className="cro-head">
+            <PixelSprite name={s.surplus_change < 0 ? "amara_concerned" : "amara_neutral"} size={72} title="Dr. Amara Okafor" />
+            <div className="cro-name">Dr. Amara Okafor · Chief Risk Officer</div>
+          </div>
           <p className="cro-question">“{s.question}”</p>
           {second && (
             <div className="first-try">
@@ -56,6 +60,7 @@ export function ShockScreen(props: {
               : "Two to four sentences: what moved, why it hurt or helped this company, and what your trades did."} />
           <div className="explain-row">
             <span className="small muted">{words} words {words < 15 && "(15 minimum)"}</span>
+            {s.sample_answer && !second && <button className="ghost" onClick={() => setText(s.sample_answer!)}>Use a sample answer (demo)</button>}
             <button className="ghost" disabled={props.busy} onClick={() => props.onSubmit("", true)}>I'm not sure</button>
             <button className="primary" disabled={props.busy || words < 15} onClick={() => { props.onSubmit(text, false); setText(""); }}>
               {props.busy ? <span className="spinner" aria-label="marking" /> : second ? "Submit second try" : "Submit explanation"}

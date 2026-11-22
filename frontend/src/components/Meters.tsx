@@ -1,6 +1,7 @@
 import type { Dashboard } from "../api";
+import { Term } from "./Term";
 
-type Meter = { key: string; label: string; value: string; status?: string; hint: string; afterValue?: string };
+type Meter = { key: string; term?: string; label: string; value: string; status?: string; hint: string; afterValue?: string };
 
 function meters(d: Dashboard, after?: Dashboard): Meter[] {
   const m = (v: Dashboard) => ({
@@ -16,14 +17,14 @@ function meters(d: Dashboard, after?: Dashboard): Meter[] {
   const a = m(d);
   const b = after ? m(after) : undefined;
   return [
-    { key: "surplus", label: "Surplus (equity cushion)", value: a.surplus, afterValue: b?.surplus, hint: "Assets minus liabilities. What protects policyholders." },
-    { key: "capital", label: "Capital ratio", value: a.capital, afterValue: b?.capital, status: d.status.capital, hint: "Surplus ÷ simplified capital requirement. Floor 100%. Simplified, not statutory RBC." },
-    { key: "liquidity", label: "Liquidity ratio", value: a.liquidity, afterValue: b?.liquidity, status: d.status.liquidity, hint: "Cash and government bonds ÷ cash you might need in a 90-day stress. Floor 100%." },
-    { key: "gap", label: "Rate mismatch (duration gap)", value: a.gap, afterValue: b?.gap, status: d.status.duration_gap, hint: "Negative: liabilities are more rate-sensitive than assets, so falling rates hurt." },
-    { key: "dv01", label: "Surplus if rates fall 0.01%", value: a.dv01, afterValue: b?.dv01, hint: "Net DV01 in $ millions, after swaps." },
-    { key: "equity", label: "Stock-market exposure", value: a.equity, afterValue: b?.equity, hint: "Loss if stocks fell 100%: alternatives (incl. stocks) held plus unhedged guarantees." },
-    { key: "fx", label: "Currency exposure", value: a.fx, afterValue: b?.fx, hint: "Foreign assets not hedged." },
-    { key: "cpty", label: "Owed by dealers (uncollateralized)", value: a.cpty, afterValue: b?.cpty, hint: "Hedge gains a dealer owes you without collateral. Lost if the dealer fails." },
+    { key: "surplus", term: "surplus", label: "Surplus (equity cushion)", value: a.surplus, afterValue: b?.surplus, hint: "Assets minus liabilities. What protects policyholders." },
+    { key: "capital", term: "capital_ratio", label: "Capital ratio", value: a.capital, afterValue: b?.capital, status: d.status.capital, hint: "Surplus ÷ simplified capital requirement. Floor 100%. Simplified, not statutory RBC." },
+    { key: "liquidity", term: "liquidity_ratio", label: "Liquidity ratio", value: a.liquidity, afterValue: b?.liquidity, status: d.status.liquidity, hint: "Cash and government bonds ÷ cash you might need in a 90-day stress. Floor 100%." },
+    { key: "gap", term: "duration_gap", label: "Rate mismatch (duration gap)", value: a.gap, afterValue: b?.gap, status: d.status.duration_gap, hint: "Negative: liabilities are more rate-sensitive than assets, so falling rates hurt." },
+    { key: "dv01", term: "dv01", label: "Surplus if rates fall 0.01%", value: a.dv01, afterValue: b?.dv01, hint: "Net DV01 in $ millions, after swaps." },
+    { key: "equity", term: "variable_annuity_guarantee", label: "Stock-market exposure", value: a.equity, afterValue: b?.equity, hint: "Loss if stocks fell 100%: alternatives (incl. stocks) held plus unhedged guarantees." },
+    { key: "fx", term: "fx_hedge", label: "Currency exposure", value: a.fx, afterValue: b?.fx, hint: "Foreign assets not hedged." },
+    { key: "cpty", term: "counterparty_risk", label: "Owed by dealers (uncollateralized)", value: a.cpty, afterValue: b?.cpty, hint: "Hedge gains a dealer owes you without collateral. Lost if the dealer fails." },
   ];
 }
 
@@ -31,8 +32,8 @@ export function Meters(props: { dashboard: Dashboard; after?: Dashboard }) {
   return (
     <div className="meters">
       {meters(props.dashboard, props.after).map((m) => (
-        <div key={m.key} className={`meter ${m.status ?? ""}`} title={m.hint}>
-          <div className="meter-label">{m.label}</div>
+        <div key={m.key} className={`meter ${m.status ?? ""}`}>
+          <div className="meter-label">{m.term ? <Term k={m.term}>{m.label}</Term> : m.label}</div>
           <div className="meter-value">
             {m.value}
             {m.afterValue && m.afterValue !== m.value && <span className="meter-after"> → {m.afterValue}</span>}

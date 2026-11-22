@@ -94,6 +94,7 @@ class EventCard(BaseModel):
     glossary_terms: list[str]
     source_note: str
     offers_prt_deal: bool = False
+    sample_answer: str = ""
 
 
 # ---------- the learner's levers ----------

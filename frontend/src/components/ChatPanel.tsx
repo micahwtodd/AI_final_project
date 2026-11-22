@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { PixelSprite, spriteFor } from "./PixelSprite";
 import { api, askStream, type Action, type AgentEvent, type AgentMode, type ChatMsg, type Colleague, type SubAnswer, type Ticket, type Usage } from "../api";
 
 type Turn = {
@@ -74,6 +75,7 @@ export function ChatPanel(props: {
   usage: Usage;
   onUsage: (u: Partial<Usage>) => void;
   onLoadTicket: (a: Action) => void;
+  onAnswered?: () => void;
 }) {
   const [turns, setTurns] = useState<Turn[]>(() => fromHistory(props.chat));
   const [mode, setMode] = useState<AgentMode>(props.mode);
@@ -87,6 +89,9 @@ export function ChatPanel(props: {
     setTurns(fromHistory(props.chat));
     setMode(props.mode);
   }, [props.gameId]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    setMode(props.mode);
+  }, [props.mode]);
   useEffect(() => {
     // newer browsers return a Promise from scrollIntoView; never hand it back to React as a cleanup
     void endRef.current?.scrollIntoView({ block: "nearest" });
@@ -128,6 +133,7 @@ export function ChatPanel(props: {
     } finally {
       setBusy(false);
       setOpenTrace(idx);
+      props.onAnswered?.();
     }
   }
 
@@ -150,7 +156,7 @@ export function ChatPanel(props: {
             return (
               <button key={c} className={`cast-chip ${to === c ? "on" : ""}`} style={{ borderColor: CAST[k].color }}
                 onClick={() => setTo(c)} disabled={busy} title={c === "team" ? "Amara routes your question to the right specialists" : `Ask ${CAST[k].name} directly`}>
-                <span className="cast-dot" style={{ background: CAST[k].color }} />
+                <PixelSprite name={spriteFor(k)!} size={22} className="chip-face" />
                 {c === "team" ? "Amara (routes to team)" : `${CAST[k].name.split(" ")[0]} · ${CAST[k].role}`}
               </button>
             );
@@ -164,12 +170,20 @@ export function ChatPanel(props: {
         {turns.length === 0 && <div className="muted small">Ask anything about this company's risks. Every number in a reply comes from the engine's tools; you can see each tool call and which colleague made it.</div>}
         {turns.map((t, i) => (
           <div key={i} className={`msg ${t.role}`} style={t.role === "agent" ? { borderLeftColor: CAST[t.agent ?? "system"]?.color } : undefined}>
-            {t.role === "agent" && <div className="msg-name" style={{ color: CAST[t.agent ?? "system"]?.color }}>{t.agentName ?? "Colleague"}</div>}
+            {t.role === "agent" && (
+              <div className="msg-name" style={{ color: CAST[t.agent ?? "system"]?.color }}>
+                {spriteFor(t.agent, t.stopped ? "concerned" : "neutral") && <PixelSprite name={spriteFor(t.agent, t.stopped ? "concerned" : "neutral")!} size={28} className="msg-face" />}
+                {t.agentName ?? "Colleague"}
+              </div>
+            )}
             {t.subs.length > 0 && (
               <div className="subs">
                 {t.subs.map((s, k) => (
                   <div key={k} className="sub-msg" style={{ borderLeftColor: CAST[s.agent]?.color }}>
-                    <div className="msg-name" style={{ color: CAST[s.agent]?.color }}>{s.agent_name}</div>
+                    <div className="msg-name" style={{ color: CAST[s.agent]?.color }}>
+                      {spriteFor(s.agent) && <PixelSprite name={spriteFor(s.agent)!} size={22} className="msg-face" />}
+                      {s.agent_name}
+                    </div>
                     <div className="msg-text">{s.text}</div>
                   </div>
                 ))}

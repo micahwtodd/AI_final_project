@@ -1,5 +1,6 @@
 import type { Action, Reveal, Shock } from "../api";
 import { LEVERS, type LeverKey } from "../labels";
+import { PixelSprite } from "../components/PixelSprite";
 
 type Row = { key?: string; label: string; value: number; mark?: "yes" | "no" };
 
@@ -58,7 +59,8 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
     <section className="reveal">
       <div className="panel examiner">
         <div className="examiner-head">
-          <div>
+          <PixelSprite name={(u?.points ?? 0) >= 50 ? "amara_pleased" : "amara_concerned"} size={72} title="Dr. Amara Okafor" />
+          <div className="examiner-text">
             <div className="cro-name">Dr. Amara Okafor · your explanation, marked</div>
             {r.review && <p className="cro-feedback">{r.review.reply_text}</p>}
             {r.review?.instruction_attempt && <div className="flag small">⚑ Your answer tried to instruct the grader. That part was ignored; only the finance content was marked.</div>}

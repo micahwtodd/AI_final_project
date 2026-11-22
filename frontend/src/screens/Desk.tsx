@@ -4,6 +4,9 @@ import { ChatPanel } from "../components/ChatPanel";
 import { LEVERS, type LeverKey } from "../labels";
 import { Meters } from "../components/Meters";
 import { BalanceSheetPanel } from "../components/BalanceSheet";
+import { Term } from "../components/Term";
+import { GuideBar } from "../components/GuideBar";
+import { DeskCat } from "../components/PixelSprite";
 
 type Run = <T>(fn: () => Promise<T>) => Promise<T | undefined>;
 
@@ -21,6 +24,19 @@ export function Desk(props: {
   const [preview, setPreview] = useState<Preview | null>(null);
   const timer = useRef<number | undefined>(undefined);
   const offersPrt = !!g.card?.offers_prt_deal && !g.prt_decided;
+  const firstQuarter = g.quarter === 1 && g.history.length === 0;
+  const [guide, setGuide] = useState<number>(() => {
+    try { return localStorage.getItem("riskdesk-guide-hidden") ? -1 : 0; } catch { return 0; }
+  });
+  const showGuide = firstQuarter && guide >= 0;
+  const focus = (n: number) => (showGuide && guide === n ? " guide-focus" : "");
+  useEffect(() => {
+    if (showGuide && guide === 2 && g.pending) setGuide(3);
+  }, [g.pending]); // eslint-disable-line react-hooks/exhaustive-deps
+  const hideGuide = () => {
+    setGuide(-1);
+    try { localStorage.setItem("riskdesk-guide-hidden", "1"); } catch { /* private mode */ }
+  };
 
   useEffect(() => {
     setDraft(g.pending ?? { ...g.action, accept_prt: null });
@@ -41,9 +57,10 @@ export function Desk(props: {
 
   return (
     <section className="desk">
+      {showGuide && <GuideBar step={guide} onNext={() => setGuide((x) => x + 1)} onHide={hideGuide} />}
       <div className="desk-left">
         {g.card && (
-          <div className="panel wire">
+          <div className={`panel wire${focus(0)}`}>
             <div className="wire-tag">NEWS WIRE · Q{g.card.quarter}</div>
             <h2>{g.card.title}</h2>
             <p className="wire-text">{g.card.signal_text}</p>
@@ -51,11 +68,16 @@ export function Desk(props: {
           </div>
         )}
 
-        <ChatPanel gameId={g.id} chat={g.chat} mode={g.agent_mode} usage={props.usage} onUsage={props.onUsage}
+        <div className={focus(1).trim()}>
+        <ChatPanel onAnswered={() => { if (showGuide && guide <= 1) setGuide(2); }} gameId={g.id} chat={g.chat} mode={g.agent_mode} usage={props.usage} onUsage={props.onUsage}
           onLoadTicket={(a) => setDraft({ ...a, accept_prt: offersPrt ? a.accept_prt : null })} />
+        </div>
 
         <div className="panel">
-          <h3>Risk dashboard {preview && !signed && <span className="muted small">(→ shows the effect of your draft ticket)</span>}</h3>
+          <div className="dash-head">
+            <h3>Risk dashboard {preview && !signed && <span className="muted small">(→ shows the effect of your draft ticket)</span>}</h3>
+            <DeskCat status={(preview?.after ?? g.dashboard).status.capital} />
+          </div>
           <Meters dashboard={g.dashboard} after={preview?.after} />
         </div>
 
@@ -87,14 +109,14 @@ export function Desk(props: {
       </div>
 
       <div className="desk-right">
-        <div className="panel ticket">
+        <div className={`panel ticket${focus(2)}${focus(3)}`}>
           <h3>Trade ticket · Q{g.quarter}</h3>
           {(Object.keys(LEVERS) as LeverKey[]).map((k) => {
             const L = LEVERS[k];
             return (
               <div className="lever" key={k}>
                 <div className="lever-head">
-                  <label htmlFor={k}>{L.label}</label>
+                  <label htmlFor={k}><Term k={L.term}>{L.label}</Term></label>
                   <span className="lever-val">{draft[k]}{L.unit}</span>
                 </div>
                 <input id={k} type="range" min={L.min} max={L.max} step={L.step} value={draft[k]}
@@ -105,7 +127,7 @@ export function Desk(props: {
           })}
 
           <div className="lever">
-            <div className="lever-head"><label>Counterparty terms</label></div>
+            <div className="lever-head"><label><Term k="collateral">Counterparty terms</Term></label></div>
             <div className="toggle-row">
               <label><input type="checkbox" checked={draft.collateralized} onChange={(e) => set("collateralized", e.target.checked)} /> Daily collateral</label>
               <label>
@@ -121,7 +143,7 @@ export function Desk(props: {
 
           {offersPrt && (
             <div className="lever prt">
-              <div className="lever-head"><label>Pension deal on offer</label></div>
+              <div className="lever-head"><label><Term k="pension_risk_transfer">Pension deal on offer</Term></label></div>
               <div className="small">A manufacturer wants to transfer its pension plan to you: long liabilities worth about 3% of your balance sheet, with premium and a 2% profit margin. It grows the business but uses capital.</div>
               <div className="toggle-row">
                 <button className={draft.accept_prt === true ? "chip on" : "chip"} onClick={() => set("accept_prt", true)}>Accept</button>

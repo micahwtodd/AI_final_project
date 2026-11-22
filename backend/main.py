@@ -76,6 +76,13 @@ def health() -> dict:
     }
 
 
+@app.get("/api/glossary")
+def glossary() -> dict:
+    """The approved plain-English glossary (the only source of definitions, for people and agents)."""
+    from backend import tools
+    return tools.glossary()
+
+
 @app.get("/api/companies")
 def companies() -> list[dict]:
     return game.companies()

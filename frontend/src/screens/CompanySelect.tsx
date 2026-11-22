@@ -4,7 +4,7 @@ import { BalanceSheetPanel } from "../components/BalanceSheet";
 import { CompanyLogo } from "../components/CompanyLogo";
 import { Dossier } from "../components/Dossier";
 
-export function CompanySelect(props: { companies: Company[]; busy: boolean; onStart: (ticker: string, seed: number) => void }) {
+export function CompanySelect(props: { companies: Company[]; busy: boolean; onStart: (ticker: string, seed: number) => void; onDemo: () => void }) {
   const [picked, setPicked] = useState<string | null>(null);
   const [seed, setSeed] = useState(409);
   const chosen = props.companies.find((c) => c.ticker === picked);
@@ -17,6 +17,10 @@ export function CompanySelect(props: { companies: Company[]; busy: boolean; onSt
           Pick a real, publicly traded insurer. Its balance sheet comes from its latest 10-K filing with the SEC. Each
           quarter you read the news, decide how to protect the company, and sign a trade ticket. Then the market moves.
         </p>
+        <div className="demo-row">
+          <button className="primary demo-btn" disabled={props.busy} onClick={props.onDemo}>▶ Demo mode</button>
+          <span className="small muted">One click: Jackson Financial, seed 409, the full team, with sample answers so you can see every feature without knowing insurance.</span>
+        </div>
       </div>
 
       <div className="company-grid">

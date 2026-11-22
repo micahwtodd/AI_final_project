@@ -8,6 +8,9 @@ import { RevealScreen } from "./screens/RevealScreen";
 import { DebriefScreen } from "./screens/DebriefScreen";
 import { SafetyLab } from "./screens/SafetyLab";
 import { QuizScreen } from "./screens/QuizScreen";
+import { TraceScreen } from "./screens/TraceScreen";
+import { UnderTheHood } from "./components/UnderTheHood";
+import { GlossaryContext, type Glossary } from "./components/Term";
 
 type Screen =
   | { name: "select" }
@@ -16,6 +19,8 @@ type Screen =
   | { name: "reveal"; reveal: Reveal; shock: Shock }
   | { name: "debrief"; game: GameView; debrief: Debrief }
   | { name: "safety"; back: Screen }
+  | { name: "trace"; game: GameView; back: Screen }
+  | { name: "experiments"; back: Screen }
   | { name: "quiz"; game: GameView; when: "pre" | "post" };
 
 export default function App() {
@@ -24,10 +29,15 @@ export default function App() {
   const [health, setHealth] = useState<Health | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [glossary, setGlossary] = useState<Glossary>({});
+
+  // Each new screen opens at the top, so the headline is the first thing the learner sees.
+  useEffect(() => { window.scrollTo(0, 0); }, [screen.name]);
 
   useEffect(() => {
     api.companies().then(setCompanies).catch((e) => setError(String(e)));
     api.health().then(setHealth).catch(() => setHealth(null));
+    fetch("/api/glossary").then((r) => r.json()).then(setGlossary).catch(() => undefined);
   }, []);
 
   async function run<T>(fn: () => Promise<T>): Promise<T | undefined> {
@@ -43,7 +53,19 @@ export default function App() {
     }
   }
 
-  const game = "game" in screen ? screen.game : screen.name === "reveal" ? screen.reveal.view : null;
+  const liveGame = screen.name === "trace" ? null : "game" in screen ? screen.game : screen.name === "reveal" ? screen.reveal.view : null;
+  const [lastGame, setLastGame] = useState<GameView | null>(null);
+  useEffect(() => { if (liveGame) setLastGame(liveGame); }, [liveGame]);
+  const game = liveGame ?? (screen.name === "select" ? null : lastGame);
+
+  async function switchMode(m: "solo" | "team") {
+    if (!game) return;
+    const r = await run(() => api.setMode(game.id, m));
+    if (!r) return;
+    const g2 = { ...game, agent_mode: r.agent_mode };
+    setLastGame(g2);
+    if (screen.name === "desk") setScreen({ name: "desk", game: g2 });
+  }
   const [usage, setUsage] = useState<Usage | null>(null);
   useEffect(() => {
     if (game?.usage) setUsage(game.usage);
@@ -59,6 +81,7 @@ export default function App() {
     screen.name === "shock" ? screen.shock.surplus_after : game ? game.dashboard.surplus_usd_bn : 0;
 
   return (
+    <GlossaryContext.Provider value={glossary}>
     <div className="app">
       <header className="topbar">
         <div className="brand" onClick={() => setScreen({ name: "select" })} title="Back to company select">
@@ -73,9 +96,10 @@ export default function App() {
           </div>
         )}
         {game && usage && <UsageMeter gameId={game.id} usage={usage} onUsage={(u) => { setUsage(u); }} />}
-        {screen.name !== "safety" && (
-          <button className="pill lab-pill" onClick={() => setScreen({ name: "safety", back: screen })}>Safety Lab</button>
-        )}
+        <UnderTheHood game={game} capUsd={usage?.budget_cap_usd ?? null} onMode={switchMode}
+          onTrace={() => game && setScreen({ name: "trace", game, back: screen })}
+          onSafety={() => setScreen({ name: "safety", back: screen })}
+          onExperiments={() => setScreen({ name: "experiments", back: screen })} />
         <div className={`pill status ${health?.key_found ? "ok" : "off"}`}>
           {health?.key_found ? `AI colleagues: ${health.model} ready` : "AI colleagues offline"}
         </div>
@@ -94,6 +118,10 @@ export default function App() {
             busy={busy}
             onStart={async (ticker, seed) => {
               const g = await run(() => api.newGame(ticker, seed));
+              if (g) setScreen({ name: "quiz", game: g, when: "pre" });
+            }}
+            onDemo={async () => {
+              const g = await run(() => api.newGame("JXN", 409, true));
               if (g) setScreen({ name: "quiz", game: g, when: "pre" });
             }}
           />
@@ -144,12 +172,21 @@ export default function App() {
           />
         )}
         {screen.name === "safety" && <SafetyLab onBack={() => setScreen(screen.back)} />}
+        {screen.name === "trace" && <TraceScreen game={screen.game} onBack={() => setScreen(screen.back)} />}
+        {screen.name === "experiments" && (
+          <section className="panel">
+            <h1>Experiments</h1>
+            <p className="muted">Solo vs Team, routing, retrieval size and prompt caching, with measured tokens and cost. Built in Project 10.</p>
+            <button className="ghost" onClick={() => setScreen(screen.back)}>← Back</button>
+          </section>
+        )}
         {screen.name === "quiz" && (
           <QuizScreen
             key={screen.when}
             gameId={screen.game.id}
             when={screen.when}
             company={screen.game.company}
+            demo={screen.game.demo}
             onSkip={() => setScreen({ name: "desk", game: screen.game })}
             onDone={async () => {
               const g = screen.game;
@@ -170,5 +207,6 @@ export default function App() {
 
       <footer className="footer">Simplified training simulation. Not company policy or advice.</footer>
     </div>
+    </GlossaryContext.Provider>
   );
 }

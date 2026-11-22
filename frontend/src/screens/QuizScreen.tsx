@@ -3,7 +3,7 @@ import { api, type QuizForm } from "../api";
 
 const SCALE = [1, 2, 3, 4, 5];
 
-export function QuizScreen(props: { gameId: string; when: "pre" | "post"; company: string; onDone: () => void; onSkip?: () => void }) {
+export function QuizScreen(props: { gameId: string; when: "pre" | "post"; company: string; demo?: boolean; onDone: () => void; onSkip?: () => void }) {
   const [form, setForm] = useState<QuizForm | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [conf, setConf] = useState<Record<string, number>>({});
@@ -71,6 +71,13 @@ export function QuizScreen(props: { gameId: string; when: "pre" | "post"; compan
         {err && <div className="flag small">{err}</div>}
         <div className="start-row">
           {pre && props.onSkip && <button className="ghost" onClick={props.onSkip}>Skip the quiz</button>}
+          {props.demo && (
+            <button className="ghost" onClick={() => {
+              const letters = ["A", "B", "C", "D"];
+              setAnswers(Object.fromEntries(form.questions.map((q, i) => [q.id, letters[(i * 3 + (pre ? 1 : 2)) % 4]])));
+              setConf(Object.fromEntries(form.confidence.map((c) => [c.id, pre ? 2 : 4])));
+            }}>Fill sample answers (demo)</button>
+          )}
           <span className="small muted">{Object.keys(answers).length}/{form.questions.length} answered · {Object.keys(conf).length}/{form.confidence.length} rated</span>
           <button className="primary" disabled={!complete || busy} onClick={async () => {
             setBusy(true);

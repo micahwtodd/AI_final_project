@@ -19,26 +19,31 @@ export const LIABILITY_LABELS: Record<string, string> = {
 
 export const LEVERS = {
   rate_hedge_pct: {
+    term: "interest_rate_swap",
     label: "Rate protection (swaps)",
     help: "Closes this % of the rate mismatch between assets and liabilities. Costs a little each quarter.",
     min: 0, max: 120, step: 5, unit: "%",
   },
   credit_shift_pct: {
+    term: "credit_spread",
     label: "Move risky bonds to government bonds",
     help: "Sells this % of junk and BBB bonds and buys government bonds. Safer, but earns less.",
     min: -10, max: 30, step: 5, unit: "%",
   },
   equity_hedge_pct: {
+    term: "put_option",
     label: "Stock-market insurance (puts)",
     help: "Protects this % of the guarantees you owe policyholders if markets fall. Costs a premium every quarter.",
     min: 0, max: 100, step: 10, unit: "%",
   },
   fx_hedge_pct: {
+    term: "forward_contract",
     label: "Currency protection (forwards)",
     help: "Locks in today's exchange rate on this % of foreign assets. Costs a little each quarter.",
     min: 0, max: 100, step: 10, unit: "%",
   },
   cash_buffer_pct: {
+    term: "forced_selling",
     label: "Cash on hand",
     help: "Cash as % of invested assets. Pays for surrenders and margin calls without selling bonds at a loss, but earns less.",
     min: 1, max: 15, step: 1, unit: "%",

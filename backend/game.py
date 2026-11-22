@@ -247,15 +247,17 @@ def advance(s: Session) -> dict:
     s.state, s.last_record, s.pending, s.phase = new_state, rec, None, "explain"
     s.timings[f"q{q}_shock"] = time.time()
     _save(s)
+    change = round(rec.surplus_after - rec.surplus_before, 2)  # one rounded figure for the headline and the question
     return {
         "quarter": q, "title": card.title, "era": card.era, "headline": card.headline,
         "narrative": card.narrative, "severity": rec.severity, "seed": s.seed,
         "market_moves": market_moves(rec.shock),
         "surplus_before": rec.surplus_before, "surplus_after": rec.surplus_after,
-        "surplus_change": round(rec.surplus_after - rec.surplus_before, 3),
+        "surplus_change": change,
         "dashboard_before": before_dash.model_dump(), "dashboard_after": engine.dashboard(new_state).model_dump(),
+        "sample_answer": card.sample_answer if s.demo else None,
         "question": f"Surplus {'fell' if rec.surplus_after < rec.surplus_before else 'rose'} "
-                    f"${abs(rec.surplus_after - rec.surplus_before):.2f} billion. Walk me through why.",
+                    f"${abs(change):.2f} billion. Walk me through why.",
     }
 
 
