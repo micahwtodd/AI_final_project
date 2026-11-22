@@ -73,13 +73,14 @@ main { flex: 1; padding: 1rem 1.5rem 2rem; max-width: 1400px; width: 100%; margi
 .company-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0.8rem; margin-bottom: 1rem; }
 .company-card { text-align: left; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; background: white; border-top: 4px solid var(--line); }
 .company-card.picked { border-color: var(--blue); border-top-color: var(--blue); box-shadow: 0 0 0 2px var(--blue) inset; }
-.company-head { display: flex; gap: 0.7rem; align-items: center; }
+.company-head { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+.company-head .logo-img, .company-head .logo-badge { height: 40px; }
 .company-card .name { font-weight: 700; color: var(--navy); }
 .company-card .ticker { font-size: 0.8rem; color: var(--steel); font-weight: 700; letter-spacing: 0.08em; }
 .company-card .stats { display: flex; flex-direction: column; font-size: 0.82rem; color: var(--muted); }
 .company-card .stats b { color: var(--text); }
-.logo-img { width: 48px; height: 48px; object-fit: contain; }
-.logo-badge { width: 48px; height: 48px; border-radius: 8px; background: var(--navy); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; letter-spacing: 0.04em; flex-shrink: 0; }
+.logo-img { height: 44px; width: auto; max-width: 170px; object-fit: contain; object-position: left center; }
+.logo-badge { width: 48px; height: 44px; border-radius: 8px; background: var(--navy); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; letter-spacing: 0.04em; flex-shrink: 0; }
 .dossier-head { display: flex; gap: 0.8rem; align-items: center; margin-bottom: 0.5rem; }
 .dossier-head h2 { margin: 0; }
 .start-row { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
