@@ -37,15 +37,6 @@
       "beta": 0.0,
       "liquid": false
     },
-    "equity": {
-      "duration": 0.0,
-      "spread_duration": 0.0,
-      "capital_factor": 0.3,
-      "yield_weight": 0.45,
-      "haircut": 0.01,
-      "beta": 1.0,
-      "liquid": false
-    },
     "alts": {
       "duration": 0.0,
       "spread_duration": 0.0,
@@ -186,5 +177,7 @@
   "credit_tiers": {
     "a_default_ratio_to_bbb": 0.15,
     "_note": "Investment-grade corporates are split into AAA (no credit losses), A (credit losses at 15% of the BBB rate) and BBB (the card's ig_loss_pct). Shares of the IG bucket are defaults until Sam reads the credit-quality table in Project 6."
-  }
+  },
+  "stock_beta": 1.0,
+  "_stock_note": "Stocks held are folded into the alternatives bucket (per Micah). Each company's alternatives beta blends alternatives at 0.2 with its stocks at stock_beta."
 }

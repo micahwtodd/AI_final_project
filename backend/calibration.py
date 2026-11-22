@@ -99,11 +99,16 @@ def build_profile(ticker: str) -> CompanyProfile:
         "ig_corp": bonds * (1 - govt_share - hy_share) + max(residual, 0.0),
         "below_ig": bonds * hy_share,
         "mortgage": mortgage,
-        "equity": v["equity_securities"],
-        "alts": v["other_invested"],
+        "alts": v["other_invested"] + v["equity_securities"],  # stocks folded into alternatives
         "cash": v["cash"],
     }
     total_raw = sum(raw_assets.values())
+    asm = load_assumptions()
+    b_alts, b_stock = asm["asset_buckets"]["alts"]["beta"], asm["stock_beta"]
+    alts_total = raw_assets["alts"]
+    alts_beta = ((v["other_invested"] * b_alts + v["equity_securities"] * b_stock) / alts_total
+                 if alts_total else b_alts)
+    derive("alts_beta", alts_beta, "alternatives at beta 0.2 blended with stocks held at beta 1.0")
     asset_mix = {b: raw_assets[b] / total_raw for b in ASSET_BUCKETS}
 
     # ---- surplus: equity excluding AOCI ----
@@ -145,6 +150,7 @@ def build_profile(ticker: str) -> CompanyProfile:
         guarantee_exposure_usd_bn=round(v["separate_account_assets"] * guar_share, 2),
         guarantee_value_usd_bn=round(mrb_net, 2),
         separate_account_assets_usd_bn=round(v["separate_account_assets"], 2),
+        alts_beta=round(alts_beta, 4),
         equity_to_assets=round(surplus / invested, 4), net_investment_yield=round(nii_yield, 4),
         rate_sensitivity=None, foreign_share=foreign, fields=fields,
     )

@@ -21,7 +21,7 @@ function meters(d: Dashboard, after?: Dashboard): Meter[] {
     { key: "liquidity", label: "Liquidity ratio", value: a.liquidity, afterValue: b?.liquidity, status: d.status.liquidity, hint: "Cash and government bonds ÷ cash you might need in a 90-day stress. Floor 100%." },
     { key: "gap", label: "Rate mismatch (duration gap)", value: a.gap, afterValue: b?.gap, status: d.status.duration_gap, hint: "Negative: liabilities are more rate-sensitive than assets, so falling rates hurt." },
     { key: "dv01", label: "Surplus if rates fall 0.01%", value: a.dv01, afterValue: b?.dv01, hint: "Net DV01 in $ millions, after swaps." },
-    { key: "equity", label: "Stock-market exposure", value: a.equity, afterValue: b?.equity, hint: "Loss if stocks fell 100%: stocks and alternatives held plus unhedged guarantees." },
+    { key: "equity", label: "Stock-market exposure", value: a.equity, afterValue: b?.equity, hint: "Loss if stocks fell 100%: alternatives (incl. stocks) held plus unhedged guarantees." },
     { key: "fx", label: "Currency exposure", value: a.fx, afterValue: b?.fx, hint: "Foreign assets not hedged." },
     { key: "cpty", label: "Owed by dealers (uncollateralized)", value: a.cpty, afterValue: b?.cpty, hint: "Hedge gains a dealer owes you without collateral. Lost if the dealer fails." },
   ];

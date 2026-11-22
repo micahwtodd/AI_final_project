@@ -108,7 +108,8 @@ def _profile_summary(p: CompanyProfile) -> dict:
             "invested_assets_usd_bn": p.invested_assets_usd_bn, "surplus_usd_bn": p.surplus_usd_bn,
             "equity_to_assets": p.equity_to_assets, "asset_mix": p.asset_mix,
             "liability_mix": p.liability_mix, "guarantee_exposure_usd_bn": p.guarantee_exposure_usd_bn,
-            "separate_account_assets_usd_bn": p.separate_account_assets_usd_bn}
+            "separate_account_assets_usd_bn": p.separate_account_assets_usd_bn,
+            "dashboard": engine.dashboard(engine.build_state(p, DEFAULT_SEED)).model_dump()}
 
 
 def view(s: Session) -> dict:

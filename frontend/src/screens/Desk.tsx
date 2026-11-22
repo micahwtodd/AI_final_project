@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { api, type Action, type GameView, type Preview, type Shock } from "../api";
-import { ASSET_LABELS, LEVERS, LIABILITY_LABELS, type LeverKey } from "../labels";
+import { LEVERS, type LeverKey } from "../labels";
 import { Meters } from "../components/Meters";
-import { MixBar } from "../components/MixBar";
+import { BalanceSheetPanel } from "../components/BalanceSheet";
 
 type Run = <T>(fn: () => Promise<T>) => Promise<T | undefined>;
 
@@ -53,15 +53,9 @@ export function Desk(props: {
           <Meters dashboard={g.dashboard} after={preview?.after} />
         </div>
 
-        <div className="panel two-col">
-          <div>
-            <h3>Assets ${g.dashboard.assets_usd_bn.toFixed(0)}bn</h3>
-            <MixBar mix={(preview?.after ?? g.dashboard).asset_values} labels={ASSET_LABELS} values />
-          </div>
-          <div>
-            <h3>Liabilities ${g.dashboard.liabilities_usd_bn.toFixed(0)}bn</h3>
-            <MixBar mix={(preview?.after ?? g.dashboard).liability_values} labels={LIABILITY_LABELS} values />
-          </div>
+        <div className="panel">
+          <h3>Balance sheet {preview && !signed && <span className="muted small">(after your draft ticket)</span>}</h3>
+          <BalanceSheetPanel dashboard={preview?.after ?? g.dashboard} compact />
         </div>
 
         {g.history.length > 0 && (

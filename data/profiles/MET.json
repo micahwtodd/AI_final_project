@@ -10,8 +10,7 @@
     "ig_corp": 0.6088306,
     "below_ig": 0.0447485,
     "mortgage": 0.1711681,
-    "equity": 0.0017361,
-    "alts": 0.0330467,
+    "alts": 0.0347828,
     "cash": 0.0445802
   },
   "liability_mix": {
@@ -23,6 +22,7 @@
   "guarantee_exposure_usd_bn": 75.97,
   "guarantee_value_usd_bn": 1.95,
   "separate_account_assets_usd_bn": 151.93,
+  "alts_beta": 0.2399,
   "equity_to_assets": 0.0941,
   "net_investment_yield": 0.0456,
   "rate_sensitivity": null,
@@ -141,6 +141,12 @@
       "source": "derived",
       "citation": "",
       "note": "policy loans, short-term and other invested assets not tagged separately; treated as investment-grade fixed income"
+    },
+    "alts_beta": {
+      "value": 0.2399,
+      "source": "derived",
+      "citation": "",
+      "note": "alternatives at beta 0.2 blended with stocks held at beta 1.0"
     },
     "surplus": {
       "value": 46.482,

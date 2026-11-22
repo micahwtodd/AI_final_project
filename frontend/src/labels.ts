@@ -5,8 +5,7 @@ export const ASSET_LABELS: Record<string, string> = {
   ig_corp: "Investment-grade corporates",
   below_ig: "Junk bonds (below investment grade)",
   mortgage: "Mortgage loans",
-  equity: "Stocks",
-  alts: "Alternatives (private equity, real estate)",
+  alts: "Alternatives (incl. stocks)",
   cash: "Cash",
 };
 

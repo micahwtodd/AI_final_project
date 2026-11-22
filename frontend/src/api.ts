@@ -24,6 +24,7 @@ export type Dashboard = {
   net_equity_exposure_usd_bn: number;
   fx_exposure_usd_bn: number;
   counterparty_exposure_usd_bn: number;
+  derivatives_mtm_usd_bn: number;
   asset_values: Record<string, number>;
   liability_values: Record<string, number>;
   status: Record<string, "green" | "amber" | "red">;
@@ -40,6 +41,7 @@ export type Company = {
   liability_mix: Record<string, number>;
   guarantee_exposure_usd_bn: number;
   separate_account_assets_usd_bn: number;
+  dashboard: Dashboard;
 };
 
 export type Card = {

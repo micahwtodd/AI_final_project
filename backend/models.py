@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-ASSET_BUCKETS = ["govt", "ig_corp", "below_ig", "mortgage", "equity", "alts", "cash"]
+ASSET_BUCKETS = ["govt", "ig_corp", "below_ig", "mortgage", "alts", "cash"]  # stocks are folded into alts
 LIABILITY_BUCKETS = ["annuities", "life", "prt", "other"]  # VA guarantees are tracked separately
 
 ASSET_LABELS = {
@@ -14,8 +14,7 @@ ASSET_LABELS = {
     "ig_corp": "Investment-grade corporates",
     "below_ig": "Below-investment-grade",
     "mortgage": "Mortgage loans",
-    "equity": "Public equity",
-    "alts": "Alternatives",
+    "alts": "Alternatives (incl. stocks)",
     "cash": "Cash and short-term",
 }
 LIABILITY_LABELS = {
@@ -48,6 +47,7 @@ class CompanyProfile(BaseModel):
     guarantee_exposure_usd_bn: float = Field(description="Account value carrying VA guarantees")
     guarantee_value_usd_bn: float = Field(description="Net market risk benefit liability (can be negative)")
     separate_account_assets_usd_bn: float
+    alts_beta: float = Field(0.2, description="Stock-market sensitivity of alternatives, blended with any stocks held")
     equity_to_assets: float
     net_investment_yield: float
     rate_sensitivity: float | None = Field(None, description="Disclosed surplus change for +100bp, $bn")
@@ -137,6 +137,7 @@ class Dashboard(BaseModel):
     net_equity_exposure_usd_bn: float
     fx_exposure_usd_bn: float
     counterparty_exposure_usd_bn: float
+    derivatives_mtm_usd_bn: float = 0.0  # uncollateralized hedge value: + owed to us, - owed by us
     asset_values: dict[str, float]
     liability_values: dict[str, float]
     status: dict[str, Literal["green", "amber", "red"]]
@@ -174,6 +175,7 @@ class GameState(BaseModel):
     portfolio_yield: float  # the company's net investment yield at the start
     foreign_share: float
     liability_duration_scale: float = 1.0
+    alts_beta: float = 0.2
     ig_aaa_share: float = 0.20  # share of investment-grade corporates rated AAA (no credit losses)
     ig_bbb_share: float = 0.45  # share rated BBB; the rest is A-rated
     action: Action = Action()

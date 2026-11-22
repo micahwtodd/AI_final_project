@@ -88,7 +88,7 @@ def guarantee_equity_sensitivity(s: GameState) -> float:
 def equity_holdings_exposure(s: GameState) -> float:
     """Loss on stocks and alternatives held for a 100% equity fall, $bn. Deliberately not hedged:
     insurers keep this equity risk premium to help fund future claims."""
-    return s.assets["equity"] * _ab("equity")["beta"] + s.assets["alts"] * _ab("alts")["beta"]
+    return s.assets["alts"] * s.alts_beta
 
 
 def foreign_assets(s: GameState) -> float:
@@ -142,6 +142,7 @@ def build_state(profile: CompanyProfile, seed: int) -> GameState:
         portfolio_yield=profile.net_investment_yield, foreign_share=profile.foreign_share,
         action=Action(cash_buffer_pct=round(cash_pct, 1), collateralized=False, dealers=1),
         ig_aaa_share=a["defaults_when_untagged"]["aaa_share_of_ig"],
+        alts_beta=profile.alts_beta,
         ig_bbb_share=a["defaults_when_untagged"]["bbb_share_of_ig"],
     )
     # scale liability durations so the starting unhedged gap is near the target (bounded)
@@ -186,6 +187,7 @@ def dashboard(s: GameState) -> Dashboard:
         capital_ratio_pct=round(cap, 1), net_equity_exposure_usd_bn=round(eq, 2),
         fx_exposure_usd_bn=round(fx, 2),
         counterparty_exposure_usd_bn=round(max(0.0, s.uncollateralized_mtm), 3),
+        derivatives_mtm_usd_bn=round(s.uncollateralized_mtm, 3),
         asset_values={b: round(v, 2) for b, v in s.assets.items()},
         liability_values={**{b: round(v, 2) for b, v in s.liabilities.items()},
                           "guarantee": round(s.guarantee_value, 2)},
@@ -326,7 +328,7 @@ def _raise_cash(s: GameState, need: float, stress: bool) -> float:
     a = assumptions()
     mult = a["stress_haircut_mult"] if stress else 1.0
     loss = 0.0
-    for b in a["sell_order"] + ["below_ig", "mortgage", "equity", "alts"]:
+    for b in a["sell_order"] + ["below_ig", "mortgage", "alts"]:
         if need <= 1e-12:
             break
         h = _ab(b)["haircut"] * mult if b != "cash" else 0.0
@@ -383,7 +385,7 @@ def apply_shock(state: GameState, shock: ShockVector) -> tuple[GameState, Attrib
             loss = mv * shock.hy_default_pct / 100 * (1 - a["market"]["hy_recovery"])
         elif b == "mortgage":
             loss = mv * shock.mortgage_loss_pct / 100
-        e = mv * p["beta"] * eq
+        e = mv * (s.alts_beta if b == "alts" else p["beta"]) * eq
         fx = -mv * s.foreign_share * shock.fx_pct / 100 if b != "cash" else 0.0
         s.assets[b] = mv + r + cs - loss + e + fx
         att["rates"] += r

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Company } from "../api";
-import { ASSET_LABELS, LIABILITY_LABELS } from "../labels";
-import { MixBar } from "../components/MixBar";
+import { BalanceSheetPanel } from "../components/BalanceSheet";
+import { CompanyLogo } from "../components/CompanyLogo";
 
 export function CompanySelect(props: { companies: Company[]; busy: boolean; onStart: (ticker: string, seed: number) => void }) {
   const [picked, setPicked] = useState<string | null>(null);
@@ -24,13 +24,19 @@ export function CompanySelect(props: { companies: Company[]; busy: boolean; onSt
             key={c.ticker}
             className={`company-card ${picked === c.ticker ? "picked" : ""}`}
             onClick={() => setPicked(c.ticker)}
+            aria-pressed={picked === c.ticker}
           >
-            <div className="ticker">{c.ticker}</div>
-            <div className="name">{c.name}</div>
+            <div className="company-head">
+              <CompanyLogo ticker={c.ticker} name={c.name} />
+              <div>
+                <div className="name">{c.name}</div>
+                <div className="ticker">{c.ticker}</div>
+              </div>
+            </div>
             <div className="stats">
-              <span>Invested assets ${c.invested_assets_usd_bn.toFixed(0)}bn</span>
-              <span>Surplus ${c.surplus_usd_bn.toFixed(1)}bn</span>
-              <span>Cushion {(100 * c.equity_to_assets).toFixed(1)}% of assets</span>
+              <span>Invested assets <b>${c.invested_assets_usd_bn.toFixed(0)}bn</b></span>
+              <span>Surplus <b>${c.surplus_usd_bn.toFixed(1)}bn</b></span>
+              <span>Cushion <b>{(100 * c.equity_to_assets).toFixed(1)}%</b> of assets</span>
             </div>
             <div className="muted small">FY{c.fiscal_year} 10-K</div>
           </button>
@@ -39,23 +45,18 @@ export function CompanySelect(props: { companies: Company[]; busy: boolean; onSt
 
       {chosen && (
         <div className="panel dossier">
-          <h2>
-            {chosen.name} <span className="muted">({chosen.ticker})</span>
-          </h2>
-          <div className="two-col">
-            <div>
-              <h3>What it owns (assets)</h3>
-              <MixBar mix={chosen.asset_mix} labels={ASSET_LABELS} />
-            </div>
-            <div>
-              <h3>What it owes (liabilities)</h3>
-              <MixBar mix={chosen.liability_mix} labels={LIABILITY_LABELS} />
-              <p className="small muted">
-                Policies with stock-market guarantees: ${chosen.guarantee_exposure_usd_bn.toFixed(0)}bn of account value
-                (separate accounts ${chosen.separate_account_assets_usd_bn.toFixed(0)}bn).
-              </p>
-            </div>
+          <div className="dossier-head">
+            <CompanyLogo ticker={chosen.ticker} name={chosen.name} />
+            <h2>
+              {chosen.name} <span className="muted">({chosen.ticker}) · general account balance sheet, FY{chosen.fiscal_year}</span>
+            </h2>
           </div>
+          <BalanceSheetPanel dashboard={chosen.dashboard} />
+          <p className="small muted">
+            Separate-account assets (${chosen.separate_account_assets_usd_bn.toFixed(0)}bn) belong to policyholders and are
+            left out, except the stock-market guarantees written on them: ${chosen.guarantee_exposure_usd_bn.toFixed(0)}bn of
+            account value carries a guarantee. Equity is shown excluding unrealized bond gains and losses (AOCI).
+          </p>
           <div className="start-row">
             <label>
               Seed{" "}
