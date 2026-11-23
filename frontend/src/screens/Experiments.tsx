@@ -142,8 +142,8 @@ export function Experiments(props: { onBack: () => void }) {
             ))}</tbody>
           </table>
           <p className="small">One-time calibration per company (Seamore reading the 10-K): <b>{usd(d.projections.calibration_one_time_per_company_usd)}</b>.
-            The per-session cap of ${d.projections.cap.per_session_usd} bounds spend at ${d.projections.cap.max_per_learner_month} per learner per month
-            (${d.projections.cap.max_10000_month.toLocaleString()} for 10,000 learners), whatever the model does.</p>
+            Each game stops calling the AI at ${d.projections.cap.per_session_usd}, whatever the model does. Nothing yet limits games per learner,
+            so a monthly cap per learner is a next step.</p>
         </div>
       )}
     </section>

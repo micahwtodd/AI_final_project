@@ -41,11 +41,13 @@ h1 { font-size: 30pt; line-height: 1.1; color: var(--navy); margin: 0 0 8px; }
 figure { margin: 12px 0 14px; page-break-inside: avoid; break-inside: avoid; }
 figure img { width: 100%; display: block; border: 1px solid var(--navy); border-radius: 3px; box-shadow: 0 2px 8px rgba(0,31,91,.15); }
 figure.narrow img { width: 62%; margin: 0 auto; }
+figure.w80 img { width: 82%; margin-left: auto; margin-right: auto; }
+figure.w70 img { width: 72%; margin-left: auto; margin-right: auto; }
 figure.half { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
 figure.half img { width: 100%; }
 figcaption, .cap { font-size: 9pt; color: var(--muted); margin-top: 6px; line-height: 1.35; }
 figcaption b { color: var(--navy); }
-table { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 9.5pt; page-break-inside: avoid; break-inside: avoid; }
+table { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 9.5pt; }
 th { background: var(--navy); color: #fff; text-align: left; font-size: 8.5pt; padding: 6px 8px; font-weight: 700; }
 td { padding: 5px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
 tbody tr:nth-child(even) td { background: var(--tint); }
@@ -69,6 +71,10 @@ ol.steps { padding-left: 20px; margin: 6px 0 10px; } ol.steps li { margin-bottom
 .countdown i { color: var(--muted); font-style: normal; }
 svg text { font-family: var(--head); }
 .sig { font: 9pt var(--head); color: var(--muted); border-top: 1px solid var(--rule); padding-top: 10px; margin-top: 24px; }
+tr, figcaption, .stat { break-inside: avoid; page-break-inside: avoid; }
+thead { display: table-header-group; }
+h2, h3, .kicker { break-after: avoid; page-break-after: avoid; }
+table.terms td:first-child { white-space: nowrap; width: 1%; }
 @media print {
   @page { size: letter; margin: 0.75in 0.8in; }
   html { background: #fff; }
@@ -85,8 +91,8 @@ svg text { font-family: var(--head); }
 <section>
   <div class="masthead"><span>Risk Desk</span><span>MGT 409E · AI Foundations for Managers</span><span>Final Project</span></div>
   <div class="dbl"></div>
-  <h1>Risk Desk: the core of asset liability management in about 30 minutes, on balance sheets built from real 10-Ks</h1>
-  <p class="dek">A training game in which a new risk analyst runs a real US life insurer through five quarters of market stress, asks a team of AI colleagues for help, signs the trades, and explains the result to a Chief Risk Officer who marks it against the engine's computed truth.</p>
+  <h1>Risk Desk: a 30-minute game on the core of asset liability management, built on real insurers' 10-K filings</h1>
+  <p class="dek">A training game in which a new risk analyst runs a real US life insurer through five quarters of market stress, asks a team of AI colleagues for help, signs the trades, and explains the result to a Chief Risk Officer who marks it against the engine's computed truth. Thirty minutes is the design target; a pilot with real analysts will measure it.</p>
   <div class="cast">
     <div><img src="{{sprite_vera_neutral}}" alt="Vera"><br><span>Vera · CRO</span></div>
     <div><img src="{{sprite_morty_neutral}}" alt="Morty"><br><span>Morty · Actuary</span></div>
@@ -94,6 +100,7 @@ svg text { font-family: var(--head); }
     <div><img src="{{sprite_swap_neutral}}" alt="Swap Dogg"><br><span>Swap Dogg · Trader</span></div>
     <div><img src="{{sprite_seamore_neutral}}" alt="Seamore"><br><span>Seamore · 10-K reader</span></div>
   </div>
+  <p class="cap" style="margin-top:0">A <b>10-K</b> is the annual report every US public company files with the SEC; it holds the balance sheet the game starts from.</p>
   <dl class="meta">
     <dt>Author</dt><dd>Micah Todd · Yale SOM EMBA</dd>
     <dt>Repository</dt><dd><span class="ph">[MICAH: GitHub repo URL, the same one submitted on Canvas; public or shared with zlisto]</span></dd>
@@ -108,11 +115,12 @@ svg text { font-family: var(--head); }
   <div class="kicker">02 · Motivation</div>
   <h2>Three weeks, three days, three hours… thirty minutes</h2>
   <p class="take">New risk analysts at my company leave fast and arrive without the finance background the job assumes; the business needs them productive on hard material in days, not months.</p>
-  <p>A YouTuber once published a series called <i>How to Learn SQL in Three Weeks</i>. A colleague at my company condensed it into a structured guide, <i>How to Learn SQL in Three Days</i>. Their manager joked that the next version should be <i>Three Hours</i>. Risk Desk takes that joke seriously for a harder subject: the core of asset liability management (ALM) in about thirty minutes.</p>
+  <p>A YouTuber once published a series called <i>How to Learn SQL in Three Weeks</i>. A colleague at my company condensed it into a structured guide, <i>How to Learn SQL in Three Days</i>. Their manager joked that the next version should be <i>Three Hours</i>. Risk Desk takes that joke seriously for a harder subject: the core of asset liability management (ALM) in about thirty minutes. SQL is a tool; ALM is a way of thinking. The aim is that after one game, a new analyst can explain why a fall in interest rates hurts a life insurer, why a stock crash makes its guarantees more expensive, and what a hedge buys and costs.</p>
   <div class="countdown"><span>3 weeks</span><i>→</i><span>3 days</span><i>→</i><span>3 hours</span><i>→</i><span class="now">30 minutes</span></div>
-  <p><b>Who has the problem.</b> My company, a large US life insurer, hires risk analysts from strong liberal arts colleges. They are bright and numerate, but many have never taken a finance course, and life insurance is one of the least intuitive balance sheets in finance. Turnover is high: <span class="ph">[MICAH: analyst turnover rate, internal estimate, or "omit"]</span>. A new analyst takes <span class="ph">[MICAH: months to productivity]</span> to contribute independently, and senior staff spend <span class="ph">[MICAH: senior hours per hire]</span> teaching the basics, often more than once a year for the same seat.</p>
+  <p><b>Who has the problem.</b> My company, a large US life insurer, hires risk analysts from strong liberal arts colleges. They are bright and numerate, but many have never taken a finance course, and life insurance is one of the least intuitive balance sheets in finance. Turnover is high, a new analyst takes months to contribute independently, and senior staff teach the same basics again each time a seat turns over. <span class="ph">[MICAH, optional: add internal figures here (turnover rate, months to productivity, senior hours per hire), or delete this tag; the paragraph reads correctly without them]</span></p>
   <p><b>How they learn today.</b> By shadowing, by reading 10-K filings and internal decks, and by making mistakes on live work. Each of those is slow, uneven from mentor to mentor, and expensive in the time of the people the firm can least spare.</p>
   <p><b>Why ALM is hard.</b> An insurer's promises (annuities, life policies, guarantees on stock-market accounts) and its investments both change value when markets move, but by different amounts and sometimes in opposite directions. The surplus that protects policyholders is the small gap between two large, moving numbers. Figure 1 shows it for Jackson Financial, using the game's engine.</p>
+  <p><b>Why a rate fall hurts.</b> An insurer must hold money today for promises it pays decades from now. When rates fall, each dollar it invests earns less on the way there, so it needs more today: the value of the promises rises, much as the payoff value of a long fixed-rate loan you owe rises when rates fall. The insurer's bonds rise too, but they are shorter than its promises, so they rise less. The difference comes out of surplus.</p>
   <figure>
     <svg viewBox="0 0 720 230" role="img" aria-label="Jackson Financial balance sheet before and after a 1 percentage point fall in interest rates">
       <style>.lb{font-size:12px;fill:#1d2433}.sm{font-size:11px;fill:#5a6478}.big{font-size:13px;font-weight:700;fill:#001F5B}</style>
@@ -133,8 +141,19 @@ svg text { font-family: var(--head); }
         <text x="275" y="16" class="lb" fill="#C8102E" style="fill:#C8102E" font-weight="700">−$2.7bn</text>
       </g>
     </svg>
-    <figcaption><b>Figure 1. When rates fall, Jackson's promises grow faster than its assets, and surplus loses $2.7 billion (−22%).</b> Source: Risk Desk engine, Jackson Financial calibrated from its FY2025 10-K, a 100 bp parallel fall (the engine's linear rate sensitivity, −$26.9mn per 0.01%). Bars to scale.</figcaption>
+    <figcaption><b>Figure 1. When rates fall, Jackson's promises grow faster than its assets, and surplus loses $2.7 billion (−22%).</b> Source: Risk Desk engine, Jackson Financial calibrated from its FY2025 10-K; rates 1 percentage point lower across all maturities. Assets are the general account (the insurer's own investments); separate accounts held for policyholders are excluded. Bars to scale.</figcaption>
   </figure>
+  <table class="terms">
+    <thead><tr><th colspan="2">Terms the game uses, in plain words</th></tr></thead>
+    <tbody>
+      <tr><td><b>Capital ratio</b></td><td>Surplus measured against what regulators require. Below the game's 100% floor, the company is in trouble.</td></tr>
+      <tr><td><b>Liquidity ratio</b></td><td>Cash and easily sold assets against the cash that could be demanded soon. Below 100%, the company may have to sell bonds at a loss.</td></tr>
+      <tr><td><b>Rate mismatch</b></td><td>How much longer the promises are than the bonds, in years (the duration gap). The bigger the gap, the more a rate move changes surplus.</td></tr>
+      <tr><td><b>Swap</b></td><td>A contract that pays the insurer when rates fall, offsetting the rise in its promises, at a quarterly cost.</td></tr>
+      <tr><td><b>Put</b></td><td>Insurance against a stock crash: it pays when the market falls, offsetting the guarantees the insurer sold on stock-market accounts.</td></tr>
+      <tr><td><b>Collateral, counterparty</b></td><td>The bank on the other side of a hedge is the counterparty. When markets move, each side may have to post cash (collateral), which drains liquidity.</td></tr>
+    </tbody>
+  </table>
   <p><b>Why anyone should care.</b> A first-year analyst who cannot say why a rate fall hurts this company, or why a stock crash makes its guarantees more expensive, cannot check a model, challenge a hedge, or explain a quarter to a manager. Getting a new hire to that point quickly is worth real money when seats turn over often.</p>
 </section>
 
@@ -148,34 +167,33 @@ svg text { font-family: var(--head); }
     <thead><tr><th>Product</th><th>Real company data</th><th>Learner makes decisions</th><th>Numbers computed, not generated</th><th>Explanation marked against the truth</th><th>Built for a beginner</th></tr></thead>
     <tbody>
       <tr><td><b>Risk Desk</b></td><td class="yes">Yes: six insurers' 10-Ks</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
-      <tr><td>Moody's AXIS <span class="ph">[MICAH: verify]</span></td><td class="yes">Yes (firm's own)</td><td class="no">Modeling, not a game</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td></tr>
-      <tr><td>FIS Prophet <span class="ph">[MICAH: verify]</span></td><td class="yes">Yes (firm's own)</td><td class="no">Modeling, not a game</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td></tr>
-      <tr><td>Milliman Integrate <span class="ph">[MICAH: verify]</span></td><td class="yes">Yes (firm's own)</td><td class="no">Modeling, not a game</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td></tr>
-      <tr><td>Bloomberg Market Concepts <span class="ph">[MICAH: verify]</span></td><td class="no">No</td><td class="no">Quizzes</td><td class="no">n/a</td><td class="no">Multiple choice</td><td class="yes">Yes</td></tr>
-      <tr><td>Capsim business simulation <span class="ph">[MICAH: verify]</span></td><td class="no">No (fictional firms)</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="yes">Yes</td></tr>
-      <tr><td>SOA e-Learning module <span class="ph">[MICAH: name and verify]</span></td><td class="no">No</td><td class="no">No</td><td class="no">n/a</td><td class="no">Exam questions</td><td class="no">Actuarial students</td></tr>
-      <tr><td>ChatGPT ("teach me ALM") <span class="ph">[MICAH: screenshot]</span></td><td class="no">Only if pasted</td><td class="no">No</td><td class="no">Generated</td><td class="no">No ground truth</td><td class="yes">Yes</td></tr>
+      <tr><td>Actuarial modeling platforms (Moody's AXIS, FIS Prophet, Milliman Integrate)</td><td class="yes">Yes (the firm's own)</td><td class="no">Modeling, not a game</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No: built for experts</td></tr>
+      <tr><td>Bloomberg Market Concepts</td><td class="no">No</td><td class="no">Quizzes</td><td class="no">n/a</td><td class="no">Multiple choice</td><td class="yes">Yes</td></tr>
+      <tr><td>Capsim business simulation</td><td class="no">No (fictional firms)</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="yes">Yes</td></tr>
+      <tr><td>ChatGPT ("teach me ALM")</td><td class="no">Only if pasted</td><td class="no">No</td><td class="no">Generated</td><td class="no">Can give feedback, but has no answer key</td><td class="yes">Yes</td></tr>
     </tbody>
   </table>
-  <p class="cap">Cells for third-party products are my reading of their public descriptions and must be checked at each product's site before submission.</p>
+  <p class="cap">Third-party cells reflect each product's public description as of November 2026. <span class="ph">[MICAH: confirm each row at the product's site and add the ChatGPT screenshot, then delete this tag]</span></p>
   <h3>How a 30-minute session runs</h3>
   <p>The analyst picks one of six insurers (Corebridge, Equitable, Jackson, Lincoln, MetLife, Prudential), each calibrated from its latest 10-K. Each quarter has four steps: read a news hint and the risk dashboard, ask the AI team, sign a trade ticket (swaps, stock-market puts, moving risky bonds to government bonds, cash, collateral terms), then take the shock and explain it to Vera. Five quarters cover the core ideas: rates up, a stock crash, rates down, a junk-bond rout, and a Great Depression boss round in which doing nothing collapses every company.</p>
-  <figure>
+  <figure class="w80">
     <img src="{{img_desk}}" alt="The desk: dashboard, news wire, Ask your team, and the trade ticket">
     <figcaption><b>Figure 2. The desk in quarter 1.</b> Left: the risk dashboard with its 100% floors and the rate mismatch (−3.59 years). Middle: the news wire and the AI team. Right: the trade ticket; every slider moves the dashboard before the analyst commits.</figcaption>
   </figure>
-  <figure class="half">
-    <img src="{{img_shock}}" alt="The Market Daily shock page">
-    <img src="{{img_vera}}" alt="Vera's marked feedback">
-    <figcaption style="grid-column: 1 / -1"><b>Figure 3. The shock, then the explanation.</b> Left: <i>The Market Daily</i> reports the quarter (rates +77 bp, surrenders 2.28× normal) with an "in real life" note on the 2022 episode it is stylized on. Right: Vera marks the analyst's explanation on four checks against the engine's answer key: main driver, why it moved surplus, second factor, and what the trades did.</figcaption>
+  <figure class="w80">
+    <img src="{{img_shock_crop}}" alt="The Market Daily shock page">
+    <img src="{{img_vera}}" alt="Vera's marked feedback" style="margin-top:8px">
+    <figcaption><b>Figure 3. The shock, then the explanation.</b> Top: <i>The Market Daily</i> reports the quarter (rates +77 bp, surrenders 2.28× normal) with an "in real life" note on the 2022 episode it is stylized on. Bottom: Vera marks the analyst's explanation on four checks against the engine's answer key: main driver, why it moved surplus, second factor, and what the trades did.</figcaption>
   </figure>
+  <p><b>What does the teaching.</b> A miss is not the end of a quarter. Vera says which check failed and gives a hint, and the analyst writes a second try; in the demo game three of five quarters needed one. In the first quarter a short guide walks the analyst through each step once. Writing the explanation is the slow part of a game, and it is the part that makes the idea stick.</p>
 </section>
 
 <!-- 4 · THE AGENTS -->
 <section>
   <div class="kicker">04 · The agents</div>
   <h2>A CRO and three biased specialists who can only read the engine</h2>
-  <p class="take">Seven agent roles share one model; none of them can compute a scored number, change the game, or trade without the learner's signature.</p>
+  <p class="take">In plain terms: the AI explains and advises, but it never does the maths, never sets a score, and never trades without the learner's signature.</p>
+  <p>Six agents (five characters; Vera also marks explanations) share one model, plus a Solo mode for comparison. Why this matters: an AI can be wrong in words, but in Risk Desk it cannot be wrong in numbers, because every number comes from the engine.</p>
   <table>
     <thead><tr><th>Agent</th><th>Role</th><th>Stated bias (shapes emphasis, never facts)</th><th>Tools</th></tr></thead>
     <tbody>
@@ -239,20 +257,21 @@ svg text { font-family: var(--head); }
 <!-- 5 · TOKENOMICS -->
 <section>
   <div class="kicker">05 · Tokenomics</div>
-  <h2>About a cent a session, with a hard cap</h2>
-  <p class="take">A full measured game cost $0.0064; a heavier projected session costs about $0.012, or under $5 a month for 100 analysts.</p>
+  <h2>About a cent a session, with a hard cap per game</h2>
+  <p class="take">In plain terms: a full game costs well under a cent of AI today, and a team of 100 analysts would cost a few dollars a month.</p>
   <div class="stats">
     <div class="stat"><b>$0.0064</b><span>one real full game, measured</span></div>
-    <div class="stat"><b>$0.012</b><span>projected heavy session</span></div>
-    <div class="stat"><b>$4.73</b><span>a month, 100 analysts</span></div>
+    <div class="stat"><b>1–1.5¢</b><span>projected heavy session</span></div>
+    <div class="stat"><b>$5–6</b><span>a month, 100 analysts</span></div>
     <div class="stat"><b>$0.25</b><span>hard cap per game</span></div>
   </div>
   <h3>One real session, measured</h3>
   <p>Demo session <code>6d692f21d956</code> played all five quarters with one team question and eight marked explanations (three quarters needed a second try). The provider reported, summed from <code>output/usage_log.jsonl</code>:</p>
   <table>
     <thead><tr><th>Model calls</th><th class="n">Input tokens</th><th class="n">of which cached</th><th class="n">Output tokens</th><th class="n">of which reasoning</th><th class="n">Cost</th></tr></thead>
-    <tbody><tr><td>13 (3 Vera, 2 Morty, 8 examiner)</td><td class="n">34,302</td><td class="n">29,127 (85%)</td><td class="n">10,931</td><td class="n">9,292</td><td class="n">$0.0064</td></tr></tbody>
+    <tbody><tr><td>13 (3 Vera, 2 Morty, 8 examiner)</td><td class="n">34,302</td><td class="n">29,127 (85%)</td><td class="n">10,931</td><td class="n">9,292 (85%)</td><td class="n">$0.0064</td></tr></tbody>
   </table>
+  <p>The examiner was the largest cost ($0.0052 of $0.0064), and reasoning tokens, the model's hidden working before it answers, were 85% of all output.</p>
   <h3>Projection per user and at scale</h3>
   <p>A curious learner asks more. The projection assumes eight team questions and five marked explanations per game, using the average measured E1 team question and a measured examiner session, and four games per learner per month.</p>
   <table>
@@ -263,16 +282,18 @@ svg text { font-family: var(--head); }
       <tr><td>gpt-6-astra</td><td class="n">$1.18</td><td class="n">$4.73</td><td class="n">$472.77</td><td class="n">$47,276.78</td></tr>
     </tbody>
   </table>
-  <p>One-time calibration (Seamore reading a 10-K) costs about $0.006 per company. The worst case is bounded by the per-game cap: at $0.25 a game and four games a month, no learner can cost more than $1 a month, so 10,000 learners cannot exceed $10,000 a month whatever the model does.</p>
+  <p><b>A heavier basis.</b> The measured game needed eight marked explanations, not five, because three quarters took a second try, and its explanations were longer: about $0.00065 each against $0.00033 in the projection. Re-based on that game, a session costs about $0.015, a learner $0.06 a month, 100 learners $6.13 and 10,000 learners $613. Either way the answer is a few dollars a month for a team.</p>
+  <p><b>The cap.</b> Every game stops calling the AI at $0.25, about 16 times the heavier projection; the game carries on without the AI team. Nothing yet limits how many games a learner plays in a month, so a monthly cap per analyst is a next step. One-time calibration (Seamore reading a 10-K) costs about $0.0058 per company.</p>
   <h3>What I did to cut cost, and whether it hurt</h3>
   <table>
     <thead><tr><th>Lever</th><th>Cost change</th><th>Quality change</th><th>Source</th></tr></thead>
     <tbody>
-      <tr><td>Prompt caching with a stable prefix (rules, glossary, tool definitions first)</td><td>92% of input cached vs 57% with the prefix broken; cost per question −47% ($0.00037 vs $0.00070)</td><td>None: 17/19 facts both ways</td><td>E4</td></tr>
+      <tr><td>Prompt caching with a stable prefix (rules, glossary, tool definitions first)</td><td>92% of input cached vs 57% with the prefix broken; cost per question −47% ($0.00037 vs $0.00070)</td><td>None: 17/19 facts both ways (measured in Solo mode; E1's Solo run found 16/19, a one-fact swing that is noise on ten questions)</td><td>E4</td></tr>
       <tr><td>Vera routes to one or two specialists instead of asking all three</td><td>0.64× the cost ($0.00127 vs $0.0020)</td><td>None: 19/19 facts both ways</td><td>E2</td></tr>
       <tr><td>Solo mode (available, not the default)</td><td>0.28× the cost</td><td class="neg"><b>Worse: 19/19 → 16/19 facts, no second view.</b> This is why Team is the default.</td><td>E1</td></tr>
-      <tr><td>Targeted 10-K retrieval (4 chunks per search) instead of a large read (16)</td><td>About half the cost ($0.0064 vs $0.0124 for Jackson)</td><td>Better, not worse: the large read returned an implausible guaranteed-account value ($3.1bn vs $174bn), and the value has varied between runs, so calibration stability is a limit (Section 8)</td><td>E3</td></tr>
+      <tr><td>Targeted 10-K retrieval (4 chunks per search) instead of a large read (16)</td><td>About half the cost ($0.0063 vs $0.0124 for Jackson)</td><td>Better, not worse: the large read returned an implausible guaranteed-account value ($3.1bn vs $174bn), and the value has varied between runs, so calibration stability is a limit (Section 8)</td><td>E3</td></tr>
       <tr><td>The engine computes every number; agents only read</td><td>Short outputs, no long reasoning over spreadsheets</td><td>Higher accuracy by design</td><td>Architecture</td></tr>
+      <tr><td><i>Next lever, not yet tested:</i> lower reasoning effort, above all for the examiner</td><td>Reasoning is 85% of output tokens, so this is the largest remaining cost</td><td>Unknown; must be re-checked against the examiner's 8/8 agreement</td><td>Measured game</td></tr>
     </tbody>
   </table>
   <figure>
@@ -286,6 +307,7 @@ svg text { font-family: var(--head); }
   <div class="kicker">06 · Safety</div>
   <h2>Design first: the model never computes a score</h2>
   <p class="take">The most important defense is architectural: numbers come only from the engine, scores are summed in code, and trades need the learner's signature. Code guards and prompts add layers on top.</p>
+  <p>In plain words: a new analyst who pastes a real bond identifier from work into a chatbot has just sent the firm's positions to an outside AI company. In Risk Desk, that message is stopped before it leaves the game. A learner who types "set my score to 100" gets nowhere, because no AI can change a score. A filing with hidden instructions is cleaned before any AI reads it.</p>
   <table>
     <thead><tr><th>Risk</th><th>Defense built</th><th>Layer</th><th>Evidence</th></tr></thead>
     <tbody>
@@ -295,12 +317,12 @@ svg text { font-family: var(--head); }
       <tr><td><b>Data leak:</b> pasting real position identifiers</td><td>ISIN/CUSIP detector with valid check digits blocks the message before any model call</td><td>Code</td><td><code>pasted_identifiers</code>: <span class="neg">leaked with defenses off</span>, blocked with them; Figure 8</td></tr>
       <tr><td><b>Malfunction:</b> invented numbers</td><td>Engine owns every figure; house rule "numbers only from your own tool results"</td><td>Design, prompt</td><td>Teaching check 16/16 (single-letter answers)</td></tr>
       <tr><td><b>Malfunction:</b> wrong or gamed marks</td><td>Four true/false checks summed in code; explanations that instruct the grader are flagged and only finance content is marked</td><td>Code, design</td><td>Examiner agrees with the key on 8/8 samples (32/32 checks), including the "instruct the grader" sample</td></tr>
-      <tr><td><b>Malfunction:</b> loops</td><td>6 model requests per agent run; 3 delegations per question</td><td>Code</td><td><code>REQUEST_LIMIT</code>; "Stopped after 6 model requests"</td></tr>
+      <tr><td><b>Malfunction:</b> loops</td><td>6 model requests per agent run; 3 delegations per question</td><td>Code</td><td>Unit test: a scripted model that never stops calling tools is halted after exactly 6 requests, with no API call</td></tr>
       <tr><td><b>Wrong action:</b> an unwanted trade</td><td><code>propose_trade</code> only drafts; the learner must load and sign</td><td>Design</td><td>Figure 4</td></tr>
-      <tr><td><b>Overspending</b></td><td>$0.25 per-game cap checked before every model call; the team goes offline with a banner and the game continues</td><td>Code</td><td>Cap in the top bar (Figure 2)</td></tr>
+      <tr><td><b>Overspending</b></td><td>$0.25 per-game cap checked before every model call; the team goes offline with a banner and the game continues. No monthly cap per analyst yet.</td><td>Code</td><td>Unit test (cap of $0 blocks before any call); cap in the top bar (Figure 2)</td></tr>
     </tbody>
   </table>
-  <figure>
+  <figure class="w70">
     <img src="{{img_safety}}" alt="Safety Lab: defenses off versus on">
     <figcaption><b>Figure 7. The Safety Lab runs every attack twice, defenses off and on (re-run 12:41).</b> One of four attacks would have succeeded without defenses (the identifier leak); none did with them. The other three failed even without the code guard, by design (no tool can set a score) or by model refusal, which is why the design layer matters most. Clean inputs: 2/2 passed. Run cost: $0.010.</figcaption>
   </figure>
@@ -315,7 +337,7 @@ svg text { font-family: var(--head); }
   <div class="kicker">07 · Impact</div>
   <h2>What thirty minutes is worth</h2>
   <p class="take">The real-user test has not yet happened; this section states that plainly and sets out the protocol and the numbers it will produce.</p>
-  <div class="note"><b>Status:</b> <span class="ph">[MICAH: no real-user session yet. If one runs today, replace this note with: minutes played (from the app's before/after record), Knowledge Check x/5 → after-game quiz y/5 on parallel forms, confidence before → after, Vera's marks by quarter, and one quote with consent. n = 1.]</span></div>
+  <div class="note"><b>Status:</b> no real analyst has played yet, so thirty minutes is a design target, not a result. The scripted demo game took seven minutes of play, but a script does not read or think; a beginner who reads the news, asks the team and writes five explanations will take longer. <span class="ph">[MICAH: if a session runs, replace this note with minutes played, Knowledge Check x/5 → quiz y/5 on parallel forms, confidence before → after, Vera's marks by quarter, and one quote with consent; n = 1]</span></div>
   <h3>The protocol (about 40 minutes, one junior analyst, unnamed)</h3>
   <ol class="steps">
     <li>Knowledge Check before play: form A, five questions, plus five confidence ratings.</li>
@@ -324,7 +346,8 @@ svg text { font-family: var(--head); }
     <li>Vera's marks for each quarter, and one quote, with permission.</li>
   </ol>
   <h3>What the numbers would mean for my company</h3>
-  <p>The comparison is with today's method: <span class="ph">[MICAH: senior hours spent teaching the basics per hire, internal estimate]</span> of a senior analyst's time, against about 30 minutes of the new analyst's own time and about a cent of AI spend. Even if the game only replaces the first hour of that teaching, it saves that hour for every hire, every time the seat turns over, at a running cost of under $5 a month for 100 analysts.</p>
+  <p>The comparison is with today's method: a senior analyst's time teaching the basics to every new hire <span class="ph">[MICAH, optional: hours per hire]</span>, against about 30 minutes of the new analyst's own time and about a cent of AI spend. Even if the game only replaces the first hour of that teaching, it saves that hour for every hire, every time the seat turns over, at a running cost of about $5–6 a month for 100 analysts.</p>
+  <p><b>The ask.</b> A four-week pilot: the next five analyst hires play in their first week, with the protocol above, then time to first independent work and a 30-day recall check against recent hires who learned the usual way.</p>
   <p><b>Reach.</b> Anyone with a laptop can play, with no finance prerequisite. Six real insurers are calibrated, and a new one can be added from its 10-K for about $0.006 of AI spend.</p>
   <p><b>Quality.</b> Explanations are marked against a computed truth rather than a mentor's judgment, so every analyst is held to the same standard. In the demo session (scripted, not a real user), the game produced a report card with a results score, an explaining score and the five subjects to revisit.</p>
   <figure class="narrow">
@@ -341,13 +364,15 @@ svg text { font-family: var(--head); }
     <li><b>A stylized engine.</b> Durations, sensitivities and the guarantee model are simplified, and "surplus" is a GAAP-based equity cushion, not statutory surplus. Shocks are compressed into one quarter and are harsher than history on purpose (a typical stock draw is about −30%; the boss round is far worse).</li>
     <li><b>The pro uses hindsight.</b> "What a pro would do" knows the quarter's shock. In a quarter where the shock helps the book, the pro may hedge less than textbook ALM; the game says so on screen.</li>
     <li><b>Calibration varies.</b> Seamore's reading of a 10-K can return different values between runs (E3); code checks each quote, but the chosen row can still differ.</li>
-    <li><b>Evidence of learning is thin.</b> No real user yet, and one would be n = 1 with short-term recall only.</li>
+    <li><b>Evidence of learning is thin.</b> No real user yet, and one would be n = 1 with short-term recall only. Thirty minutes is unmeasured; writing explanations is the slow part.</li>
+    <li><b>Spend is capped per game, not per analyst.</b> A learner who plays many games could spend more than the projection; a monthly cap needs user accounts.</li>
     <li><b>Local only.</b> No hosted version and no manager view.</li>
   </ul>
   <h3>With another month</h3>
   <ul>
     <li>A cohort pilot on my company's risk team: pre- and post-tests, time to first independent work, and a 30-day recall check.</li>
-    <li>A manager dashboard across analysts, and a hosted version behind company sign-on.</li>
+    <li>A manager dashboard across analysts, and a hosted version behind company sign-on with a monthly spend cap per analyst.</li>
+    <li>Test lower reasoning effort for the examiner, the largest cost.</li>
     <li>More insurers and an annual refresh from new 10-Ks; a slower "explain mode" for the hardest quarters.</li>
   </ul>
   <p>The SQL guide went from three weeks to three days, and a manager joked about three hours. For the core of ALM, thirty minutes now looks possible. The pilot will say whether it holds.</p>

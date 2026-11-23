@@ -163,3 +163,34 @@ def test_replies_drop_stock_opener_and_questions_back_to_the_learner():
     assert out == "Rates rose 77bp. Cash is 7.6% of assets."
     assert strip_opener("Liquidity is 1.5x the need. Is 1.5x enough?") == "Liquidity is 1.5x the need."
     assert strip_opener("Is that a hedge?") == "Is that a hedge?"  # never blank a reply
+
+
+def test_loop_guard_stops_an_agent_that_never_answers(monkeypatch):
+    """A scripted model (no API call) that keeps calling a tool forever is stopped by REQUEST_LIMIT."""
+    from pydantic_ai import Agent
+    from pydantic_ai.messages import ModelResponse, ToolCallPart
+    from pydantic_ai.models.function import FunctionModel
+
+    calls = []
+
+    def looping(messages, info):
+        calls.append(1)
+        return ModelResponse(parts=[ToolCallPart("get_risk_dashboard", {})])
+
+    def fake_agent(kind):
+        a = Agent(FunctionModel(looping), deps_type=agents.Deps, output_type=agents.AgentReply, name=kind)
+        agents.register_tools(a, agents.TOOLSETS[kind])
+        return a
+
+    monkeypatch.setattr(agents, "ai_available", lambda: True)
+    monkeypatch.setattr(agents, "get_agent", fake_agent)
+    s = game.new_game("MET", 409, agent_mode="solo")
+    q: asyncio.Queue = asyncio.Queue()
+    asyncio.run(agents.ask(s, "What is our biggest risk?", q, game.save))
+    events = []
+    while not q.empty():
+        events.append(q.get_nowait())
+    assert len(calls) == agents.REQUEST_LIMIT
+    assert any(e["type"] == "stop" and e["detail"]["reason"] == "request_limit" for e in events)
+    reply = next(e for e in events if e["type"] == "reply")
+    assert reply["detail"]["stopped"] == "request_limit"

@@ -30,6 +30,7 @@ CROPS = {
     "ticket": ("07_ticket_q1.png", (2060, 0, 2800, 1210), 700),
     "predict": ("08_predict.png", None, 1500),
     "shock": ("09_shock_q1.png", None, 1700),
+    "shock_crop": ("09_shock_q1.png", (80, 370, 2800, 1570), 1600),
     "vera": ("10_vera_q1.png", (80, 400, 2800, 1590), 1600),
     "report_card": ("12_report_card.png", (345, 140, 2495, 3990), 1200),
     "report_card_top": ("12_report_card.png", (345, 140, 2495, 1400), 1300),
