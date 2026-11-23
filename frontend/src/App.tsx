@@ -7,6 +7,7 @@ import { ShockScreen } from "./screens/ShockScreen";
 import { RevealScreen } from "./screens/RevealScreen";
 import { DebriefScreen } from "./screens/DebriefScreen";
 import { SafetyLab } from "./screens/SafetyLab";
+import { Experiments } from "./screens/Experiments";
 import { QuizScreen } from "./screens/QuizScreen";
 import { TraceScreen } from "./screens/TraceScreen";
 import { UnderTheHood } from "./components/UnderTheHood";
@@ -206,13 +207,7 @@ export default function App() {
         )}
         {screen.name === "safety" && <SafetyLab onBack={() => setScreen(screen.back)} />}
         {screen.name === "trace" && <TraceScreen game={screen.game} onBack={() => setScreen(screen.back)} />}
-        {screen.name === "experiments" && (
-          <section className="panel">
-            <h1>Experiments</h1>
-            <p className="muted">Solo vs Team, routing, retrieval size and prompt caching, with measured tokens and cost. Built in Project 10.</p>
-            <button className="ghost" onClick={() => setScreen(screen.back)}>← Back</button>
-          </section>
-        )}
+        {screen.name === "experiments" && <Experiments onBack={() => setScreen(screen.back)} />}
         {screen.name === "quiz" && (
           <QuizScreen
             key={screen.when}

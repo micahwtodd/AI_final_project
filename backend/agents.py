@@ -380,8 +380,9 @@ def strip_opener(text: str) -> str:
     return cleaned[:1].upper() + cleaned[1:]
 
 async def ask(session, message: str, queue: asyncio.Queue, save: Callable[[Any], None], to: str | None = None,
-              guard: bool = True) -> None:
-    """Answer one learner question. Puts events on `queue` (and the audit trail)."""
+              guard: bool = True, note: str | None = None) -> None:
+    """Answer one learner question. Puts events on `queue` (and the audit trail).
+    `note` is for experiments only (E2): an extra instruction to the lead agent for this one question."""
     run_id = secrets.token_hex(4)
     quarter = min(session.state.quarter, engine.n_quarters())
     if session.agent_mode == "solo":
@@ -415,6 +416,8 @@ async def ask(session, message: str, queue: asyncio.Queue, save: Callable[[Any],
         else:
             company = DISPLAY_NAMES.get(session.ticker, session.ticker)
             prompt = f"[Quarter {quarter} of {engine.n_quarters()} | {company} ({session.ticker}) | phase: {session.phase}]\nLearner: {message}"
+            if note:
+                prompt += f"\n[Instruction for this question: {note}]"
             history = [m for r in _HISTORY.get(f"{session.id}:{lead}", [])[-HISTORY_RUNS:] for m in r]
             result = await _run_agent(lead, prompt, run, history=history)
             if result is not None:

@@ -277,6 +277,14 @@ def flag(body: FlagBody) -> dict:
     return {"ok": True}
 
 
+@app.get("/api/experiments")
+def experiments() -> dict:
+    """Results of scripts/experiments.py (E1 to E4 and the cost projections)."""
+    import json
+    p = REPO_DIR / "evidence" / "experiments.json"
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {"generated": None}
+
+
 @app.get("/api/safety")
 def safety_latest() -> dict:
     from backend import safety_lab
