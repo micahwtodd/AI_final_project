@@ -85,11 +85,11 @@ See [`output/harness.md`](output/harness.md) for the agents' tools, memory, stop
 
 Run `python scripts/experiments.py` to measure again (about 10 minutes, well under $1). On the last run:
 
-- **E1 Solo vs Team** (ten fixed questions, facts marked by code): Solo 17/19 facts, $0.0004 and 8s per question; Team 17/19 facts and two views on all three decision questions, $0.0013 and 18s. Asking every specialist (E2) found 19/19.
-- **E2** Asking every specialist cost about 40% more and was slower than letting Vera route; it found the two facts routing missed.
-- **E3** Reading 16 chunks per search instead of 4 cost 2 to 2.5 times as much and, for Jackson, returned a different guaranteed-account figure ($174bn vs $243bn), so more text did not mean a better answer.
-- **E4** Prompt caching: 90% of input cached with a stable prefix vs 50% with it broken; cost per question about halved.
-- **Cost:** about $0.012 per session, $0.05 per learner per month on `gpt-6-luna`; the $0.25 cap bounds the worst case.
+- **E1 Solo vs Team** (ten fixed questions, facts marked by code): Solo 17/19 facts, $0.0004 and 8s per question; Team 19/19 facts and two views on all three decision questions, $0.0011 and 19s.
+- **E2** Asking every specialist cost nearly twice as much and was slower than letting Vera route, with no better facts.
+- **E3** Reading 16 chunks per search instead of 4 cost 2 to 4 times as much and did not give steadier answers: for Jackson, the two reads disagreed on which figures they found, and the guaranteed-account figure varied between runs ($174bn vs $243bn). Lincoln's values matched.
+- **E4** Prompt caching: 93% of input cached with a stable prefix vs 54% with it broken; cost per question about halved.
+- **Cost:** about $0.01 per session, $0.04 per learner per month on `gpt-6-luna`; the $0.25 cap bounds the worst case.
 
 ## Recalibrating the companies
 

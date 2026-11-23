@@ -6,15 +6,15 @@
         "question": "What is our biggest risk right now?",
         "mode": "solo",
         "note": null,
-        "seconds": 9.8,
+        "seconds": 8.3,
         "tokens": {
-          "input": 8656,
-          "cached": 7497,
-          "cache_write": 781,
-          "output": 391,
+          "input": 8502,
+          "cached": 7560,
+          "cache_write": 564,
+          "output": 310,
           "requests": 3
         },
-        "cost_usd": 0.000406,
+        "cost_usd": 0.000339,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -31,7 +31,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "The biggest risk is that our promises to policyholders are much more sensitive to interest rates than our investments. That rate mismatch (duration gap) is -3.59 years: liability duration is 11.25 years, versus asset duration of 5.8 years. The dashboard estimates that if rates fall by 1 basis point, surplus falls by $26.9 million; the mismatch is flagged red. Liquidity is also close to its floor at 101.7%, but the rate mismatch is the clearest current warning.",
+        "reply": "The biggest risk is the rate mismatch (duration gap): it is -3.59 years, meaning liabilities are more sensitive to rates than assets. If rates fall by 1 basis point, the estimated surplus loss is $26.9 million; falling rates therefore hurt this company. Liquidity is also close to its floor: the liquidity ratio is 101.7% against a 100% floor, while the capital ratio is 159.6% against a 100% floor. So the immediate concern is rate sensitivity, with limited room in liquidity if cash needs rise.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -40,15 +40,15 @@
         "question": "How much would our surplus change if interest rates fell by 1%?",
         "mode": "solo",
         "note": null,
-        "seconds": 6.4,
+        "seconds": 7.5,
         "tokens": {
-          "input": 5342,
-          "cached": 4881,
-          "cache_write": 209,
-          "output": 199,
+          "input": 5516,
+          "cached": 4923,
+          "cache_write": 341,
+          "output": 419,
           "requests": 2
         },
-        "cost_usd": 0.0002,
+        "cost_usd": 0.000327,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -60,7 +60,7 @@
         ],
         "facts_found": 1,
         "facts_total": 1,
-        "reply": "On today’s book, a 1% fall in interest rates would reduce surplus by $2.69 billion in this hypothetical stress test. The change is attributed to rates; the test is not a forecast of this quarter’s market move.",
+        "reply": "A 1% fall is 100 basis points. Using the company’s estimate of a $26.9 million surplus loss for each basis point rates fall, that implies a surplus decrease of about $2.69 billion, assuming the effect scales linearly.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -69,15 +69,15 @@
         "question": "What is our capital ratio, and how close are we to the floor?",
         "mode": "solo",
         "note": null,
-        "seconds": 8.1,
+        "seconds": 5.5,
         "tokens": {
-          "input": 5343,
-          "cached": 4881,
-          "cache_write": 210,
-          "output": 226,
+          "input": 5385,
+          "cached": 2482,
+          "cache_write": 2651,
+          "output": 250,
           "requests": 2
         },
-        "cost_usd": 0.000213,
+        "cost_usd": 0.000506,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -94,7 +94,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Our capital ratio is 159.6%, against a 100% floor. The dashboard marks capital green, so we are above the floor; it does not label capital as a current breach.",
+        "reply": "Our capital ratio is 159.6%, against a 100% floor, so we are above the floor; the dashboard marks capital green. The capital ratio (simplified) is surplus divided by a simplified capital requirement, and below 100% would be a breach.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -103,15 +103,15 @@
         "question": "Should we hedge more of the stock-market guarantees?",
         "mode": "solo",
         "note": null,
-        "seconds": 8.5,
+        "seconds": 5.3,
         "tokens": {
-          "input": 5707,
-          "cached": 4876,
+          "input": 5749,
+          "cached": 4918,
           "cache_write": 579,
-          "output": 539,
+          "output": 361,
           "requests": 2
         },
-        "cost_usd": 0.000416,
+        "cost_usd": 0.000327,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -128,7 +128,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "More stock protection is worth considering: the stock-market guarantees (VA guarantees) could cost $0.71 billion more if stocks fall 10%, and they are currently unhedged. Each additional 10% of put protection costs $0.0085 billion per quarter, whether or not it pays; it would reduce guarantee losses in a stock fall but would not remove the fall in our own stock and alternatives holdings. So the choice is less downside from the guarantees versus a recurring premium and less return left from risky assets. The $0.71 billion is a guarantee-only estimate, not the change in company surplus.",
+        "reply": "More hedging would protect the stock-market guarantees: currently, none are hedged, and a stock fall of 10% would add $0.71bn to the guarantee cost. Each extra 10% of put protection costs $0.0085bn per quarter, whether or not stocks fall. That protection addresses the guarantee exposure, not all of the company’s stock and alternative-asset exposure, so it is not a complete hedge of the company’s market risk. The figures are gross guarantee effects, not the change in company surplus; there is a clear trade-off between less guarantee risk and lower quarterly carry.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -137,15 +137,15 @@
         "question": "Should we sell some junk and BBB bonds and buy government bonds?",
         "mode": "solo",
         "note": null,
-        "seconds": 8.8,
+        "seconds": 12.3,
         "tokens": {
-          "input": 5794,
-          "cached": 4879,
+          "input": 5836,
+          "cached": 4921,
           "cache_write": 663,
-          "output": 726,
+          "output": 1009,
           "requests": 2
         },
-        "cost_usd": 0.00052,
+        "cost_usd": 0.000662,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -162,7 +162,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Selling some BBB and junk bonds for government bonds would reduce credit and capital risk, but it would also give up yield: government bonds yield 3.31%, compared with 4.09% for investment-grade corporates and 5.65% for junk bonds. The capital charge is much lower for government bonds (0.5%) than for BBB corporates (1.5%) or junk bonds (8.0%). Still, the reported surplus loss after liability offsets from a broad credit-spread widening is only $0.22 billion, while the rate mismatch (duration gap) is flagged red; a credit shift would not directly fix that. I would consider a selective shift rather than a blanket sale, weighing the reduced risk against lower income; liquidity is amber at 101.7%, just above its 100% floor.",
+        "reply": "I would not make a broad credit sale the first move. A spread-widening stress of 100bp cuts bond values by $4.1bn, but the estimated loss to surplus after liabilities offset it is $0.22bn; the capital ratio is 159.6%, above the 100% floor. Swapping junk or BBB for government bonds would reduce credit-spread and capital risk, but gives up yield: government bonds yield 3.31%, versus 4.09% for investment-grade corporates and 5.65% for junk. The dashboard instead flags the rate mismatch (duration gap) as red and liquidity as amber, so credit trimming is a trade-off—not an obvious cure for the main warning lights this quarter.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -171,15 +171,15 @@
         "question": "Do we have enough cash on hand if policyholders start surrendering?",
         "mode": "solo",
         "note": null,
-        "seconds": 6.6,
+        "seconds": 7.4,
         "tokens": {
-          "input": 6047,
-          "cached": 4880,
-          "cache_write": 915,
-          "output": 415,
+          "input": 5861,
+          "cached": 4922,
+          "cache_write": 687,
+          "output": 481,
           "requests": 2
         },
-        "cost_usd": 0.000396,
+        "cost_usd": 0.000401,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -196,7 +196,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Yes, but only narrowly: our liquidity ratio is 101.7%, just above the 100% floor, so the dashboard marks liquidity amber. In the projection where rates rise 100 basis points and surrenders run at 1.5 times normal, the extra surrender outflow is $1.07 billion; the tool says our $5.7 billion of cash covers it. For the broader 90-day stress, liquid assets after stressed sale discounts are $8.69 billion against $8.54 billion of possible outflows. That leaves little room for worse-than-assumed withdrawals before we would need to sell other assets, potentially at a loss.",
+        "reply": "Yes, but only narrowly: our liquidity ratio is 101.7%, just above the 100% floor. In the modeled 90-day stress, available cash and government bonds after stressed sale discounts are $8.69bn against $8.54bn of possible outflows. In the separate scenario of rates rising 100bp and surrenders running at 1.5× normal, the extra surrender outflow is $1.07bn; the projection marks it as covered. So we can meet the modeled need, but there is little room for a worse-than-modeled rush of policyholders cashing out (surrenders).",
         "specialist_answers": [],
         "stopped": null
       },
@@ -205,15 +205,15 @@
         "question": "What would a 10% fall in the stock market do to us?",
         "mode": "solo",
         "note": null,
-        "seconds": 4.8,
+        "seconds": 4.3,
         "tokens": {
-          "input": 5326,
-          "cached": 4881,
+          "input": 5368,
+          "cached": 4923,
           "cache_write": 193,
-          "output": 282,
+          "output": 234,
           "requests": 2
         },
-        "cost_usd": 0.000239,
+        "cost_usd": 0.000216,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -230,7 +230,7 @@
         ],
         "facts_found": 1,
         "facts_total": 2,
-        "reply": "A hypothetical 10% stock-market fall would reduce our surplus by $0.79 billion. The modeled loss comes entirely from equity; the tool shows no change from rates, credit spreads, defaults, liquidity, or counterparty effects in this scenario. This is a what-if on today’s book, not a prediction of this quarter’s outcome.",
+        "reply": "In a hypothetical 10% stock-market fall, our surplus would fall by $0.79 billion on today’s book. The stress test attributes that entire change to equity exposure, with no rate, credit-spread, default, or liquidity moves in the scenario. This is a what-if, not a forecast of this quarter’s market move.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -239,15 +239,15 @@
         "question": "What would it cost per quarter to close half of our rate mismatch with swaps?",
         "mode": "solo",
         "note": null,
-        "seconds": 6.9,
+        "seconds": 5.6,
         "tokens": {
-          "input": 8358,
-          "cached": 7500,
-          "cache_write": 480,
-          "output": 283,
-          "requests": 3
+          "input": 5374,
+          "cached": 4924,
+          "cache_write": 198,
+          "output": 371,
+          "requests": 2
         },
-        "cost_usd": 0.000314,
+        "cost_usd": 0.000285,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -264,7 +264,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Closing half of the rate mismatch with swaps would cost $0.0202 billion per quarter on the preview. It would reduce the rate mismatch (duration gap) from -3.59 years to -1.8 years; this is a preview, not an executed trade.",
+        "reply": "Closing half of the rate mismatch (duration gap) with interest rate swaps would cost about $0.020 billion per quarter: five 10% increments at $0.004 billion each. That is a recurring hedge cost, whether or not rates move in your favor.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -273,15 +273,15 @@
         "question": "Should we add rate protection before the next quarter?",
         "mode": "solo",
         "note": null,
-        "seconds": 10.4,
+        "seconds": 10.2,
         "tokens": {
-          "input": 8340,
-          "cached": 7501,
-          "cache_write": 461,
-          "output": 720,
+          "input": 8777,
+          "cached": 7564,
+          "cache_write": 835,
+          "output": 604,
           "requests": 3
         },
-        "cost_usd": 0.00053,
+        "cost_usd": 0.00052,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -298,7 +298,7 @@
         ],
         "facts_found": 1,
         "facts_total": 2,
-        "reply": "Some rate protection is reasonable to consider: our rate mismatch (duration gap) is red at -3.59 years, and a 1 bp rate fall is associated with a $26.9 million surplus loss on the current book. We currently have no rate hedge; each additional 10% of hedging costs $0.004 billion per quarter. That recurring cost buys protection against falling rates, but it is not free, and the news is only a hint—not a forecast. I would weigh a partial hedge rather than assume maximum protection is best; this is a trade-off, not a trade proposal.",
+        "reply": "Adding some rate protection is worth considering: our rate mismatch (duration gap) is negative at -3.59 years, and a 1 bp fall in rates is associated with a $26.9 million surplus loss. The protection would reduce that falling-rate exposure, but it costs $0.004 billion per quarter for each extra 10% hedged and would also give up some benefit if rates rise. The news wire hints at hotter inflation, but it is not a forecast, so I would not base the decision on it. Our capital ratio is 159.6%, while liquidity is only just above its floor at 101.7%; keep the hedge cost in view rather than treating more protection as free.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -307,15 +307,15 @@
         "question": "What happens to us if one of our derivatives dealers fails?",
         "mode": "solo",
         "note": null,
-        "seconds": 7.0,
+        "seconds": 9.7,
         "tokens": {
-          "input": 5506,
-          "cached": 4878,
-          "cache_write": 376,
-          "output": 508,
-          "requests": 2
+          "input": 8498,
+          "cached": 7555,
+          "cache_write": 565,
+          "output": 626,
+          "requests": 3
         },
-        "cost_usd": 0.000375,
+        "cost_usd": 0.000497,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -332,7 +332,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Right now, our dashboard shows no uncollateralized dealer exposure, and our rate and equity hedges are both at 0%, so a dealer failure would not create a recorded loss on those hedges. If we later use derivatives, a failed dealer might not pay what it owes; we could then face a replacement cost to set up the same hedge elsewhere. Daily collateral and using more than one dealer can reduce that risk, but both add cost. This is counterparty risk—not a forecast that a dealer will fail.",
+        "reply": "At present, our rate and equity hedge levels are both zero, so there is no hedge gain for a dealer to withhold and no hedge to replace if our sole dealer fails. If we add hedges, a dealer failure creates counterparty risk: the bank may not pay what it owes, and replacing the hedge can cost more at then-current prices. We currently have one dealer and no collateral arrangement; daily collateral would add $0.0022 billion per quarter, while using three dealers would add $0.0037 billion per quarter. Those measures can limit dealer-failure losses, but they come with a cost.",
         "specialist_answers": [],
         "stopped": null
       }
@@ -343,25 +343,25 @@
         "question": "What is our biggest risk right now?",
         "mode": "team",
         "note": null,
-        "seconds": 26.9,
+        "seconds": 23.6,
         "tokens": {
-          "input": 21715,
-          "cached": 14099,
-          "cache_write": 6608,
-          "output": 2912,
-          "requests": 8
+          "input": 18570,
+          "cached": 13954,
+          "cache_write": 3734,
+          "output": 2141,
+          "requests": 7
         },
-        "cost_usd": 0.002524,
+        "cost_usd": 0.001765,
         "specialists": [
-          "portfolio_manager",
-          "actuary"
+          "actuary",
+          "portfolio_manager"
         ],
         "two_views": true,
         "facts": [
           {
             "name": "rate mismatch (years)",
             "target": -3.59,
-            "found": false
+            "found": true
           },
           {
             "name": "liquidity ratio (%)",
@@ -369,19 +369,19 @@
             "found": true
           }
         ],
-        "facts_found": 1,
+        "facts_found": 2,
         "facts_total": 2,
-        "reply": "The dashboard makes the rate mismatch the clearest headline risk: falling rates reduce surplus, while rising rates support it. The measured sensitivity is a $26.9 million surplus loss for each 1-basis-point rate decline. Bonnie puts more weight on near-term liquidity pressure; the liquidity ratio is 101.7%, only just above its floor, so the trade-off is rate exposure versus a thin cash buffer.",
+        "reply": "The clearest single risk is the red rate mismatch: at -3.59 years, falling rates hurt surplus because liabilities respond more than assets. Bonnie flags a second vulnerability: liquidity is only just above its required floor, while Morty favors safer matching even though it can cost yield. Their views reflect their biases—Morty is cautious, while Bonnie favors higher-yielding assets—and the trade-off is rate protection versus keeping enough readily available cash.",
         "specialist_answers": [
-          {
-            "agent": "portfolio_manager",
-            "agent_name": "Bonnie Yields (Portfolio Manager)",
-            "text": "I’d keep reaching for yield in credit and mortgages; liquidity—not equity exposure—is the sharper near-term pressure, with JXN’s liquidity ratio at 101.7%, though forced selling could still bite."
-          },
           {
             "agent": "actuary",
             "agent_name": "Morty Tables (Actuary)",
-            "text": "I’d put falling-rate exposure first and protect surplus before reaching for yield: a negative rate mismatch (duration gap) means liabilities are more rate-sensitive than assets, so falling rates squeeze surplus while rising rates support it. JXN’s variable-annuity guarantees rise by $4.73bn if rates fall 100bp—gross, not the company’s net surplus hit—and the tools don’t provide the size of the gap."
+            "text": "I’d prioritize closing the negative rate mismatch: if rates fall, liabilities gain more value than assets, squeezing surplus. The gap is -3.59 years, and each 1bp fall cuts surplus by $26.9 million; safer matching costs some yield, but I’ve seen that trade before."
+          },
+          {
+            "agent": "portfolio_manager",
+            "agent_name": "Bonnie Yields (Portfolio Manager)",
+            "text": "My biggest concern is thin liquidity headroom: corporate/BBB credit and alternatives can lose value or be hard to sell in stress, but I’d keep those higher-yielding assets working for policyholder promises. The liquidity ratio is 101.7%, leaving little room for a stumble—so liquidity is the lane I’d watch most closely."
           }
         ],
         "stopped": null
@@ -391,15 +391,15 @@
         "question": "How much would our surplus change if interest rates fell by 1%?",
         "mode": "team",
         "note": null,
-        "seconds": 6.7,
+        "seconds": 7.3,
         "tokens": {
           "input": 5315,
-          "cached": 4853,
-          "cache_write": 210,
-          "output": 391,
+          "cached": 5063,
+          "cache_write": 0,
+          "output": 464,
           "requests": 2
         },
-        "cost_usd": 0.000295,
+        "cost_usd": 0.000308,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -411,7 +411,7 @@
         ],
         "facts_found": 1,
         "facts_total": 1,
-        "reply": "A 1% fall in rates would reduce Jackson’s surplus by about $2.69 billion, using the dashboard sensitivity of a $26.9 million decrease per 1 basis point and scaling it to 100 basis points. The rate mismatch is negative, so falling rates hurt surplus; this is a straight-line estimate, not a full revaluation.",
+        "reply": "The dashboard implies surplus would decrease by about $2.69 billion for the rate fall you specified, using its sensitivity of a $26.9 million decrease per basis point. The negative duration gap means liabilities are more rate-sensitive than assets, so falling rates hurt surplus.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -420,15 +420,15 @@
         "question": "What is our capital ratio, and how close are we to the floor?",
         "mode": "team",
         "note": null,
-        "seconds": 3.9,
+        "seconds": 4.5,
         "tokens": {
           "input": 5315,
-          "cached": 2447,
-          "cache_write": 2616,
-          "output": 188,
+          "cached": 5063,
+          "cache_write": 0,
+          "output": 192,
           "requests": 2
         },
-        "cost_usd": 0.000471,
+        "cost_usd": 0.000172,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -445,7 +445,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Our capital ratio is 159.6%, compared with the 100% floor—59.6 percentage points above it. That is currently green; the ratio is surplus divided by a simplified capital requirement.",
+        "reply": "Our capital ratio is 159.6%, which is 59.6 percentage points above the 100% floor. That puts capital in the green zone; the capital ratio compares surplus with a simplified capital requirement.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -454,15 +454,15 @@
         "question": "Should we hedge more of the stock-market guarantees?",
         "mode": "team",
         "note": null,
-        "seconds": 25.6,
+        "seconds": 22.6,
         "tokens": {
-          "input": 15995,
-          "cached": 11530,
-          "cache_write": 3709,
-          "output": 3620,
+          "input": 15996,
+          "cached": 13957,
+          "cache_write": 1283,
+          "output": 2463,
           "requests": 6
         },
-        "cost_usd": 0.002465,
+        "cost_usd": 0.001607,
         "specialists": [
           "actuary",
           "trader"
@@ -482,17 +482,17 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Both specialists favor some added protection, but neither argues for hedging every guarantee. Morty stresses the cost and imperfect fit of puts; Swap Dogg emphasizes protection in a selloff and is predisposed to hedge more aggressively. The trade-off is cushioning guarantee losses against recurring premiums and collateral demands, which matter because liquidity is only slightly above its floor.",
+        "reply": "Morty and Swap Dogg both favor adding some protection, but Morty is more cautious: the guarantee cost is not the same as Jackson’s total surplus loss, and the tools do not quantify how much a particular hedge would offset. Swap Dogg emphasizes that puts would reduce downside in a stock fall but charge a premium every quarter, whether or not they pay. The trade-off is less exposure to the stock-market guarantees versus recurring hedge cost; the evidence supports weighing those costs, not treating more hedging as free protection.",
         "specialist_answers": [
           {
             "agent": "actuary",
             "agent_name": "Morty Tables (Actuary)",
-            "text": "I’d add some protection rather than leave these guarantees fully exposed, but not hedge every last bit: puts cost premium and can imperfectly track the guarantee. Jackson has $118.25bn of guaranteed account value and no equity-put hedge today."
+            "text": "I’d add protection, cautiously: equity-put cover is 0%, and the guarantees alone cost $0.71bn in a 10% stock fall; these figures don’t quantify how much a particular added hedge would offset. That is not the company’s surplus loss: our stocks and alternatives fall too, while bonds can gain when rates fall."
           },
           {
             "agent": "trader",
             "agent_name": "Swap Dogg (Trader)",
-            "text": "I’d increase stock-market protection, man: Jackson has 0% equity hedging against $7.9bn net equity exposure, and each extra 10% of put cover costs $0.0085bn quarterly; daily collateral adds $0.0022bn quarterly. That can cushion guarantee losses in a selloff, but gives up some equity risk premium; liquidity is 101.7% and the current hedge setup is uncollateralized with one dealer, so collateral needs and counterparty risk matter—still, peace of mind is cheap, man."
+            "text": "I’d add puts rather than leave Jackson’s stock-market guarantees exposed, man; each extra 10% of put protection costs $0.0085bn per quarter. Unhedged, a hypothetical 20% stock drop cut surplus by $1.581bn, while puts cost their premium whether or not they pay."
           }
         ],
         "stopped": null
@@ -502,15 +502,15 @@
         "question": "Should we sell some junk and BBB bonds and buy government bonds?",
         "mode": "team",
         "note": null,
-        "seconds": 21.7,
+        "seconds": 23.9,
         "tokens": {
-          "input": 15941,
-          "cached": 13254,
-          "cache_write": 1931,
-          "output": 2510,
+          "input": 16152,
+          "cached": 13353,
+          "cache_write": 2043,
+          "output": 2596,
           "requests": 6
         },
-        "cost_usd": 0.001705,
+        "cost_usd": 0.001763,
         "specialists": [
           "actuary",
           "portfolio_manager"
@@ -530,17 +530,17 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Bonnie favors keeping the BBB and junk bonds for their higher income, while acknowledging that government bonds would improve liquidity; her yield-seeking bias is relevant. Morty favors a modest shift to protect surplus, but says he cannot tell whether it improves matching without asset cash-flow and duration details; his cautious bias is relevant. The trade-off is stronger liquidity and lower credit risk versus giving up income, and the available information does not settle the size of any shift.",
+        "reply": "Bonnie favors keeping most of these bonds because their extra income supports policyholder promises; her yield-seeking bias can underweight credit risk. Morty is more cautious about credit risk, but his view is that matching would improve only if the government bonds’ duration fits the liabilities; his caution can undervalue the income given up. The trade-off is better credit quality and easier selling in stress versus lower income, and the figures provided do not show whether a particular switch would improve matching; the company’s rate mismatch is -3.59 years. [rate_mismatch]",
         "specialist_answers": [
           {
             "agent": "actuary",
             "agent_name": "Morty Tables (Actuary)",
-            "text": "My cautious bias favors a modest shift from junk and BBB bonds into government bonds to protect surplus, but I can’t tell whether it improves matching without the asset cash flows and durations; our liability duration is 11.25 years. The safer credit may reduce risk, though the yield and carry given up aren’t in my figures."
+            "text": "My cautious reading is that government bonds could reduce credit risk, but whether this shift improves asset-liability matching depends on the duration of the bonds bought versus those sold; the figures here don’t show that comparison, and giving up yield is the trade-off. Jackson’s whole-company rate mismatch is -3.59 years, meaning liabilities are more rate-sensitive than assets."
           },
           {
             "agent": "portfolio_manager",
             "agent_name": "Bonnie Yields (Portfolio Manager)",
-            "text": "I’d keep our BBB and junk bonds for their higher carry rather than shift them into lower-yielding government bonds; they add credit risk and are harder to sell quickly, while government bonds would strengthen liquidity. Our stressed liquidity ratio is 101.7%, and I’m still reaching for yield to help fund policyholder promises."
+            "text": "I’d keep most BBB and below-investment-grade bonds: their extra income supports policyholder promises, though they carry more credit risk, while government bonds are easier to sell in stress. Our below-investment-grade holdings yield 5.65%, so switching into governments would trim carry but improve credit quality and liquidity, where our buffer is thin."
           }
         ],
         "stopped": null
@@ -550,19 +550,20 @@
         "question": "Do we have enough cash on hand if policyholders start surrendering?",
         "mode": "team",
         "note": null,
-        "seconds": 15.8,
+        "seconds": 26.6,
         "tokens": {
-          "input": 13051,
-          "cached": 11594,
-          "cache_write": 827,
-          "output": 1009,
-          "requests": 5
+          "input": 18462,
+          "cached": 16136,
+          "cache_write": 1444,
+          "output": 2250,
+          "requests": 7
         },
-        "cost_usd": 0.000787,
+        "cost_usd": 0.001555,
         "specialists": [
-          "portfolio_manager"
+          "portfolio_manager",
+          "actuary"
         ],
-        "two_views": false,
+        "two_views": true,
         "facts": [
           {
             "name": "liquidity ratio (%)",
@@ -577,12 +578,17 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "JXN just covers modeled surrender and collateral needs: its liquidity ratio is 101.7%, only slightly above the 100% floor. That ratio counts cash and government bonds after stressed sale discounts against cash needs over 90 days; if withdrawals exceed the modeled buffer, less readily sold assets may have to be sold at larger discounts. Bonnie favors keeping yield-bearing credit invested, so her view appropriately weighs the return against the risk that the liquid buffer is narrow.",
+        "reply": "Jackson is only just covered: its liquidity ratio is 101.7%, barely above the 100% floor, so the buffer is thin. Morty’s stress assumes $1.07bn of extra surrender outflow and reports no surrender-charge offset; Bonnie says cash and government bonds are the ready pool, while relying on less-liquid assets could force sales at a loss. Bonnie’s yield-seeking bias is worth keeping in mind when judging how much of the wider investment portfolio is truly available as cash.",
         "specialist_answers": [
           {
             "agent": "portfolio_manager",
             "agent_name": "Bonnie Yields (Portfolio Manager)",
-            "text": "I see JXN just covering modeled surrender and collateral needs: its liquidity ratio—cash and government bonds after stressed sale discounts divided by 90-day cash needs—is 101.7%. I favor keeping yield-bearing credit working for policyholders, but if that narrow cash-and-government buffer runs out, the next assets to sell are less readily sold and would bring larger discounts."
+            "text": "I’d call Jackson only just covered for a 90-day surrender and collateral-call stress: its liquidity ratio is 101.7%. Cash and government bonds are the genuinely ready pool; corporates are next to sell, while below-investment-grade bonds, mortgages and alternatives are less liquid and carry larger stressed haircuts, so running through the ready pool risks forced selling."
+          },
+          {
+            "agent": "actuary",
+            "agent_name": "Morty Tables (Actuary)",
+            "text": "I’d keep a wary eye on cash: the 90-day stress assumes elevated surrenders as rates rise and shows $1.07bn of extra outflow; no surrender-charge offset is reported, so I wouldn’t rely on one."
           }
         ],
         "stopped": null
@@ -592,15 +598,15 @@
         "question": "What would a 10% fall in the stock market do to us?",
         "mode": "team",
         "note": null,
-        "seconds": 30.7,
+        "seconds": 23.0,
         "tokens": {
-          "input": 17963,
-          "cached": 15895,
-          "cache_write": 1186,
-          "output": 2552,
-          "requests": 7
+          "input": 15309,
+          "cached": 13310,
+          "cache_write": 1243,
+          "output": 1655,
+          "requests": 6
         },
-        "cost_usd": 0.001671,
+        "cost_usd": 0.001192,
         "specialists": [
           "actuary",
           "portfolio_manager"
@@ -620,17 +626,17 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Morty’s cautious guarantee lens puts the added gross guarantee cost at $0.71bn; most of the account value is policyholder money in separate accounts, and this is not the company’s total surplus change. Bonnie’s yield-seeking lens notes about $81 million of loss in our unhedged stock and alternatives holdings. Those are separate effects, so the overall net impact is not quantified by these figures.",
+        "reply": "Morty and Bonnie agree that policyholder account assets are not the same as Jackson’s own investments. Morty estimates a 10% stock fall adds $0.71bn to gross variable-annuity guarantee cost, but says that is not the surplus impact; Bonnie reports $3.36bn in company-owned alternatives with a stock-market beta of 0.241. The net change in surplus from that shock is not available from these figures.",
         "specialist_answers": [
           {
             "agent": "actuary",
             "agent_name": "Morty Tables (Actuary)",
-            "text": "I’d keep the guarantee risk in view, not mistake the whole account for our loss: the $118.25bn guaranteed account value is mostly policyholder-owned separate-account money, while a 10% stock fall adds $0.71bn to our gross guarantee cost, with 0% hedged by equity puts. The guarantee-liability value is -$4.11bn; that $0.71bn is not the company-wide surplus impact, since our own stock and alternatives losses and other offsets are not quantified here."
+            "text": "I’d keep the guarantee exposure separate from the policyholders’ account assets: a 10% stock fall adds $0.71bn to Jackson’s gross variable-annuity guarantee cost, but that is not the change in surplus. The separate-account assets belong to policyholders, while Jackson bears the guarantee; the company’s own stock and alternative holdings also fall, so the net surplus effect isn’t available from this figure."
           },
           {
             "agent": "portfolio_manager",
             "agent_name": "Bonnie Yields (Portfolio Manager)",
-            "text": "I’d keep alternatives for their yield, while recognizing our stock/alternatives exposure implies about an $81 million loss in the specified fall; the sleeve is deliberately unhedged, so there’s no market-hedge offset."
+            "text": "I’d keep our company-owned alternatives exposure distinct from policyholder accounts: alternatives, including stocks, total $3.36bn and have a stock-market beta of 0.241. The available figures don’t quantify the requested shock’s surplus impact or provide the separate-account exposure."
           }
         ],
         "stopped": null
@@ -640,15 +646,15 @@
         "question": "What would it cost per quarter to close half of our rate mismatch with swaps?",
         "mode": "team",
         "note": null,
-        "seconds": 11.2,
+        "seconds": 21.6,
         "tokens": {
-          "input": 10584,
-          "cached": 9630,
-          "cache_write": 450,
-          "output": 738,
+          "input": 10749,
+          "cached": 9677,
+          "cache_write": 568,
+          "output": 934,
           "requests": 4
         },
-        "cost_usd": 0.000572,
+        "cost_usd": 0.000685,
         "specialists": [
           "trader"
         ],
@@ -667,12 +673,12 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "The preview is for receive-fixed swaps covering half the current rate mismatch; those swaps gain when rates fall and bring the mismatch closer to zero. Swap Dogg favors broad hedging and tends to underweight its cost, so his estimate is a pricing input, not a recommendation.",
+        "reply": "The preview puts the quarterly cost at $0.0202bn for swaps covering half the rate mismatch. These receive-fixed swaps would reduce, not eliminate, the mismatch; this is a current-book estimate for one-quarter cash-settled contracts, not a forecast of future pricing.",
         "specialist_answers": [
           {
             "agent": "trader",
             "agent_name": "Swap Dogg (Trader)",
-            "text": "I’d estimate this as receive-fixed swaps sized to 50% of Jackson’s current rate mismatch, using the current book and the preview’s per-quarter pricing assumption. The preview estimates a cost of $0.0202bn per quarter, man."
+            "text": "I’d size the estimate as receive-fixed swaps covering half the current rate mismatch (+50% protection), taking the duration gap from -3.59 to -1.8 years; the preview prices that at $0.0202bn per quarter. That is the model’s current-book estimate for one-quarter, cash-settled swaps, man, and leaves the remaining half of the mismatch exposed."
           }
         ],
         "stopped": null
@@ -682,25 +688,25 @@
         "question": "Should we add rate protection before the next quarter?",
         "mode": "team",
         "note": null,
-        "seconds": 19.6,
+        "seconds": 22.8,
         "tokens": {
-          "input": 18531,
-          "cached": 16271,
-          "cache_write": 1378,
-          "output": 2097,
+          "input": 19185,
+          "cached": 16580,
+          "cache_write": 1723,
+          "output": 1971,
           "requests": 7
         },
-        "cost_usd": 0.001472,
+        "cost_usd": 0.001455,
         "specialists": [
-          "trader",
-          "actuary"
+          "actuary",
+          "trader"
         ],
         "two_views": true,
         "facts": [
           {
             "name": "rate mismatch (years)",
             "target": -3.59,
-            "found": false
+            "found": true
           },
           {
             "name": "swaps named",
@@ -708,19 +714,19 @@
             "found": true
           }
         ],
-        "facts_found": 1,
+        "facts_found": 2,
         "facts_total": 2,
-        "reply": "Morty’s cautious view reflects his tendency to overstate protection’s value and undervalue yield; he cannot quantify the company’s net surplus sensitivity from his results. Swap Dogg favors protection, but his known bias is to hedge everything and underweight cost, so the choice is between reducing rate exposure and paying for that protection—not a forecast of next quarter’s rates.",
+        "reply": "Both specialists favor positive rate protection—receive-fixed swaps—because the rate mismatch is negative 3.59 years, so falling rates hurt surplus; Morty emphasizes the liability risk, while Swap Dogg’s pro-hedging bias makes him downplay the cost. Fully closing the mismatch would cost $0.0404 billion this quarter, so the trade-off is less rate sensitivity versus a real hedge expense. That supports considering protection, but it does not settle how much to add; neither specialist knows what rates will do next quarter.",
         "specialist_answers": [
-          {
-            "agent": "trader",
-            "agent_name": "Swap Dogg (Trader)",
-            "text": "I’d favor adding receive-fixed interest rate swaps to close the rate mismatch; they gain when rates fall and lose value when rates rise, man. The book is currently unhedged, with a -$26.9 million-per-basis-point rate gap, and each extra 10% of rate protection costs $0.004 billion per quarter—peace of mind isn’t free."
-          },
           {
             "agent": "actuary",
             "agent_name": "Morty Tables (Actuary)",
-            "text": "I’d lean toward cautious additional rate protection, but the current rate mismatch and net surplus sensitivity aren’t in my tool results; liability duration is 11.25 years. The reason for caution is that the guarantees rise by $4.73bn if rates fall 100bp, though bonds also gain, so that is not the company’s surplus effect."
+            "text": "I’d favor positive rate protection (receive-fixed swaps) to close our negative rate mismatch—3.59 years—because falling rates hurt surplus; negative protection (pay-fixed) helps when rates rise but widens that mismatch. Falling rates also increase our stock-market guarantees, while rising rates can bring surrender cash demands; the modeled stress is covered by cash, though I’d keep liquidity close at hand."
+          },
+          {
+            "agent": "trader",
+            "agent_name": "Swap Dogg (Trader)",
+            "text": "I’d lean toward positive, receive-fixed rate protection: the current rate mismatch is -$26.9 million per bp, and that direction closes it; peace of mind is cheap, man. Fully closing it would cost $0.0404 billion this quarter, trading that cost for less rate mismatch."
           }
         ],
         "stopped": null
@@ -730,15 +736,15 @@
         "question": "What happens to us if one of our derivatives dealers fails?",
         "mode": "team",
         "note": null,
-        "seconds": 19.2,
+        "seconds": 12.5,
         "tokens": {
-          "input": 13690,
-          "cached": 12206,
-          "cache_write": 854,
-          "output": 1454,
-          "requests": 5
+          "input": 10459,
+          "cached": 9663,
+          "cache_write": 292,
+          "output": 432,
+          "requests": 4
         },
-        "cost_usd": 0.001019,
+        "cost_usd": 0.0004,
         "specialists": [
           "trader"
         ],
@@ -757,12 +763,12 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Jackson currently has no rate or equity hedges, so a dealer failure would not leave a current hedge to replace. The position is uncollateralized and Jackson relies on one dealer; if a future derivative were owed money and the dealer failed, recovering it could be difficult, and the replacement cost is not available here. The underlying exposures would remain: a $26.9 million surplus loss per basis-point rise in rates and $7.9 billion in net equity exposure. That is counterparty risk; collateral can reduce the amount at risk, but Jackson’s current arrangements are uncollateralized.",
+        "reply": "If a derivatives dealer fails, Jackson may not receive what the dealer owes; collateral can limit that loss, but any uncovered amount remains a risk. Jackson may also have to pay more to replace the hedge if market prices have moved, and we do not have company-specific figures here to quantify either exposure.",
         "specialist_answers": [
           {
             "agent": "trader",
             "agent_name": "Swap Dogg (Trader)",
-            "text": "Man, Jackson currently has no rate or equity hedges, is uncollateralized, and relies on one dealer, so there is no current hedge to replace if that dealer fails; its underlying exposures remain a $26.9 million surplus loss per basis-point rise in rates and $7.9 billion in net equity exposure. The actual replacement cost isn’t available from the company-specific data here, and without collateral any amount owed on a derivative could be harder to recover."
+            "text": "I’d want daily collateral and multiple dealers, man: collateral limits what Jackson could lose if a dealer fails, but any uncovered amount is counterparty exposure, and replacing the hedge can cost more if markets have moved. I don’t have company-specific collateral, exposure, or replacement-cost figures here, so I can’t quantify them; I’d still hedge fully, because peace of mind is cheap."
           }
         ],
         "stopped": null
@@ -775,36 +781,36 @@
       "facts_total": 19,
       "two_views_on_decisions": 0,
       "decision_questions": 3,
-      "avg_cost_usd": 0.000361,
-      "total_cost_usd": 0.003609,
-      "avg_seconds": 7.7,
+      "avg_cost_usd": 0.000408,
+      "total_cost_usd": 0.00408,
+      "avg_seconds": 7.6,
       "avg_tokens": {
-        "input": 6442,
-        "cached": 5665,
-        "cache_write": 487,
-        "output": 429,
+        "input": 6487,
+        "cached": 5469,
+        "cache_write": 728,
+        "output": 466,
         "requests": 2
       },
-      "cached_share": 0.879
+      "cached_share": 0.843
     },
     "team_summary": {
       "questions": 10,
       "errors": 0,
-      "facts_found": 17,
+      "facts_found": 19,
       "facts_total": 19,
       "two_views_on_decisions": 3,
       "decision_questions": 3,
-      "avg_cost_usd": 0.001298,
-      "total_cost_usd": 0.012981,
-      "avg_seconds": 18.1,
+      "avg_cost_usd": 0.00109,
+      "total_cost_usd": 0.010902,
+      "avg_seconds": 18.8,
       "avg_tokens": {
-        "input": 13810,
-        "cached": 11178,
-        "cache_write": 1977,
-        "output": 1747,
+        "input": 13551,
+        "cached": 11676,
+        "cache_write": 1233,
+        "output": 1510,
         "requests": 5
       },
-      "cached_share": 0.809
+      "cached_share": 0.862
     }
   },
   "E2": {
@@ -814,15 +820,15 @@
         "question": "What is our biggest risk right now?",
         "mode": "team",
         "note": "consult all three specialists (Morty, Bonnie and Swap Dogg), then synthesize.",
-        "seconds": 28.6,
+        "seconds": 20.3,
         "tokens": {
-          "input": 32149,
-          "cached": 27010,
-          "cache_write": 3753,
-          "output": 3621,
-          "requests": 11
+          "input": 25127,
+          "cached": 21054,
+          "cache_write": 2939,
+          "output": 2679,
+          "requests": 9
         },
-        "cost_usd": 0.002688,
+        "cost_usd": 0.002031,
         "specialists": [
           "portfolio_manager",
           "actuary",
@@ -843,22 +849,22 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "The clearest dashboard red flag is rate mismatch: the gap is -3.59 years, so falling rates put pressure on surplus. Liquidity is also tight, at 101.7%. The specialists prioritize different exposures—guarantees, liquidity, and rates; hedging can reduce rate risk but costs money, while favoring yield can leave less protection against credit losses or cash needs.",
+        "reply": "The strongest company-wide signal is rate mismatch (duration gap): the dashboard flags it red at -3.59 years, and falling rates reduce surplus; Morty and Swap Dogg focus on this exposure. Bonnie instead calls liquidity the tightest risk: the liquidity ratio is 101.7%, just above the 100% floor. Their biases matter: Morty is cautious and discounts yield, Bonnie reaches for yield and underweights credit, while Swap Dogg favors hedging and underweights cost—so they identify different risks, not a settled trade.",
         "specialist_answers": [
           {
             "agent": "portfolio_manager",
             "agent_name": "Bonnie Yields (Portfolio Manager)",
-            "text": "I see tight stressed liquidity as the biggest current risk; I favor keeping higher-yielding BBB, junk, and mortgage holdings to fund policyholder promises, though they are harder to sell quickly. The company’s liquidity ratio is 101.7%, leaving only a slim cushion against stressed cash needs."
+            "text": "I see liquidity as our tightest current risk: the stressed liquidity ratio is 101.7%, so our cushion is thin if cash demands rise—we need to keep our footing through the next stretch."
           },
           {
             "agent": "actuary",
             "agent_name": "Morty Tables (Actuary)",
-            "text": "I’d put the unhedged stock-market guarantees at the top of my watch list; I’m cautious about that exposure, even if protection costs carry. The tool shows a $4.73bn increase in guarantee cost under its rate-fall stress—gross guarantee exposure, not the company’s net surplus loss."
+            "text": "I’d put the biggest liability-side concern at our rate mismatch: liabilities are more rate-sensitive, so falling rates squeeze surplus; I’d favor closing that gap, though it costs carry. Surplus falls $26.9 million for each basis point rates fall."
           },
           {
             "agent": "trader",
             "agent_name": "Swap Dogg (Trader)",
-            "text": "I see falling rates as the biggest hedge risk: the book has no rate hedge and a -$26.9 million DV01 per basis point; a hypothetical 100-basis-point fall cuts surplus by $2.69 billion, so my preference is to hedge it fully, man. Current hedge cost is $0.0 billion this quarter, and each extra 10% of rate hedge costs $0.004 billion per quarter—peace of mind is cheap."
+            "text": "I see the biggest tested market exposure in rates: falling rates are the sore spot, man. On today’s book, a 100 bp fall cuts surplus by $2.69bn (a 100 bp rise adds $2.692bn), versus $1.581bn lost in the tested 20% equity drop; these are hypothetical stresses, not a forecast."
           }
         ],
         "stopped": null
@@ -868,15 +874,15 @@
         "question": "How much would our surplus change if interest rates fell by 1%?",
         "mode": "team",
         "note": "consult all three specialists (Morty, Bonnie and Swap Dogg), then synthesize.",
-        "seconds": 33.8,
+        "seconds": 27.0,
         "tokens": {
-          "input": 24304,
-          "cached": 20410,
-          "cache_write": 2760,
-          "output": 5160,
-          "requests": 9
+          "input": 21182,
+          "cached": 18144,
+          "cache_write": 2030,
+          "output": 4141,
+          "requests": 8
         },
-        "cost_usd": 0.003243,
+        "cost_usd": 0.002606,
         "specialists": [
           "trader",
           "actuary",
@@ -892,22 +898,22 @@
         ],
         "facts_found": 1,
         "facts_total": 1,
-        "reply": "The dashboard estimate is a $2.69bn decrease in surplus if rates fall by 1%. The liability and asset estimates from Morty and Bonnie do not reconcile to that company-level net estimate, so they should be treated as separate sensitivities, not combined as a confirmed answer; their usual caution and yield-seeking biases, alongside Swap Dogg’s preference to hedge broadly, are worth keeping in view.",
+        "reply": "For Jackson, Morty and Swap Dogg both estimate that a 1% rate fall reduces surplus by $2.69 billion; Swap Dogg says this reflects liabilities being more rate-sensitive than assets. Bonnie estimates the assets gain about $4.35 billion but says she cannot calculate the net surplus change without liability sensitivity, so her figure does not contradict their net estimate. Morty also reports a $4.73 billion increase in gross guarantee cost, but says it may already be included in the net sensitivity and should not be added again.",
         "specialist_answers": [
           {
             "agent": "trader",
             "agent_name": "Swap Dogg (Trader)",
-            "text": "Assuming only rates move by 100 bp and today’s hedges remain in place, Jackson’s net rate exposure is a $2.69bn surplus loss; the tool doesn’t separate the gross rate mismatch from the effect of existing hedges. I’d still favor hedging the mismatch fully, man—that’s my hedge-everything bias, not a claim that the hedge’s standalone impact is known."
+            "text": "For the requested rate-fall scenario, Jackson’s surplus falls by $2.69 billion, indicating liabilities are more rate-sensitive than assets; the size of the rate mismatch isn’t available from this result. My hedge-everything bias would favor fully closing that mismatch with receive-fixed swaps, which gain when rates fall, but the exact hedge amount and cost aren’t available here, man."
           },
           {
             "agent": "actuary",
             "agent_name": "Morty Tables (Actuary)",
-            "text": "I’d take my usual cautious line and favor protecting surplus, accepting some lost carry. Assuming a 100 bp fall, liability duration is 11.25 years and guarantee liabilities rise $4.73bn; without asset sensitivity, I can’t estimate the net surplus change."
+            "text": "I’d protect surplus and close the rate mismatch; assuming the current net sensitivity scales linearly, a 1% rate fall implies a $2.69bn surplus loss from the reported −$26.9mn per bp. Separately, the guarantees’ gross cost rises by $4.73bn in that rate scenario, but whether that is already reflected in the company-wide sensitivity is unavailable, so I would not add it again; I’ve seen that sort of double-counting survive longer than some bonds."
           },
           {
             "agent": "portfolio_manager",
             "agent_name": "Bonnie Yields (Portfolio Manager)",
-            "text": "I’d expect assets to gain about $4.3bn on the stated parallel rate fall, using a duration-only estimate from the portfolio’s 5.8-year duration and assuming spreads and other values stay unchanged. I can’t estimate the surplus change without liability rate sensitivity; my yield-seeking tilt can underweight credit risk."
+            "text": "I’d keep favoring higher-yielding bonds rated BBB or lower and mortgage loans to help fund policyholder promises; assuming the stated parallel rate fall and a linear duration response, assets gain about $4.35bn, but the surplus change is unavailable without liability rate sensitivity."
           }
         ],
         "stopped": null
@@ -917,17 +923,21 @@
         "question": "What is our capital ratio, and how close are we to the floor?",
         "mode": "team",
         "note": "consult all three specialists (Morty, Bonnie and Swap Dogg), then synthesize.",
-        "seconds": 5.6,
+        "seconds": 17.7,
         "tokens": {
-          "input": 5480,
-          "cached": 4877,
-          "cache_write": 351,
-          "output": 365,
-          "requests": 2
+          "input": 23536,
+          "cached": 20490,
+          "cache_write": 1912,
+          "output": 2060,
+          "requests": 9
         },
-        "cost_usd": 0.0003,
-        "specialists": [],
-        "two_views": false,
+        "cost_usd": 0.001587,
+        "specialists": [
+          "actuary",
+          "trader",
+          "portfolio_manager"
+        ],
+        "two_views": true,
         "facts": [
           {
             "name": "capital ratio (%)",
@@ -942,8 +952,24 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Our capital ratio is 159.6%, against a 100% floor, so we are above the floor; the dashboard marks capital green. This ratio compares surplus with a simplified capital requirement, so it is a cushion measure—not a guarantee that losses cannot occur.",
-        "specialist_answers": [],
+        "reply": "Our capital ratio is 159.6%, which is 59.6 percentage points above the 100% floor. Morty and Bonnie cannot substantiate that figure from their areas; Swap Dogg reports it, while his bias is to favor more hedging, which does not change the current ratio.",
+        "specialist_answers": [
+          {
+            "agent": "actuary",
+            "agent_name": "Morty Tables (Actuary)",
+            "text": "I’d protect surplus and work to close the rate mismatch; this liability view cannot substantiate a capital ratio or distance to the capital floor. The whole-company rate mismatch is -3.59 years, leaving liabilities more rate-sensitive than assets when rates fall—a familiar old-cycle concern."
+          },
+          {
+            "agent": "trader",
+            "agent_name": "Swap Dogg (Trader)",
+            "text": "I’m a hedge-everything old hand, man; this view puts the company’s capital ratio at 159.6%, which is 59.6 percentage points above the 100% floor. That’s a solid cushion, though I’d still rather keep risks hedged."
+          },
+          {
+            "agent": "portfolio_manager",
+            "agent_name": "Bonnie Yields (Portfolio Manager)",
+            "text": "I favor keeping higher-yielding credit in the mix to help fund policyholder promises, though spread risk remains. I can’t substantiate a company-specific capital ratio or distance to the 100% floor from my investment view; the available spread stress shows a $0.22bn surplus loss after liability offset."
+          }
+        ],
         "stopped": null
       },
       {
@@ -951,18 +977,18 @@
         "question": "Should we hedge more of the stock-market guarantees?",
         "mode": "team",
         "note": "consult all three specialists (Morty, Bonnie and Swap Dogg), then synthesize.",
-        "seconds": 20.1,
+        "seconds": 21.7,
         "tokens": {
-          "input": 18676,
-          "cached": 16393,
-          "cache_write": 1401,
-          "output": 2402,
-          "requests": 7
+          "input": 16145,
+          "cached": 14026,
+          "cache_write": 1363,
+          "output": 2805,
+          "requests": 6
         },
-        "cost_usd": 0.001628,
+        "cost_usd": 0.001789,
         "specialists": [
-          "trader",
-          "actuary"
+          "actuary",
+          "trader"
         ],
         "two_views": true,
         "facts": [
@@ -979,17 +1005,17 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Both favor adding stock-market protection. Morty focuses on the guarantees growing when markets fall; Swap Dogg stresses that put options cost a premium even when they do not pay out. The trade-off is reducing guarantee risk versus giving up return and paying an ongoing hedge cost.",
+        "reply": "Morty favors more put protection, reflecting his cautious bias; he estimates a 10% stock-market fall adds $0.71bn of gross guarantee cost. Swap Dogg favors a full hedge, reflecting his tendency to hedge everything; that protection costs $0.0851bn each quarter. The trade-off is less exposure to stock losses versus a recurring premium, and the tools do not quantify how closely the puts would track the guarantee losses.",
         "specialist_answers": [
-          {
-            "agent": "trader",
-            "agent_name": "Swap Dogg (Trader)",
-            "text": "I’d favor more stock-market protection with puts, man: the full-hedge preview takes net equity exposure from $7.9bn to $0.81bn, though the premium is paid whether or not it pays out. Moving from the current 0% hedge to 100% costs $0.0851bn this quarter, so that recurring cost is the concern."
-          },
           {
             "agent": "actuary",
             "agent_name": "Morty Tables (Actuary)",
-            "text": "I’d lean toward more protection: Jackson’s stock-market guarantees have no put hedge, and falling rates can also enlarge the promise, though protection gives up return. In the stock-fall stress, guarantee cost rises by $0.71bn gross—not the company’s net loss, since bonds may gain while stocks and alternatives fall."
+            "text": "My cautious bias is to favor more put protection, assuming a 10% stock fall and today’s 0% hedge: Jackson’s guarantees are $4.11bn of liability on $118.25bn of guaranteed accounts, and that stock fall adds $0.71bn of gross guarantee cost. More puts would offset some of that cost, but they charge a premium every quarter."
+          },
+          {
+            "agent": "trader",
+            "agent_name": "Swap Dogg (Trader)",
+            "text": "I’d hedge the stock-market guarantees fully—my hedge-everything bias, man; Jackson is currently at 0% equity hedging, and a 100% stock-put hedge would take net equity exposure from $7.9bn to $0.81bn, costing $0.0851bn per quarter. The preview leaves liquidity at 101.7%, while these tools don’t quantify any basis mismatch between the puts and guarantee losses."
           }
         ],
         "stopped": null
@@ -999,18 +1025,19 @@
         "question": "Should we sell some junk and BBB bonds and buy government bonds?",
         "mode": "team",
         "note": "consult all three specialists (Morty, Bonnie and Swap Dogg), then synthesize.",
-        "seconds": 22.2,
+        "seconds": 23.0,
         "tokens": {
-          "input": 16108,
-          "cached": 13260,
-          "cache_write": 2092,
-          "output": 2285,
-          "requests": 6
+          "input": 21777,
+          "cached": 18167,
+          "cache_write": 2602,
+          "output": 3611,
+          "requests": 8
         },
-        "cost_usd": 0.001612,
+        "cost_usd": 0.002413,
         "specialists": [
+          "portfolio_manager",
           "actuary",
-          "portfolio_manager"
+          "trader"
         ],
         "two_views": true,
         "facts": [
@@ -1027,17 +1054,22 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Bonnie favors keeping most riskier bonds for their higher income; Morty favors trimming some to protect surplus. The trade-off is higher yield against greater credit risk and harder selling in stress. Morty also notes this change would not address the company’s rate or stock-guarantee exposures.",
+        "reply": "The trade-off is clear: government bonds improve saleability and reduce credit exposure, but sacrifice yield; Morty and Swap Dogg lean toward trimming, while Bonnie prefers keeping much of the higher-yield holdings. Bonnie reports a 101.7% liquidity ratio and calls the cushion thin, so liquidity is a genuine concern, not a reason by itself to choose a trade. Their known biases matter here: Morty is cautious, Bonnie tends to underweight credit risk, and Swap Dogg tends to underweight hedge costs; the specialists cannot quantify the proposed switch’s size or income cost.",
         "specialist_answers": [
-          {
-            "agent": "actuary",
-            "agent_name": "Morty Tables (Actuary)",
-            "text": "I’d lean toward trimming some riskier bonds for government bonds to protect surplus, though that gives up yield; in the modeled stress, extra surrenders are $1.07bn and are covered by $5.7bn of cash alone. Liability duration is 11.25 years, and variable-annuity guarantees rise $4.73bn if rates fall 100bp, so the credit switch does not by itself resolve the liability-rate mismatch or stock-guarantee exposure."
-          },
           {
             "agent": "portfolio_manager",
             "agent_name": "Bonnie Yields (Portfolio Manager)",
-            "text": "I’d keep most of our BBB and below-investment-grade bonds rather than make a broad switch to government bonds: they earn more to help fund policyholder promises, while governments are easier to sell and carry less credit risk. Our stressed spread-widening loss to surplus after liability offsets is $0.22bn; my yield-seeking view is that retaining credit is worth considering, though forced-sale costs could make the risk worse."
+            "text": "I’d keep much of our BBB and junk exposure for the higher yield that helps fund policyholder promises; switching into government bonds would improve saleability but give up income. Our liquidity ratio is 101.7%, a thin cushion, and my caution is that credit losses and stressed selling can erode the benefit."
+          },
+          {
+            "agent": "actuary",
+            "agent_name": "Morty Tables (Actuary)",
+            "text": "I’d lean toward a modest switch into government bonds to protect surplus and keep assets easier to sell, though it gives up yield; without the bonds’ durations, I can’t say whether it would close our rate mismatch. Our negative 3.59-year rate mismatch leaves surplus exposed when rates fall, while the +100bp, 1.5× surrender stress means an extra $1.07bn outflow, covered by $5.7bn cash."
+          },
+          {
+            "agent": "trader",
+            "agent_name": "Swap Dogg (Trader)",
+            "text": "I’d lean toward trimming BBB and below-investment-grade bonds for government bonds: that reduces credit-spread and default exposure and adds more liquid assets, but gives up yield and carry; this tool can’t quantify the trade size or carry cost. In a hypothetical credit-spread stress, today’s book loses $0.248bn to spreads."
           }
         ],
         "stopped": null
@@ -1047,18 +1079,18 @@
         "question": "Do we have enough cash on hand if policyholders start surrendering?",
         "mode": "team",
         "note": "consult all three specialists (Morty, Bonnie and Swap Dogg), then synthesize.",
-        "seconds": 20.2,
+        "seconds": 16.8,
         "tokens": {
-          "input": 15365,
-          "cached": 13252,
-          "cache_write": 1357,
-          "output": 2448,
+          "input": 15574,
+          "cached": 13341,
+          "cache_write": 1477,
+          "output": 1964,
           "requests": 6
         },
-        "cost_usd": 0.001602,
+        "cost_usd": 0.001376,
         "specialists": [
-          "portfolio_manager",
-          "actuary"
+          "actuary",
+          "portfolio_manager"
         ],
         "two_views": true,
         "facts": [
@@ -1075,17 +1107,17 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Yes in the modeled stress, but only narrowly: the company’s liquidity ratio is 101.7%, just above its 100% floor. Morty says cash alone covers the extra surrender outflow in his scenario; Bonnie’s broader 90-day test leaves little spare room, and using other assets could mean selling them at a discount. Morty’s cautious bias emphasizes liability risk; Bonnie’s yield-seeking bias can underweight credit risk, so her comfort with the asset position deserves that caveat.",
+        "reply": "The company’s liquidity ratio is 101.7%, so the tested cash-and-government-bond resources only narrowly cover stressed near-term needs. Morty’s surrender test is reassuring for the extra outflow it tested; Bonnie’s warning is that larger needs could force sales of less-liquid assets at a discount. In short: enough for the modeled stress, but not a generous cushion.",
         "specialist_answers": [
-          {
-            "agent": "portfolio_manager",
-            "agent_name": "Bonnie Yields (Portfolio Manager)",
-            "text": "I see $5.7bn in cash and short-term assets; under the 90-day stress, cash plus government bonds after stressed discounts is $8.69bn against $8.54bn of outflows—a 101.7% liquidity ratio. I’d keep higher-yielding holdings to support policyholder promises, but only cash and government bonds count in that measure; selling other assets next means larger haircuts."
-          },
           {
             "agent": "actuary",
             "agent_name": "Morty Tables (Actuary)",
-            "text": "I’d keep a cautious cash buffer; surrender pressure rises when market rates move above the crediting rate. In the rates-up, 1.5x-surrenders scenario, Jackson’s extra surrender outflow is $1.07bn against $5.7bn of cash on hand, so cash covers the projected outflow; it also has $3.01bn in government bonds."
+            "text": "I’d keep a cautious cash buffer; our stress test says cash covers an extra $1.07bn surrender outflow. Fixed and indexed annuities are fully surrenderable, so I’d rather keep the cushion than rely on selling bonds in a hurry."
+          },
+          {
+            "agent": "portfolio_manager",
+            "agent_name": "Bonnie Yields (Portfolio Manager)",
+            "text": "I’d keep reaching for yield rather than hold more idle cash; our stressed liquidity ratio is 101.7%, with cash and government bonds after stressed haircuts only narrowly covering 90-day needs. The next assets to sell—corporates, mortgages and alternatives—would face larger stressed haircuts, so the cushion is thin."
           }
         ],
         "stopped": null
@@ -1095,15 +1127,15 @@
         "question": "What would a 10% fall in the stock market do to us?",
         "mode": "team",
         "note": "consult all three specialists (Morty, Bonnie and Swap Dogg), then synthesize.",
-        "seconds": 20.2,
+        "seconds": 31.3,
         "tokens": {
-          "input": 15547,
-          "cached": 13237,
-          "cache_write": 1554,
-          "output": 2391,
+          "input": 16146,
+          "cached": 13377,
+          "cache_write": 2013,
+          "output": 3807,
           "requests": 6
         },
-        "cost_usd": 0.001598,
+        "cost_usd": 0.002364,
         "specialists": [
           "actuary",
           "portfolio_manager"
@@ -1123,17 +1155,17 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "A 10% stock-market fall would pressure surplus, but the available figures do not establish the whole-company net effect: Morty estimates $0.71bn of additional gross stock-market guarantee liabilities, while Bonnie estimates $81 million of losses in the alternatives-and-stocks bucket. Morty’s cautious estimate excludes company-asset losses and any bond gains from rate moves; Bonnie notes the data do not separate policyholder accounts from company-owned exposure. So those figures are not a complete net-loss calculation.",
+        "reply": "For the requested fall, the dashboard’s equity sensitivity implies about $0.79bn of equity-exposure loss, but that is not a complete company forecast. Morty’s isolated estimate is a further $0.71bn increase in stock-market-guarantee cost and reduction in surplus; do not add the estimates because overlap is not resolved. Bonnie identifies alternatives exposure but cannot separate company-borne holdings from policyholder accounts, so the total effect remains uncertain; her yield-seeking bias favors retaining alternatives.",
         "specialist_answers": [
           {
             "agent": "actuary",
             "agent_name": "Morty Tables (Actuary)",
-            "text": "I’d protect surplus; a 10% stock fall adds $0.71bn to guarantee liabilities on a gross basis, with no equity puts in place. That is not the net-surplus change: the estimate omits losses on company stocks and alternatives and any bond gains from rate moves, so it cannot give the whole-company result."
+            "text": "I’d use the guarantees-only hit as the cautious estimate, assuming rates and all other assets and liabilities are unchanged; there is no equity-put protection in the current position. The stock-market guarantees add $0.71bn of cost, reducing surplus by the same amount on that isolated basis—the total-company effect cannot be quantified from this result."
           },
           {
             "agent": "portfolio_manager",
             "agent_name": "Bonnie Yields (Portfolio Manager)",
-            "text": "I see direct stock-market exposure in alternatives, including stocks; using the reported beta, a 10% market fall implies about $81 million of losses on that bucket. The data don’t break out separate-account assets, so I can’t distinguish any policyholder-account exposure from the insurer’s own exposure."
+            "text": "My yield-seeking bias favors keeping alternatives for their return potential: the asset summary lists $3.36bn in alternatives (including stocks) and a 0.241 stock-market beta, but does not provide a direct-loss estimate for the stated market fall. It doesn’t separate Jackson-borne holdings from policyholder separate accounts or quantify the capital impact; the reported liquidity ratio is 101.7%."
           }
         ],
         "stopped": null
@@ -1143,18 +1175,18 @@
         "question": "What would it cost per quarter to close half of our rate mismatch with swaps?",
         "mode": "team",
         "note": "consult all three specialists (Morty, Bonnie and Swap Dogg), then synthesize.",
-        "seconds": 20.4,
+        "seconds": 23.1,
         "tokens": {
-          "input": 21009,
-          "cached": 18014,
-          "cache_write": 1987,
-          "output": 2960,
-          "requests": 8
+          "input": 24727,
+          "cached": 20757,
+          "cache_write": 2836,
+          "output": 3616,
+          "requests": 9
         },
-        "cost_usd": 0.002009,
+        "cost_usd": 0.002483,
         "specialists": [
-          "trader",
           "actuary",
+          "trader",
           "portfolio_manager"
         ],
         "two_views": true,
@@ -1172,22 +1204,22 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Swap Dogg estimates the requested receive-fixed swaps would cost $0.020bn per quarter. Morty disagrees that the size and cost can be established from the supplied mismatch figures; Bonnie supports reducing the rate mismatch but flags the thin liquidity cushion. The trade-off is paying recurring hedge cost to reduce rate sensitivity while keeping liquidity and counterparty risk in view.",
+        "reply": "Swap Dogg estimates the half-close would cost $0.0202 billion per quarter using receive-fixed interest rate swaps. Morty’s protection-first view and Bonnie’s yield-focused view frame the trade-off: less rate mismatch exposure versus lower carry and possible cash pressure from collateral. Swap Dogg favors hedging, so treat his cost view with that bias in mind.",
         "specialist_answers": [
-          {
-            "agent": "trader",
-            "agent_name": "Swap Dogg (Trader)",
-            "text": "I’d size receive-fixed swaps at +50% of the rate mismatch; estimated cost is $0.020bn per quarter. Material caveat, man: today’s setup is uncollateralized and uses one dealer, so counterparty risk remains."
-          },
           {
             "agent": "actuary",
             "agent_name": "Morty Tables (Actuary)",
-            "text": "I would not size a half-closing swap from these figures: the liability duration is 11.25 years, but the rate mismatch and quarterly swap price are not supplied, so neither the swap size nor its cost can be reported."
+            "text": "I’d favor receive-fixed swaps to close part of the mismatch and protect surplus; I won’t estimate the quarterly trade cost, which is outside my area. Assets have 5.8 years’ duration against 11.25 for liabilities, a -3.59-year rate mismatch, and surplus falls $26.9 million per bp rates fall; separately, guarantees rise $4.73 billion for a 100bp rate fall, gross, with no equity-put hedge."
+          },
+          {
+            "agent": "trader",
+            "agent_name": "Swap Dogg (Trader)",
+            "text": "I’d use a 50% receive-fixed swap hedge to close half the mismatch, man; the preview moves net DV01 from -$26.9 million per bp to -$13.5 million per bp, though it doesn’t provide a dollar notional for the swaps. Assuming that 50% rate-hedge setting, the quarterly cost is $0.0202 billion—peace of mind is cheap."
           },
           {
             "agent": "portfolio_manager",
             "agent_name": "Bonnie Yields (Portfolio Manager)",
-            "text": "I’d favor receive-fixed swaps for the requested mismatch reduction, keeping our yield engine in the race; asset duration is 5.8 years. The tools don’t provide quarterly swap carry cost, and our liquid cushion is only just above its floor, so I’d keep it in view."
+            "text": "I’d keep our yield engine moving while using swaps to better match assets to promises: asset duration is 5.8 years, but my tools lack liability mismatch and swap pricing, so I can’t estimate the quarterly cost to close half. A hedge could reduce income after hedge costs (carry) and require cash collateral, putting pressure on liquidity."
           }
         ],
         "stopped": null
@@ -1197,15 +1229,15 @@
         "question": "Should we add rate protection before the next quarter?",
         "mode": "team",
         "note": "consult all three specialists (Morty, Bonnie and Swap Dogg), then synthesize.",
-        "seconds": 23.3,
+        "seconds": 19.3,
         "tokens": {
-          "input": 22507,
-          "cached": 19167,
-          "cache_write": 2332,
-          "output": 2905,
-          "requests": 8
+          "input": 16236,
+          "cached": 13975,
+          "cache_write": 1505,
+          "output": 2269,
+          "requests": 6
         },
-        "cost_usd": 0.002036,
+        "cost_usd": 0.001538,
         "specialists": [
           "actuary",
           "trader"
@@ -1225,17 +1257,17 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "JXN has a red rate mismatch (duration gap) of -3.59 years, so falling rates reduce surplus; both specialists favor receive-fixed swaps, though Morty emphasizes liability risk and Swap Dogg focuses on closing the mismatch. The trade-off is hedge cost against liquidity headroom: the preview keeps liquidity above its floor, but with little room to spare.",
+        "reply": "Both favor adding positive rate protection: Jackson’s rate mismatch is -3.59 years, leaving surplus exposed if rates fall. Morty emphasizes that exposure; Swap Dogg favors a receive-fixed swap but flags its quarterly cost of $0.0404 billion. The trade-off is less rate risk versus a recurring hedge cost; neither specialist can tell us what rates will do next quarter.",
         "specialist_answers": [
           {
             "agent": "actuary",
             "agent_name": "Morty Tables (Actuary)",
-            "text": "I’d favor added receive-fixed swaps, cautiously: our liabilities have 11.25 years of duration, and guarantee costs rise $4.73bn if rates fall 100bp—gross guarantee exposure, not net surplus sensitivity. That protects against falling rates, but the swaps lose value if rates rise."
+            "text": "I’d add positive rate protection: liabilities are more rate-sensitive than assets, leaving Jackson with a negative rate mismatch and exposed if rates fall; unhedged, surplus falls $26.9 million for a 1 bp decline."
           },
           {
             "agent": "trader",
             "agent_name": "Swap Dogg (Trader)",
-            "text": "I’d lean toward +100% receive-fixed rate protection to close JXN’s current rate mismatch, man; it costs $0.0404bn this quarter, versus $0.004bn per added 10% of protection. The preview leaves capital at 159.6% and liquidity at 101.7%—above the 100% floors, but liquidity has little headroom."
+            "text": "I’d favor closing the rate mismatch, man: it’s -3.59 years with net DV01 of -$26.9 million per bp, and a 100% receive-fixed swap preview takes both to zero. That preview costs $0.0404 billion per quarter, against $0.1522 billion of quarterly carry—peace of mind is cheap, man."
           }
         ],
         "stopped": null
@@ -1245,15 +1277,15 @@
         "question": "What happens to us if one of our derivatives dealers fails?",
         "mode": "team",
         "note": "consult all three specialists (Morty, Bonnie and Swap Dogg), then synthesize.",
-        "seconds": 19.3,
+        "seconds": 21.8,
         "tokens": {
-          "input": 16199,
-          "cached": 13789,
-          "cache_write": 1654,
-          "output": 2612,
-          "requests": 6
+          "input": 19935,
+          "cached": 16593,
+          "cache_write": 2460,
+          "output": 2539,
+          "requests": 7
         },
-        "cost_usd": 0.001726,
+        "cost_usd": 0.001831,
         "specialists": [
           "portfolio_manager",
           "trader"
@@ -1273,17 +1305,17 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "A dealer failure could leave Jackson without the affected hedge and force it to replace that protection at then-current terms; that is counterparty risk and replacement cost. Swap Dogg focuses on the lost hedge and cost to rebuild it, while Bonnie focuses on the cash pressure from collateral; they agree the company-specific dealer exposure and contract protections are not available, so the loss or cash need cannot be sized. Bonnie reports a stressed liquidity ratio of 101.7%, including collateral calls, but that does not establish that every dealer exposure is protected.",
+        "reply": "If a derivatives dealer failed, Jackson could lose what the dealer owed on its hedges and incur the cost of replacing them; collateral can limit the loss, but the specialists lack Jackson-specific dealer exposures and collateral terms, so they cannot quantify the impact. Bonnie highlights liquidity: the company’s liquidity ratio is 101.7%, but that does not measure the cost of replacing a hedge. They agree the direct exposure is uncertain; Bonnie’s yield-seeking bias can make her underweight credit risk, while Swap Dogg’s preference to hedge can make him underweight hedge costs.",
         "specialist_answers": [
           {
             "agent": "portfolio_manager",
             "agent_name": "Bonnie Yields (Portfolio Manager)",
-            "text": "I’d keep our eyes on the cash lane: a dealer failure could leave a hedge unpaid or create collateral-related cash needs; our stressed liquidity ratio is 101.7%, with collateral calls included in the 90-day stress. The available facts don’t show Jackson’s dealer exposure or collateral-agreement terms, so I can’t size the loss or any cash call—we have a solid race position, not a dealer-specific all-clear."
+            "text": "I’d keep the yield engine running, but these figures don’t show Jackson’s dealer-by-dealer exposure or collateral terms, so I can’t quantify a dealer failure’s direct loss or cash call. Our liquidity ratio is 101.7% after stressed cash and government-bond capacity against 90-day needs that include collateral calls; the impact of a specific dealer failure remains uncertain."
           },
           {
             "agent": "trader",
             "agent_name": "Swap Dogg (Trader)",
-            "text": "I’d treat a dealer failure as real counterparty risk, man: the dashboard shows net DV01 of -$26.9 million, but not how much of that exposure sits with any one dealer. The hedge could be lost and rebuilding it would incur replacement cost at then-current terms; Jackson’s dealer-specific exposure, the replacement-cost amount, and any collateral or CSA protections aren’t provided here."
+            "text": "If a derivatives dealer failed, Jackson could lose amounts owed on its hedges and face the cost of replacing them; collateral can limit that exposure, but I don’t have Jackson-specific collateral terms or a quantified dealer-failure loss. The dashboard shows a 101.7% liquidity ratio, man, but that doesn’t measure replacement cost."
           }
         ],
         "stopped": null
@@ -1296,36 +1328,36 @@
       "facts_total": 19,
       "two_views_on_decisions": 3,
       "decision_questions": 3,
-      "avg_cost_usd": 0.001844,
-      "total_cost_usd": 0.018442,
-      "avg_seconds": 21.4,
+      "avg_cost_usd": 0.002002,
+      "total_cost_usd": 0.020018,
+      "avg_seconds": 22.2,
       "avg_tokens": {
-        "input": 18734,
-        "cached": 15941,
-        "cache_write": 1924,
-        "output": 2715,
+        "input": 20038,
+        "cached": 16992,
+        "cache_write": 2114,
+        "output": 2949,
         "requests": 7
       },
-      "cached_share": 0.851
+      "cached_share": 0.848
     },
     "route_summary": {
       "questions": 10,
       "errors": 0,
-      "facts_found": 17,
+      "facts_found": 19,
       "facts_total": 19,
       "two_views_on_decisions": 3,
       "decision_questions": 3,
-      "avg_cost_usd": 0.001298,
-      "total_cost_usd": 0.012981,
-      "avg_seconds": 18.1,
+      "avg_cost_usd": 0.00109,
+      "total_cost_usd": 0.010902,
+      "avg_seconds": 18.8,
       "avg_tokens": {
-        "input": 13810,
-        "cached": 11178,
-        "cache_write": 1977,
-        "output": 1747,
+        "input": 13551,
+        "cached": 11676,
+        "cache_write": 1233,
+        "output": 1510,
         "requests": 5
       },
-      "cached_share": 0.809
+      "cached_share": 0.862
     }
   },
   "E3": {
@@ -1333,61 +1365,58 @@
       {
         "ticker": "JXN",
         "variant": "targeted (k=4)",
-        "seconds": 35.0,
-        "searches": 16,
-        "chunks_read": 32,
+        "seconds": 38.2,
+        "searches": 17,
+        "chunks_read": 36,
         "tokens": {
-          "input": 76972,
-          "cached": 53106,
-          "cache_write": 23110,
-          "output": 3355,
+          "input": 95860,
+          "cached": 70315,
+          "cache_write": 24789,
+          "output": 3543,
           "requests": 6
         },
-        "cost_usd": 0.005173,
+        "cost_usd": 0.005649,
         "accepted": {
           "govt_share_of_bonds": 0.063502461909089,
-          "below_ig_share_of_bonds": 0.065,
-          "bbb_share_of_bonds": 0.409,
-          "guaranteed_account_value": 242.757
+          "guaranteed_account_value": 174.293
         },
-        "rejected": 0
+        "rejected": 2
       },
       {
         "ticker": "JXN",
         "variant": "large read (16 chunks per search)",
-        "seconds": 39.8,
-        "searches": 15,
-        "chunks_read": 105,
+        "seconds": 37.4,
+        "searches": 19,
+        "chunks_read": 111,
         "tokens": {
-          "input": 215639,
-          "cached": 140205,
-          "cache_write": 74678,
-          "output": 3714,
+          "input": 241376,
+          "cached": 169691,
+          "cache_write": 70929,
+          "output": 3412,
           "requests": 6
         },
-        "cost_usd": 0.012669,
+        "cost_usd": 0.012345,
         "accepted": {
           "govt_share_of_bonds": 0.063502461909089,
           "below_ig_share_of_bonds": 0.065,
-          "bbb_share_of_bonds": 0.409,
-          "guaranteed_account_value": 174.293
+          "bbb_share_of_bonds": 0.409
         },
         "rejected": 0
       },
       {
         "ticker": "LNC",
         "variant": "targeted (k=4)",
-        "seconds": 45.5,
-        "searches": 15,
-        "chunks_read": 34,
+        "seconds": 27.7,
+        "searches": 18,
+        "chunks_read": 35,
         "tokens": {
-          "input": 175922,
-          "cached": 154438,
-          "cache_write": 19468,
-          "output": 2403,
-          "requests": 16
+          "input": 71470,
+          "cached": 47966,
+          "cache_write": 22748,
+          "output": 2218,
+          "requests": 6
         },
-        "cost_usd": 0.005381,
+        "cost_usd": 0.004508,
         "accepted": {
           "govt_share_of_bonds": 0.011511290526050207,
           "below_ig_share_of_bonds": 0.033
@@ -1397,17 +1426,17 @@
       {
         "ticker": "LNC",
         "variant": "large read (16 chunks per search)",
-        "seconds": 33.2,
-        "searches": 17,
-        "chunks_read": 98,
+        "seconds": 54.2,
+        "searches": 15,
+        "chunks_read": 112,
         "tokens": {
-          "input": 208432,
-          "cached": 139837,
-          "cache_write": 67713,
-          "output": 2977,
-          "requests": 7
+          "input": 664126,
+          "cached": 580814,
+          "cache_write": 81170,
+          "output": 3389,
+          "requests": 17
         },
-        "cost_usd": 0.011439,
+        "cost_usd": 0.017863,
         "accepted": {
           "govt_share_of_bonds": 0.011511290526050207,
           "below_ig_share_of_bonds": 0.033
@@ -1417,9 +1446,17 @@
     ],
     "fields_changed": {
       "JXN": {
+        "bbb_share_of_bonds": {
+          "targeted": null,
+          "large": 0.409
+        },
+        "below_ig_share_of_bonds": {
+          "targeted": null,
+          "large": 0.065
+        },
         "guaranteed_account_value": {
-          "targeted": 242.757,
-          "large": 174.293
+          "targeted": 174.293,
+          "large": null
         }
       },
       "LNC": {}
@@ -1433,15 +1470,15 @@
         "question": "What is our biggest risk right now?",
         "mode": "solo",
         "note": null,
-        "seconds": 7.8,
+        "seconds": 5.3,
         "tokens": {
-          "input": 8560,
-          "cached": 7700,
-          "cache_write": 482,
-          "output": 438,
+          "input": 8441,
+          "cached": 7763,
+          "cache_write": 300,
+          "output": 215,
           "requests": 3
         },
-        "cost_usd": 0.000394,
+        "cost_usd": 0.00026,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1458,7 +1495,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Our biggest risk is that interest rates fall: the assets and promises to policyholders do not move together, leaving a rate mismatch (duration gap) of -3.59 years, marked red. The dashboard estimates that a 1 bp rate fall reduces surplus by $26.9 million; a hypothetical 100 bp fall would reduce it by $2.69 billion, not a forecast. Liquidity is also thin: its ratio is 101.7%, just above the 100% floor, while the capital ratio is 159.6%.",
+        "reply": "The biggest risk is the rate mismatch (duration gap): it is negative 3.59 years, so falling rates reduce surplus. A one-basis-point rate fall cuts surplus by $26.9 million, net of bonds and hedges. Liquidity is the other immediate pressure: its ratio is 101.7%, only just above the 100% floor, while capital is 159.6% against a 100% floor. So rate sensitivity is the main exposure, and liquidity has little room for error.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1467,15 +1504,15 @@
         "question": "How much would our surplus change if interest rates fell by 1%?",
         "mode": "solo",
         "note": null,
-        "seconds": 6.6,
+        "seconds": 6.5,
         "tokens": {
-          "input": 5342,
-          "cached": 5090,
-          "cache_write": 0,
-          "output": 251,
-          "requests": 2
+          "input": 8698,
+          "cached": 8046,
+          "cache_write": 274,
+          "output": 315,
+          "requests": 3
         },
-        "cost_usd": 0.000202,
+        "cost_usd": 0.00031,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1487,7 +1524,7 @@
         ],
         "facts_found": 1,
         "facts_total": 1,
-        "reply": "On today’s book, a 1% fall in interest rates would reduce our surplus by $2.69 billion. This is a hypothetical stress test, not a prediction of this quarter’s market move.",
+        "reply": "If interest rates fell by 1%, our surplus would decrease by $2.69 billion on today’s book. The main reason is the rate mismatch (duration gap): our liabilities are more sensitive to rates than our assets, so falling rates hurt the cushion. This is a hypothetical sensitivity, not a forecast of this quarter’s market move.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1496,15 +1533,15 @@
         "question": "What is our capital ratio, and how close are we to the floor?",
         "mode": "solo",
         "note": null,
-        "seconds": 5.1,
+        "seconds": 3.9,
         "tokens": {
-          "input": 5343,
-          "cached": 5091,
+          "input": 5385,
+          "cached": 5133,
           "cache_write": 0,
-          "output": 277,
+          "output": 186,
           "requests": 2
         },
-        "cost_usd": 0.000215,
+        "cost_usd": 0.00017,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1521,7 +1558,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "The capital ratio (simplified) is 159.6%, against a 100% floor—59.6 percentage points above it. The dashboard marks capital green.",
+        "reply": "Our capital ratio (simplified) is 159.6%, against a 100% floor, so we are 59.6 percentage points above it. That is a meaningful cushion; the dashboard marks capital green. This is the game’s simplified measure, not the regulatory RBC ratio.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1532,13 +1569,13 @@
         "note": null,
         "seconds": 7.5,
         "tokens": {
-          "input": 5707,
-          "cached": 5455,
+          "input": 5749,
+          "cached": 5497,
           "cache_write": 0,
-          "output": 550,
+          "output": 489,
           "requests": 2
         },
-        "cost_usd": 0.000355,
+        "cost_usd": 0.000325,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1555,7 +1592,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "More protection is worth considering: none of the stock-market guarantees is currently hedged, and a 10% stock fall would add $0.71 billion to the guarantee cost. Each additional 10% of protection costs $0.0085 billion per quarter, whether or not stocks fall. That is a real ongoing cost, and the $0.71 billion is the guarantees’ gross effect—not the change in company surplus, because our own stocks and alternatives can also fall. The company’s capital ratio is 159.6%, while liquidity is only just above its 100% floor at 101.7%; I would weigh the protection against its recurring cost rather than automatically hedge everything.",
+        "reply": "A larger hedge could soften the guarantees’ cost when stocks fall, but it would not remove the company’s full stock-market risk. The guarantees currently have no equity-put hedge; a 10% stock fall would add $0.71 billion of guarantee cost before accounting for other company assets, and each extra 10% of put hedging costs $0.0085 billion per quarter whether or not it pays. Because stocks and alternatives we own can also fall, that guarantee figure is not the change in company surplus. So more hedging buys protection at a recurring cost; the current red rate mismatch and amber liquidity status are also risks competing for attention.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1564,15 +1601,15 @@
         "question": "Should we sell some junk and BBB bonds and buy government bonds?",
         "mode": "solo",
         "note": null,
-        "seconds": 13.3,
+        "seconds": 14.9,
         "tokens": {
-          "input": 5849,
-          "cached": 4918,
-          "cache_write": 679,
-          "output": 935,
+          "input": 5836,
+          "cached": 5584,
+          "cache_write": 0,
+          "output": 1388,
           "requests": 2
         },
-        "cost_usd": 0.000627,
+        "cost_usd": 0.000775,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1589,7 +1626,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "A selective shift could reduce credit and capital risk, but I would not make a broad BBB sale the first priority: even if all credit spreads widened by 100 bp, the estimated surplus loss after liability offsets is only $0.22bn, while the rate mismatch (duration gap) is flagged red at -3.59 years. The junk-bond holding is $3.31bn and yields 5.65%, versus 3.31% for government and agency bonds; switching some would trade income for safer, lower-capital-charge assets. BBB holdings are $22.21bn, but the 4.09% yield is for all investment-grade corporates, not BBB alone. So, a measured move—especially from junk—has a case if credit resilience is your goal, but it will not fix the rate mismatch, and the liquidity ratio is only 101.7%, flagged amber. I have not set up a trade; any proposal would need your specific requested levers and your review and signature.",
+        "reply": "A selective shift could reduce risk, especially in junk bonds, but I would not recommend a blanket move based on these figures alone. Junk holdings are valued at $3.31 billion, with a 5.65% yield and an 8% capital factor; government bonds yield 3.31% and have a 0.5% capital factor, so the lower risk comes with lower income. The credit figures show that a 100 bp widening across all spreads would cause a $4.1 billion bond-price loss, but the estimated surplus loss after liabilities offset part of it is $0.22 billion. Since the duration gap is flagged red, compare the effect on the company’s rate mismatch (duration gap) as well; the tools do not show the specific amount or BBB-only yield needed to quantify a proposed shift.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1598,15 +1635,15 @@
         "question": "Do we have enough cash on hand if policyholders start surrendering?",
         "mode": "solo",
         "note": null,
-        "seconds": 7.1,
+        "seconds": 8.8,
         "tokens": {
-          "input": 5832,
-          "cached": 4920,
-          "cache_write": 660,
-          "output": 455,
+          "input": 5573,
+          "cached": 4962,
+          "cache_write": 359,
+          "output": 277,
           "requests": 2
         },
-        "cost_usd": 0.000384,
+        "cost_usd": 0.000258,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1623,7 +1660,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Under the tested scenario—rates up 100 bp and surrenders at 1.5× normal—the extra surrender outflow is $1.07bn, and the projection says it is covered by our $5.7bn of cash. The broader 90-day stress is tighter: after stressed sale discounts, liquid assets are $8.69bn against $8.54bn of possible outflows, for a 101.7% liquidity ratio. So we appear to cover the stated stress, but only narrowly; liquidity is rated amber, not comfortable enough to ignore.",
+        "reply": "On the modeled 90-day stress, we have just enough: the liquidity ratio is 101.7%, with $8.69 billion of cash and government bonds available after stressed discounts against $8.54 billion of potential outflows. That is a narrow cushion, not a guarantee against heavier or faster surrenders. If those first sources run short, we would need to sell other assets, which face larger discounts. The liquidity ratio compares cash and easily sold government bonds with cash needs in a 90-day stress.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1634,13 +1671,13 @@
         "note": null,
         "seconds": 5.2,
         "tokens": {
-          "input": 5326,
-          "cached": 5074,
+          "input": 5368,
+          "cached": 5116,
           "cache_write": 0,
-          "output": 307,
+          "output": 170,
           "requests": 2
         },
-        "cost_usd": 0.000229,
+        "cost_usd": 0.000161,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1657,7 +1694,7 @@
         ],
         "facts_found": 1,
         "facts_total": 2,
-        "reply": "A hypothetical 10% stock-market fall would reduce Jackson Financial’s surplus by $0.79 billion on today’s book. The stress test attributes the full change to equity; rates, credit spreads, defaults, liquidity, and counterparty effects are zero in this scenario. This is a what-if, not a forecast of this quarter’s market move.",
+        "reply": "A hypothetical 10% stock-market fall would reduce our surplus by $0.79 billion on today’s book. This is a what-if result, not a forecast of this quarter’s market move.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1666,15 +1703,15 @@
         "question": "What would it cost per quarter to close half of our rate mismatch with swaps?",
         "mode": "solo",
         "note": null,
-        "seconds": 8.6,
+        "seconds": 5.6,
         "tokens": {
-          "input": 8459,
-          "cached": 7698,
-          "cache_write": 383,
-          "output": 534,
-          "requests": 3
+          "input": 5374,
+          "cached": 5122,
+          "cache_write": 0,
+          "output": 274,
+          "requests": 2
         },
-        "cost_usd": 0.00043,
+        "cost_usd": 0.000213,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1691,7 +1728,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "The preview estimates a cost of $0.0202bn per quarter to hedge 50% of the rate mismatch with swaps. It would reduce the mismatch from -3.59 years to -1.8 years. This is only a preview; no trade has been placed.",
+        "reply": "At the current zero rate-hedge level, closing half the rate mismatch means adding a 50% rate hedge. At the quoted cost of $0.004 billion per quarter for each extra 10%, that would cost $0.020 billion, or $20 million, per quarter. Swaps would reduce the surplus impact when rates move, but the quarterly hedge cost continues even if rates are calm.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1700,15 +1737,15 @@
         "question": "Should we add rate protection before the next quarter?",
         "mode": "solo",
         "note": null,
-        "seconds": 7.1,
+        "seconds": 10.6,
         "tokens": {
-          "input": 5591,
-          "cached": 4912,
-          "cache_write": 427,
-          "output": 461,
-          "requests": 2
+          "input": 8808,
+          "cached": 7769,
+          "cache_write": 661,
+          "output": 654,
+          "requests": 3
         },
-        "cost_usd": 0.000358,
+        "cost_usd": 0.000525,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1725,7 +1762,7 @@
         ],
         "facts_found": 1,
         "facts_total": 2,
-        "reply": "There is a case for adding some rate protection: our rate mismatch (duration gap) is red at -3.59 years, and a 1 bp fall in rates would reduce surplus by $26.9 million. Each extra 10% of rate hedging costs $0.004 billion this quarter, so more protection also weighs on carry; it can also reduce gains if rates rise. The wire’s hotter-inflation hint is not a forecast, so I would not use it alone to decide the hedge size. I would favor measured protection rather than maximizing it; no trade has been placed.",
+        "reply": "Yes—some rate protection is worth considering: the company’s rate mismatch (duration gap) is negative 3.59 years, and a 1 bp fall in rates reduces surplus by $26.9 million. Each additional 10% of rate hedging costs $0.004 billion per quarter. The hedge would cushion falling rates, but it would cost money and give up some benefit if rates rise; the inflation wire is only a hint, not a forecast. I would not treat this as a case for a full hedge based on the information available.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1734,15 +1771,15 @@
         "question": "What happens to us if one of our derivatives dealers fails?",
         "mode": "solo",
         "note": null,
-        "seconds": 9.4,
+        "seconds": 9.6,
         "tokens": {
-          "input": 8370,
-          "cached": 7530,
-          "cache_write": 462,
-          "output": 532,
+          "input": 8349,
+          "cached": 7749,
+          "cache_write": 222,
+          "output": 589,
           "requests": 3
         },
-        "cost_usd": 0.000437,
+        "cost_usd": 0.000438,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1759,7 +1796,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Today, our reported rate and equity hedge positions are both 0%, so a dealer failure would not currently remove protection from those hedges. The exposure to watch is counterparty risk: if a dealer later owed us money on a hedge and failed, it might not pay, and we could face replacement cost to arrange the hedge again. We currently use one dealer and have no daily collateral; using three dealers adds $0.0037 billion per quarter, while daily collateral adds $0.0022 billion per quarter. Those costs buy less dependence on a single dealer and better protection against nonpayment; derivatives, as ever, come with paperwork and a bill.",
+        "reply": "Our current record shows no rate or equity hedges, one dealer, and no collateral posted, so there is no listed hedge position whose value we could lose if that dealer failed. If we add hedges, a dealer failure could leave us without money the bank owes and require us to pay the replacement cost to set the hedge up elsewhere. Collateral can limit that loss, while using more than one dealer reduces our reliance on a single bank; both come with added costs. I do not have a figure for the potential replacement cost.",
         "specialist_answers": [],
         "stopped": null
       }
@@ -1770,15 +1807,15 @@
         "question": "What is our biggest risk right now?",
         "mode": "solo",
         "note": null,
-        "seconds": 8.4,
+        "seconds": 8.3,
         "tokens": {
-          "input": 8702,
-          "cached": 5105,
-          "cache_write": 3219,
-          "output": 440,
+          "input": 8495,
+          "cached": 5155,
+          "cache_write": 2962,
+          "output": 318,
           "requests": 3
         },
-        "cost_usd": 0.000711,
+        "cost_usd": 0.000619,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1795,7 +1832,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Our biggest risk is falling interest rates: our liabilities are more rate-sensitive than our assets, creating a rate mismatch (duration gap) of -3.59 years. The dashboard estimates that each 1 bp fall in rates reduces surplus by $26.9 million; asset duration is 5.8 years versus liability duration of 11.25 years. Capital is above its floor, but liquidity is a secondary concern: the liquidity ratio is 101.7%, only just above its floor. This is a current exposure, not a prediction that rates will fall.",
+        "reply": "Our biggest risk is the rate mismatch (duration gap): it is negative 3.59 years, so falling rates reduce surplus. A 1 bp fall in rates would cut surplus by $26.9 million. Liquidity is also tight: the liquidity ratio is 101.7%, just above its 100% floor, while the capital ratio is 159.6% and green. In short, rate exposure is the main concern; liquidity has little room for stress.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1804,15 +1841,15 @@
         "question": "How much would our surplus change if interest rates fell by 1%?",
         "mode": "solo",
         "note": null,
-        "seconds": 4.1,
+        "seconds": 6.8,
         "tokens": {
-          "input": 5368,
-          "cached": 2474,
-          "cache_write": 2642,
-          "output": 241,
-          "requests": 2
+          "input": 8445,
+          "cached": 5159,
+          "cache_write": 2908,
+          "output": 316,
+          "requests": 3
         },
-        "cost_usd": 0.000501,
+        "cost_usd": 0.000611,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1824,7 +1861,7 @@
         ],
         "facts_found": 1,
         "facts_total": 1,
-        "reply": "On today’s book, a 1% fall in interest rates would reduce our surplus by $2.69 billion. This is a hypothetical sensitivity, not a forecast of what rates will do this quarter.",
+        "reply": "If interest rates fell by 1%, our surplus would decrease by about $2.69 billion on today’s book, assuming other market conditions stayed unchanged. This is a hypothetical stress-test result, not a forecast of what will happen this quarter.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1833,15 +1870,15 @@
         "question": "What is our capital ratio, and how close are we to the floor?",
         "mode": "solo",
         "note": null,
-        "seconds": 3.4,
+        "seconds": 5.6,
         "tokens": {
-          "input": 5367,
-          "cached": 2473,
-          "cache_write": 2642,
-          "output": 163,
+          "input": 5415,
+          "cached": 2497,
+          "cache_write": 2666,
+          "output": 210,
           "requests": 2
         },
-        "cost_usd": 0.000462,
+        "cost_usd": 0.000488,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1858,7 +1895,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Our capital ratio is 159.6%, compared with the 100% floor. That puts us 59.6 percentage points above the floor; the capital traffic light is green.",
+        "reply": "Our capital ratio is 159.6%, compared with the 100% floor. We are above the floor, and the dashboard marks capital green.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1867,15 +1904,15 @@
         "question": "Should we hedge more of the stock-market guarantees?",
         "mode": "solo",
         "note": null,
-        "seconds": 8.1,
+        "seconds": 11.8,
         "tokens": {
-          "input": 5792,
-          "cached": 2469,
-          "cache_write": 3071,
-          "output": 630,
-          "requests": 2
+          "input": 9275,
+          "cached": 5527,
+          "cache_write": 3370,
+          "output": 696,
+          "requests": 3
         },
-        "cost_usd": 0.000749,
+        "cost_usd": 0.000862,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1892,7 +1929,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "There is a case for hedging more: if stocks fall 10%, the guarantees alone add $0.71bn of cost, and none of that guarantee exposure is currently hedged. Equity puts can reduce that loss, but each extra 10% of hedging costs $0.0085bn per quarter whether or not the puts pay; they also give up some of the return from risky assets. So I would consider increasing the hedge in measured steps, not assume that the maximum hedge is best. The $0.71bn is a gross guarantee figure, not the change in company surplus, because the company’s own investments also move when stocks fall.",
+        "reply": "More protection is a reasonable option, but the figures do not make it an automatic yes. The company currently has no equity puts; a hypothetical stock fall of 10% would cost the guarantees $0.71 billion gross, while the whole-company stress test shows a $0.79 billion surplus decline. Those figures describe different things, so do not add them together. Each extra 10% of put hedging costs $0.0085 billion per quarter, whether or not markets fall; it would reduce some guarantee risk but add ongoing cost. The news signal is not a forecast, so this is a trade-off, not a prediction.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1901,15 +1938,15 @@
         "question": "Should we sell some junk and BBB bonds and buy government bonds?",
         "mode": "solo",
         "note": null,
-        "seconds": 9.7,
+        "seconds": 9.8,
         "tokens": {
-          "input": 5869,
-          "cached": 2470,
-          "cache_write": 3147,
-          "output": 676,
+          "input": 5939,
+          "cached": 2495,
+          "cache_write": 3192,
+          "output": 801,
           "requests": 2
         },
-        "cost_usd": 0.000781,
+        "cost_usd": 0.00085,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1926,7 +1963,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "I would not make selling credit the first move based on this dashboard: the rate mismatch (duration gap) is red, while the liquidity ratio is only just above its floor. Selling junk and BBB bonds for government bonds would reduce credit risk and capital use, but government bonds yield 3.31%, versus 4.09% for investment-grade corporates and 5.65% for junk, so it would also reduce investment income. A 100 bp widening in all spreads produces a $0.22 billion surplus loss after the liability offset, so the reported credit shock looks less pressing than the rate mismatch. A limited shift could still be considered, but it trades income for added safety rather than addressing the clearest current warning.",
+        "reply": "A selective shift could make sense: government bonds have a much lower capital charge than investment-grade corporate bonds or below-investment-grade bonds, and they remove credit-spread and default exposure on the amount moved. But you would give up yield: the current yields are 3.31% for government bonds, 4.09% for investment-grade corporates, and 5.65% for below-investment-grade bonds. A move into longer-duration government bonds may also help narrow our negative rate mismatch, though the effect depends on how much you move. The scale matters: if all credit spreads widened by 100 bp, the portfolio bond loss is $4.1 billion, but the estimated surplus loss after liability offsets is $0.22 billion; I would assess the size of any shift rather than sell broadly just because the bonds are riskier.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1935,15 +1972,15 @@
         "question": "Do we have enough cash on hand if policyholders start surrendering?",
         "mode": "solo",
         "note": null,
-        "seconds": 6.1,
+        "seconds": 7.2,
         "tokens": {
-          "input": 5681,
-          "cached": 2473,
-          "cache_write": 2956,
-          "output": 440,
+          "input": 5904,
+          "cached": 2496,
+          "cache_write": 3156,
+          "output": 400,
           "requests": 2
         },
-        "cost_usd": 0.000639,
+        "cost_usd": 0.000645,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1960,7 +1997,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Just barely, under the stated stress: our liquidity ratio is 101.7%, with $8.69 billion of liquid assets after stressed discounts against $8.54 billion of possible 90-day cash needs. In the separate scenario of rates rising 100 basis points and surrenders running at 1.5 times normal, the extra surrender outflow is $1.07 billion, which the projection says is covered by cash. The overall cushion is thin; if cash and government bonds ran short, we would have to sell other investments, which take larger discounts in a stressed market.",
+        "reply": "For the modeled rate-rise and higher-surrender scenario, the extra surrender outflow is $1.07 billion, and our $5.7 billion of cash alone covers it. Looking at the broader 90-day stress, cash and government bonds after stressed sale discounts total $8.69 billion against $8.54 billion of possible outflows: the liquidity ratio is 101.7%, just above the 100% floor. So we appear able to meet the modeled need, but the cushion is thin; if those liquid assets ran out, we would have to sell other investments at larger discounts.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -1969,15 +2006,15 @@
         "question": "What would a 10% fall in the stock market do to us?",
         "mode": "solo",
         "note": null,
-        "seconds": 3.8,
+        "seconds": 4.7,
         "tokens": {
-          "input": 5356,
-          "cached": 2476,
-          "cache_write": 2628,
-          "output": 164,
+          "input": 5394,
+          "cached": 2495,
+          "cache_write": 2647,
+          "output": 253,
           "requests": 2
         },
-        "cost_usd": 0.00046,
+        "cost_usd": 0.000508,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -1994,7 +2031,7 @@
         ],
         "facts_found": 1,
         "facts_total": 2,
-        "reply": "A 10% stock-market fall would reduce our surplus by $0.79 billion on today’s book. The stress test attributes the full change to equity; it is a hypothetical, not a forecast of this quarter. That is the cushion available to absorb losses while meeting what we owe.",
+        "reply": "A 10% stock-market fall on today’s book would reduce our surplus—the cushion after what we own is set against what we owe—by $0.79bn. In this hypothetical, the change comes entirely from equity exposure; the other modeled causes show no change. This is a what-if, not a forecast of this quarter.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -2003,15 +2040,15 @@
         "question": "What would it cost per quarter to close half of our rate mismatch with swaps?",
         "mode": "solo",
         "note": null,
-        "seconds": 7.2,
+        "seconds": 6.2,
         "tokens": {
-          "input": 5614,
-          "cached": 2475,
-          "cache_write": 2887,
-          "output": 441,
-          "requests": 2
+          "input": 8481,
+          "cached": 5148,
+          "cache_write": 2955,
+          "output": 341,
+          "requests": 3
         },
-        "cost_usd": 0.000631,
+        "cost_usd": 0.000629,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -2028,7 +2065,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "Closing half of the current rate mismatch would mean a 50% rate hedge, assuming the quoted cost scales linearly. That would cost about $0.020 billion ($20 million) per quarter, based on $0.004 billion for each additional 10% of rate hedging. The estimate is for the interest rate swap hedge cost only; it does not include any other trade costs.",
+        "reply": "Setting the rate hedge to 50%—half of the current mismatch—would cost $0.0202 billion per quarter. The preview shows the rate mismatch (duration gap) narrowing from -3.59 years to -1.8 years; the hedge reduces the exposure but does not eliminate it.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -2037,15 +2074,15 @@
         "question": "Should we add rate protection before the next quarter?",
         "mode": "solo",
         "note": null,
-        "seconds": 8.1,
+        "seconds": 6.3,
         "tokens": {
-          "input": 8665,
-          "cached": 5107,
-          "cache_write": 3180,
-          "output": 551,
-          "requests": 3
+          "input": 5952,
+          "cached": 2489,
+          "cache_write": 3211,
+          "output": 385,
+          "requests": 2
         },
-        "cost_usd": 0.000762,
+        "cost_usd": 0.000644,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -2062,7 +2099,7 @@
         ],
         "facts_found": 1,
         "facts_total": 2,
-        "reply": "Some added rate protection is worth considering: our rate mismatch (duration gap) is -3.59 years, and a hypothetical 100 bp fall in rates would reduce surplus by $2.69 billion on today’s book. A 100 bp rise would instead increase surplus by about $2.69 billion, so protection against falling rates would give up some benefit if rates rise. Each extra 10% of rate hedging costs $0.004 billion per quarter; the news is only a hint, not a forecast, so this supports considering partial protection rather than assuming which way rates will move. Any trade would be a proposal for you to review and sign, not an execution.",
+        "reply": "Some added rate protection is worth considering: our rate mismatch (duration gap) is negative 3.59 years, and a 1 bp fall in rates reduces surplus by $26.9 million. Each extra 10% of rate hedging costs $0.004 billion per quarter, so more protection trades lower exposure to falling rates for ongoing cost and less benefit if rates rise. Capital is above its floor, while liquidity is only just above its floor; the news wire is a hint, not a forecast, so I would not size a hedge as a bet on rates moving one way.",
         "specialist_answers": [],
         "stopped": null
       },
@@ -2071,15 +2108,15 @@
         "question": "What happens to us if one of our derivatives dealers fails?",
         "mode": "solo",
         "note": null,
-        "seconds": 7.3,
+        "seconds": 7.6,
         "tokens": {
-          "input": 5348,
-          "cached": 2470,
-          "cache_write": 2626,
-          "output": 558,
-          "requests": 2
+          "input": 8403,
+          "cached": 5159,
+          "cache_write": 2866,
+          "output": 393,
+          "requests": 3
         },
-        "cost_usd": 0.000657,
+        "cost_usd": 0.000644,
         "specialists": [],
         "two_views": false,
         "facts": [
@@ -2096,7 +2133,7 @@
         ],
         "facts_found": 2,
         "facts_total": 2,
-        "reply": "A dealer failure means the bank on the other side may not pay what a hedge owes us; that is counterparty risk. Our reported book has no rate or equity hedges currently, so the dashboard does not show an active hedge whose value could be lost, but it gives no dollar estimate for other possible derivative exposure. We currently use one dealer and do not have daily collateral; using three dealers adds $0.0037 billion per quarter, and daily collateral adds $0.0022 billion per quarter. Those protections cost money, but reduce the risk that one dealer’s failure leaves us without a hedge or forces us to replace it at an unfavorable price.",
+        "reply": "Right now, we have no rate or equity hedges, and the dashboard shows no uncollateralized dealer exposure, so a dealer failure has no current hedge value shown as at risk. If we add derivatives later, a failed dealer might not pay what it owes us, and replacing the hedge could cost more; that is counterparty risk. Collateral can limit the unpaid amount, while using more dealers can reduce reliance on one bank, but both protections have costs. Neither protection is free—risk has a remarkably good sense of timing.",
         "specialist_answers": [],
         "stopped": null
       }
@@ -2108,17 +2145,17 @@
       "facts_total": 19,
       "two_views_on_decisions": 0,
       "decision_questions": 3,
-      "avg_cost_usd": 0.000363,
-      "total_cost_usd": 0.003631,
+      "avg_cost_usd": 0.000344,
+      "total_cost_usd": 0.003435,
       "avg_seconds": 7.8,
       "avg_tokens": {
-        "input": 6438,
-        "cached": 5839,
-        "cache_write": 309,
-        "output": 474,
+        "input": 6758,
+        "cached": 6274,
+        "cache_write": 182,
+        "output": 456,
         "requests": 2
       },
-      "cached_share": 0.907
+      "cached_share": 0.928
     },
     "off_summary": {
       "questions": 10,
@@ -2127,28 +2164,28 @@
       "facts_total": 19,
       "two_views_on_decisions": 0,
       "decision_questions": 3,
-      "avg_cost_usd": 0.000635,
-      "total_cost_usd": 0.006353,
-      "avg_seconds": 6.6,
+      "avg_cost_usd": 0.00065,
+      "total_cost_usd": 0.0065,
+      "avg_seconds": 7.4,
       "avg_tokens": {
-        "input": 6176,
-        "cached": 2999,
-        "cache_write": 2900,
-        "output": 430,
+        "input": 7170,
+        "cached": 3862,
+        "cache_write": 2993,
+        "output": 411,
         "requests": 2
       },
-      "cached_share": 0.486
+      "cached_share": 0.539
     }
   },
   "examiner": {
     "tokens": {
       "input": 12719,
-      "cached": 9570,
-      "cache_write": 2519,
-      "output": 2285,
+      "cached": 12089,
+      "cache_write": 0,
+      "output": 2060,
       "requests": 5
     },
-    "cost_usd": 0.001616,
+    "cost_usd": 0.001214,
     "quarters": 5
   },
   "projections": {
@@ -2160,33 +2197,33 @@
       "note": "Per-session tokens = average Team question (E1) x questions per session + one measured examiner session."
     },
     "tokens_per_session": {
-      "input": 123199,
-      "cached": 98994,
-      "cache_write": 18335,
-      "output": 16261,
+      "input": 121127,
+      "cached": 105497,
+      "cache_write": 9864,
+      "output": 14140,
       "requests": 45
     },
     "models": {
       "gpt-6-luna": {
-        "per_session": 0.012,
-        "per_learner_month": 0.048,
-        "learners_100_month": 4.8,
-        "learners_10000_month": 479.97
+        "per_session": 0.00993,
+        "per_learner_month": 0.0397,
+        "learners_100_month": 3.97,
+        "learners_10000_month": 397.38
       },
       "gpt-6.1-sol": {
-        "per_session": 0.23009,
-        "per_learner_month": 0.9203,
-        "learners_100_month": 92.03,
-        "learners_10000_month": 9203.48
+        "per_session": 0.18814,
+        "per_learner_month": 0.7526,
+        "learners_100_month": 75.26,
+        "learners_10000_month": 7525.67
       },
       "gpt-6-astra": {
-        "per_session": 1.19993,
-        "per_learner_month": 4.7997,
-        "learners_100_month": 479.97,
-        "learners_10000_month": 47997.26
+        "per_session": 0.99346,
+        "per_learner_month": 3.9738,
+        "learners_100_month": 397.38,
+        "learners_10000_month": 39738.28
       }
     },
-    "calibration_one_time_per_company_usd": 0.0053,
+    "calibration_one_time_per_company_usd": 0.0051,
     "cap": {
       "per_session_usd": 0.25,
       "max_per_learner_month": 1.0,
@@ -2194,7 +2231,7 @@
       "max_10000_month": 10000.0
     }
   },
-  "generated": "2026-11-23 08:35",
+  "generated": "2026-11-23 08:51",
   "model": "gpt-6-luna",
-  "seconds": 488.4
+  "seconds": 522.6
 }
