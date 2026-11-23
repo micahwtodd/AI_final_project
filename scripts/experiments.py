@@ -2,7 +2,7 @@
 
 E1  Solo versus Team on ten fixed questions (data/test/questions.json): engine facts present (marked in code),
     whether two differing views reached the learner, tokens, cost, latency. The ten answer pairs are saved for
-    Micah to read and judge.
+    a reader to judge side by side.
 E2  Team routing (Vera picks one or two specialists) versus asking every specialist, same ten questions.
 E3  Calibration (Seamore reading the 10-K) with targeted retrieval (k=4 chunks per search) versus a large read
     (16 chunks per search), two companies: which profile fields changed, tokens and cost.

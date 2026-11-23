@@ -261,7 +261,7 @@ export function Desk(props: {
             <h3>Past quarters</h3>
             <table className="table">
               <thead>
-                <tr><th>Q</th><th>Event</th><th>Surplus change</th><th>Score</th></tr>
+                <tr><th>Q</th><th>Event</th><th>Surplus change</th><th title="Results score, 0 to 100: your trades against doing nothing and what a pro would do. Vera's explanation marks are separate.">Results score</th></tr>
               </thead>
               <tbody>
                 {g.history.map((h) => (

@@ -104,6 +104,7 @@ export function ShockScreen(props: {
         <div className="panel shock-dash">
           <h3>Dashboard before → after</h3>
           <Meters dashboard={s.dashboard_before} after={s.dashboard_after} hits={!second && !s.collapsed} />
+          <div className="small muted">"After" is the book at quarter end, once your swaps and puts have expired and been cash-settled, so the rate mismatch and stock exposure go back to unhedged. That jump is the hedges ending, not the shock.</div>
         </div>
 
         <div className="shock-mid">
@@ -154,7 +155,7 @@ export function ShockScreen(props: {
                 : "What moved, why it hurt or helped this company, and what your trades did."} />
             <div className="rubric-chips" aria-label="What Vera marks">
               {chips.map((c) => <span key={c.key} className={`rubric-chip ${c.on ? "on" : ""}`}>{c.on ? "●" : "○"} {c.label}</span>)}
-              <span className="rubric-note">These light up when your answer touches each part. Vera decides whether it is right.</span>
+              <span className="rubric-note">These light up when your answer touches each part. Vera decides whether it is right. The main driver is the biggest dollar move on <i>your</i> book, after your hedges: hedge the obvious risk well and something else can become the main driver.</span>
             </div>
             <div className="explain-row">
               {s.sample_answer && !second && <button className="ghost" disabled={locked} onClick={() => setText(s.sample_answer!)}>Use a sample answer (demo)</button>}

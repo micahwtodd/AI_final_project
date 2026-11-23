@@ -1,5 +1,5 @@
 {
-  "_note": "Teaching-accuracy check: 16 concept questions (four retired: three on currency, one on pension deals), each sent to the colleague who owns the topic, who must answer with one letter. Code marks it against this key. Draft for Micah to approve. Option order shuffled with a fixed seed so correct answers are spread across A to D.",
+  "_note": "Teaching-accuracy check: 16 concept questions (four retired: three on currency, one on pension deals), each sent to the colleague who owns the topic, who must answer with one letter. Code marks it against this key. Option order shuffled with a fixed seed so correct answers are spread across A to D.",
   "questions": [
     {
       "id": "T01",

@@ -1,5 +1,5 @@
 {
-  "_note": "Before-and-after quiz. Form A before the game, form B after: same eight concepts, different wording and scenarios. Draft for Micah to verify. Option order shuffled with a fixed seed so correct answers are spread across A to D.",
+  "_note": "Before-and-after quiz. Form A before the game, form B after: same eight concepts, different wording and scenarios. Option order shuffled with a fixed seed so correct answers are spread across A to D.",
   "concepts": [
     "duration_gap",
     "surrenders",

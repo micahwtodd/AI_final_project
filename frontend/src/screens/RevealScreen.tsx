@@ -215,6 +215,7 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
         <div className="panel beat beat-in" ref={(el) => { refs.current[2] = el; }}>
           <h2>How a pro would have traded</h2>
           <p className="small muted"><span className="key-you">●</span> you · <span className="key-pro">●</span> a pro. Highlighted rows are where you and the pro differ. The last column is what matching the pro on that lever alone would have added this quarter; ⭐ marks the one that mattered most.</p>
+          <p className="small muted"><b>The pro trades with hindsight:</b> its ticket was set knowing this quarter's shock, so it is a teaching benchmark, not a fair forecast. In a quarter where the shock helps the book (like rising rates for an insurer with a negative rate mismatch), the pro may hedge less than textbook ALM would.</p>
           <ProTable you={r.your_action} pro={r.benchmark_action} gains={r.lever_gains ?? {}} />
           <WhatIfPanel gameId={r.view.id} quarter={r.quarter} you={r.your_action} />
           {beat === 2 && next("Collect your lesson card")}

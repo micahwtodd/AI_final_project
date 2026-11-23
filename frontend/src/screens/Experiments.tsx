@@ -69,7 +69,7 @@ export function Experiments(props: { onBack: () => void }) {
         <div className="panel">
           <h2>E1 · Solo versus Team</h2>
           <SumTable rows={[["Solo (Vera alone, every tool)", d.E1.solo_summary], ["Team (Vera routes to specialists)", d.E1.team_summary]]} />
-          <h3>The ten answer pairs (for Micah to read and judge)</h3>
+          <h3>The ten answer pairs, Solo and Team side by side</h3>
           {pairs.map(({ s, t }) => (
             <div key={s.id} className="exp-pair">
               <button className="link" onClick={() => setOpen(open === s.id ? null : s.id)}>

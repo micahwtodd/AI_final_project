@@ -45,7 +45,9 @@ def get_risk_dashboard(s: GameState) -> dict:
         "surplus_change_if_rates_fall_1bp_usd_mn": d.net_dv01_usd_mn,
         "equity_exposure_usd_bn_per_100pct_fall": d.net_equity_exposure_usd_bn,
         "uncollateralized_dealer_exposure_usd_bn": d.counterparty_exposure_usd_bn,
-        "status": d.status, "quarter": min(s.quarter, 4),
+        "status": d.status, "quarter": min(s.quarter, engine.n_quarters()),
+        "this_quarter_rule": ((engine.card_for(s.quarter).rule or {}).get("text") or "none: normal prices")
+        if 1 <= s.quarter <= engine.n_quarters() else "none: normal prices",
     }
 
 
@@ -195,14 +197,17 @@ def get_liquidity_ladder(s: GameState) -> dict:
 def get_hedge_costs(s: GameState) -> dict:
     hc = engine.assumptions()["hedge_costs_quarterly"]
     gap = engine.asset_dv01(s) - engine.liability_dv01(s)
+    rule = engine.card_for(s.quarter).rule if 1 <= s.quarter <= engine.n_quarters() else {}
+    swap_m, put_m = rule.get("swap_cost_mult", 1.0), rule.get("put_cost_mult", 1.0)
     return {
+        "this_quarter_rule": (rule.get("text") + " The costs below already include it.") if rule else "none: normal prices",
         "current": {"rate_hedge_pct": s.action.rate_hedge_pct, "equity_hedge_pct": s.action.equity_hedge_pct,
                     "collateralized": s.action.collateralized,
                     "dealers": s.action.dealers,
                     "hedge_cost_this_quarter_usd_bn": _r(engine.quarterly_hedge_cost(s, s.action), 4)},
         "cost_per_quarter_of_each_extra_10pct_usd_bn": {
-            "rate_hedge": _r(abs(gap) * 0.10 * hc["swap_per_dv01"], 4),
-            "equity_puts": _r(engine.guarantee_equity_sensitivity(s) * 0.10 * hc["put_premium"], 4),
+            "rate_hedge": _r(abs(gap) * 0.10 * hc["swap_per_dv01"] * swap_m, 4),
+            "equity_puts": _r(engine.guarantee_equity_sensitivity(s) * 0.10 * hc["put_premium"] * put_m, 4),
         },
         "three_dealers_extra_cost_usd_bn": _r(engine.total_assets(s) * hc["three_dealers"], 4),
         "daily_collateral_extra_cost_usd_bn": _r(engine.total_assets(s) * hc["collateral_ops"], 4),

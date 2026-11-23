@@ -49,7 +49,7 @@ export function SafetyLab(props: { onBack: () => void }) {
         {err && <div className="flag small">{err}</div>}
         {a && t && x && (
           <div className="lab-summary">
-            <div className="stat"><b>{a.attacks_blocked}/{a.attacks_total}</b><span>attacks blocked</span></div>
+            <div className="stat"><b>{a.rows.filter((r) => r.kind === "attack" && r.off && !/fail|refus/i.test(r.off.outcome)).length} → 0</b><span>attacks that got through: defenses off → on ({a.attacks_total} tried; the rest already failed by design or model refusal)</span></div>
             <div className="stat"><b>{a.clean_passed}/{a.clean_total}</b><span>clean inputs passed</span></div>
             <div className="stat"><b>{t.pass_rate.toFixed(0)}%</b><span>teaching accuracy ({t.correct}/{t.total})</span></div>
             <div className="stat"><b>{x.check_agreement_pct.toFixed(0)}%</b><span>examiner agreement ({x.samples_fully_agreeing}/{x.total} samples)</span></div>
