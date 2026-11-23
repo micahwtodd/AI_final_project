@@ -20,6 +20,8 @@ export function balanceSheet(d: Dashboard): { assets: Segment[]; claims: Segment
   const m = d.derivatives_mtm_usd_bn ?? 0;
   if (m > 0.005) assets.push({ key: "mtm", label: "Hedges owed by dealers", value: m, color: "#7FA7C9" });
   if (m < -0.005) claims.push({ key: "mtm", label: "Hedges owed to dealers", value: -m, color: "#7FA7C9" });
+  const posted = d.collateral_posted_usd_bn ?? 0;
+  if (posted > 0.005) assets.push({ key: "collateral", label: "Collateral posted (locked up)", value: posted, color: "#B08A3E" });
   claims.push({ key: "equity", label: "Equity (surplus)", value: Math.max(0, d.surplus_usd_bn), color: EQUITY_COLOR });
   const total = assets.reduce((s, x) => s + x.value, 0);
   return { assets, claims, total };

@@ -71,7 +71,7 @@ def total_liabilities(s: GameState) -> float:
 
 
 def surplus(s: GameState) -> float:
-    return total_assets(s) + s.uncollateralized_mtm - total_liabilities(s) - s.guarantee_value
+    return total_assets(s) + s.collateral_posted + s.uncollateralized_mtm - total_liabilities(s) - s.guarantee_value
 
 
 def asset_dv01(s: GameState) -> float:
@@ -204,6 +204,7 @@ def dashboard(s: GameState) -> Dashboard:
         fx_exposure_usd_bn=round(fx, 2),
         counterparty_exposure_usd_bn=round(max(0.0, s.uncollateralized_mtm), 3),
         derivatives_mtm_usd_bn=round(s.uncollateralized_mtm, 3),
+        collateral_posted_usd_bn=round(s.collateral_posted, 3),
         asset_values={b: round(v, 2) for b, v in s.assets.items()},
         liability_values={**{b: round(v, 2) for b, v in s.liabilities.items()},
                           "guarantee": round(s.guarantee_value, 2)},
@@ -400,6 +401,10 @@ def apply_shock(state: GameState, shock: ShockVector) -> tuple[GameState, Attrib
     s = state.model_copy(deep=True)
     act = s.action
     live = 1 - s.hedges_lost_share
+    if s.collateral_posted:  # last quarter's collateral call is returned
+        s.assets["cash"] += s.collateral_posted
+        s.collateral_posted = 0.0
+    invested = total_assets(s)
     dy, ds_ig, ds_hy = shock.rate_bp * BP, shock.ig_spread_bp * BP, shock.hy_spread_bp * BP
     eq = shock.equity_pct / 100
     att = dict(rates=0.0, credit_spreads=0.0, defaults=0.0, equity=0.0, fx=0.0,
@@ -520,6 +525,14 @@ def apply_shock(state: GameState, shock: ShockVector) -> tuple[GameState, Attrib
             s.liabilities[b] -= released
             att["liquidity"] -= payout - released  # paying book value for a liability marked lower
             cash_need += payout
+
+    # ---- collateral calls: when rates jump, dealers, repo lenders and securities-lending counterparties
+    # demand more collateral. It is still ours (no loss by itself) but it is locked up, so it drains the
+    # liquidity ratio, and if cash runs short we sell bonds at a haircut to post it.
+    if shock.margin_call_pct > 0:
+        call = shock.margin_call_pct / 100 * invested
+        cash_need += call
+        s.collateral_posted += call
 
     # ---- pay what is owed this quarter; forced sales lose a haircut
     if cash_need >= 0:
@@ -670,7 +683,10 @@ def answer_key(rec: QuarterRecord) -> dict:
         "defaults": f"Defaults and credit losses cost {comps['defaults']:+.2f}bn: a permanent loss, unlike spread moves.",
         "equity": f"Stocks moved {sh.equity_pct:+.1f}%; alternatives (incl. stocks) and the stock-market guarantees changed surplus by {comps['equity']:+.2f}bn, net of any puts.",
         "fx": f"The dollar moved {sh.fx_pct:+.1f}%; foreign assets net of currency hedges changed by {comps['fx']:+.2f}bn.",
-        "liquidity": f"Surrenders ran at {sh.lapse_mult:.2f}x normal; paying them and any forced selling cost {comps['liquidity']:+.2f}bn.",
+        "liquidity": (f"Surrenders ran at {sh.lapse_mult:.2f}x normal"
+                      + (f" and dealers called {sh.margin_call_pct:.1f}% of invested assets as collateral" if sh.margin_call_pct else "")
+                      + f"; paying them and any forced selling cost {comps['liquidity']:+.2f}bn"
+                      + (" (posted collateral is still ours but locked up, so the liquidity ratio fell)." if sh.margin_call_pct else ".")),
         "counterparty": f"A dealer default cost {comps['counterparty']:+.2f}bn of hedge value owed without collateral.",
     }
     return {

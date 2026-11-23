@@ -8,7 +8,7 @@
       "era": "Echoes 2022",
       "signal_text": "WIRE: Consumer prices ran hotter than forecast for a third straight month. Some economists say the central bank is 'behind the curve'; others expect inflation to fade on its own.",
       "headline": "CENTRAL BANK HIKES AGAIN; BOND YIELDS SURGE",
-      "narrative": "Rates jumped across the curve in a matter of weeks. Competitors now pay more on new annuities, so policyholders are surrendering to move their money, and the bonds sold to pay them fetch less than they cost. Stocks barely moved.",
+      "narrative": "Rates jumped across the curve in a matter of weeks. Dealers, repo lenders and securities-lending counterparties all demanded more collateral, and competitors now pay more on new annuities, so policyholders are surrendering too. Cash is flying out the door, and bonds sold to raise it fetch less than they cost. Stocks barely moved.",
       "primary_risk": "interest_rate",
       "secondary_risks": [
         "liquidity"
@@ -18,31 +18,32 @@
         "ig_spread_bp": 10,
         "hy_spread_bp": 30,
         "equity_pct": -3,
-        "lapse_mult": 10,
+        "lapse_mult": 2,
+        "margin_call_pct": 2,
         "stress_liquidity": true
       },
-      "lesson": "When rates rise fast, bonds and liabilities both fall in value, and the mismatch between them can even help. The real danger is cash: policyholders surrender to chase higher rates elsewhere, and without cash on hand you sell bonds at a loss to pay them. Swaps that gain when rates fall lose money now, and demand collateral the same quarter.",
+      "lesson": "When rates rise fast, bonds and liabilities both fall in value, and for a life insurer the mismatch can even help. The real danger is cash. Counterparties demand more collateral the same week, policyholders surrender to chase higher rates, and swaps that gain when rates fall now lose money. Collateral you post is still yours but it is locked up, so your liquidity ratio drops, and without cash on hand you sell bonds at fire-sale prices to meet the calls.",
       "benchmark_action": {
         "rate_hedge_pct": 0,
         "credit_shift_pct": 0,
         "equity_hedge_pct": 0,
-        "cash_buffer_pct": 12,
+        "cash_buffer_pct": 15,
         "fx_hedge_pct": 0,
         "collateralized": true,
         "dealers": 3
       },
       "glossary_terms": [
-        "surrender",
-        "crediting_rate",
-        "forced_selling",
+        "margin_call",
+        "collateral",
         "liquidity_ratio",
-        "margin_call"
+        "forced_selling",
+        "surrender"
       ],
-      "source_note": "Stylized on 2022, when the US 10-year Treasury yield rose roughly 2.3 percentage points over the year. One quarter here compresses part of that move, plus a surge in surrenders. A typical draw (1.0x) is a 1 percentage point rise in rates.",
-      "sample_answer": "Interest rates jumped, and that was the main driver. Our liabilities are longer than our assets, so their value fell more than our bonds did, which actually lifted surplus. The second factor was the surrender wave: policyholders cashed out to chase higher rates, and paying them meant selling bonds at a loss. More cash on hand would have avoided the fire sale.",
+      "source_note": "Stylized on 2022, when the US 10-year Treasury yield rose roughly 2.3 percentage points over the year and the UK's September gilt crisis showed how fast collateral calls can drain cash. A typical draw (1.0x) here is a 0.6 percentage point rise in rates, collateral calls of 2% of invested assets and surrenders at twice the normal pace.",
+      "sample_answer": "Interest rates jumped, and that was the main driver. Our liabilities are longer than our assets, so their value fell more than our bonds did, which actually lifted surplus. Stocks dipped a little as the second factor, raising our guarantee costs. The real danger was cash: dealers demanded collateral and policyholders surrendered, which pushed our liquidity ratio below the floor. More cash on hand would have covered the calls without fire sales.",
       "real_world": {
         "title": "2022: the fastest rate hikes in 40 years",
-        "text": "Inflation hit its highest level in four decades and the Federal Reserve raised rates at the fastest pace since the early 1980s. The 10-year Treasury yield rose by more than 2 percentage points over the year and bond prices fell sharply. Annuity holders cashed out in record numbers to chase higher rates elsewhere."
+        "text": "Inflation hit its highest level in four decades and the Federal Reserve raised rates at the fastest pace since the early 1980s. The 10-year Treasury yield rose by more than 2 percentage points over the year. In September, UK pension funds using interest rate swaps faced collateral calls so large they had to dump government bonds, and the Bank of England stepped in. Annuity holders cashed out to chase higher rates elsewhere."
       }
     },
     {

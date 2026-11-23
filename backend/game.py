@@ -89,6 +89,7 @@ MOVE_LABELS = [
     ("rate_bp", "Interest rates", "bp"), ("ig_spread_bp", "Investment-grade spreads", "bp"),
     ("hy_spread_bp", "High-yield spreads", "bp"), ("equity_pct", "Stock market", "%"),
     ("fx_pct", "US dollar", "%"), ("lapse_mult", "Surrenders vs normal", "x"),
+    ("margin_call_pct", "Collateral calls (% of assets)", "%"),
     ("hy_default_pct", "High-yield defaults", "%"), ("ig_loss_pct", "BBB credit losses", "%"),
     ("mortgage_loss_pct", "Mortgage losses", "%"),
 ]

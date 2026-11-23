@@ -74,6 +74,7 @@ class ShockVector(BaseModel):
     equity_pct: float = 0
     fx_pct: float = 0  # USD up = positive; foreign assets lose value
     lapse_mult: float = 1.0
+    margin_call_pct: float = 0  # collateral demanded when rates jump (derivatives, repo, securities lending), % of invested assets
     dealer_default: bool = False
     stress_liquidity: bool = False
 
@@ -148,6 +149,7 @@ class Dashboard(BaseModel):
     fx_exposure_usd_bn: float
     counterparty_exposure_usd_bn: float
     derivatives_mtm_usd_bn: float = 0.0  # uncollateralized hedge value: + owed to us, - owed by us
+    collateral_posted_usd_bn: float = 0.0  # still ours, but locked up: not liquid
     asset_values: dict[str, float]
     liability_values: dict[str, float]
     status: dict[str, Literal["green", "amber", "red"]]
@@ -195,3 +197,4 @@ class GameState(BaseModel):
     prt_decided: bool = False
     history: list[QuarterRecord] = []
     boss_severity: float = 1.0  # set by build_state: the boss shock's strength for this company
+    collateral_posted: float = 0.0  # cash locked up with dealers after a collateral call; returned the next quarter

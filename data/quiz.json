@@ -169,8 +169,7 @@
     "_note": "Dropped at Gate 1 (Micah: limit to 5 questions and 5 confidence ratings). Kept for reference; not used.",
     "concepts": [
       "forced_selling",
-      "fx_hedge_cost",
-      "pension_risk_transfer"
+      "fx_hedge_cost"
     ],
     "forms": {
       "A": [
@@ -197,18 +196,6 @@
             "D": "It protects against a stronger dollar but costs a little every quarter"
           },
           "answer": "D"
-        },
-        {
-          "id": "A8",
-          "concept": "pension_risk_transfer",
-          "q": "A company asks us to take over its pension plan. What do we take on?",
-          "options": {
-            "A": "Long-dated promises to retirees plus premium to invest, which uses capital",
-            "B": "No liabilities, only fees",
-            "C": "Short-term liabilities only",
-            "D": "Stock-market guarantees"
-          },
-          "answer": "A"
         }
       ],
       "B": [
@@ -235,18 +222,6 @@
             "D": "Our credit quality"
           },
           "answer": "B"
-        },
-        {
-          "id": "B8",
-          "concept": "pension_risk_transfer",
-          "q": "After accepting a pension deal, what should we usually do to stay matched?",
-          "options": {
-            "A": "Nothing",
-            "B": "Shorten our assets",
-            "C": "Lengthen our assets or add rate protection, because the new promises are long",
-            "D": "Sell all bonds"
-          },
-          "answer": "C"
         }
       ]
     },

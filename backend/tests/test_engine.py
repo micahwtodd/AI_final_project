@@ -182,3 +182,16 @@ def test_a_collapse_scores_zero_for_quarters_never_reached():
     s, rec = engine.play_quarter(s, None)
     rec.surplus_after = -1.0
     assert engine.score([rec])["per_quarter"][1:] == [0.0] * (engine.n_quarters() - 1)
+
+
+def test_collateral_call_locks_up_cash_without_losing_it_and_comes_back():
+    s = fresh("JXN")
+    calm = ShockVector()
+    called = ShockVector(margin_call_pct=2)
+    a, _ = engine.apply_shock(s, calm)
+    b, att = engine.apply_shock(s, called)
+    assert b.collateral_posted == pytest.approx(0.02 * engine.total_assets(s))
+    assert engine.dashboard(b).liquidity_ratio_pct < engine.dashboard(a).liquidity_ratio_pct
+    assert engine.surplus(b) == pytest.approx(engine.surplus(a) + att.liquidity, abs=1e-6)  # only fire-sale haircuts cost money
+    c, _ = engine.apply_shock(b, calm)  # returned the next quarter
+    assert c.collateral_posted == 0

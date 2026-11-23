@@ -70,7 +70,9 @@ def key_text(key: dict, rec: QuarterRecord) -> str:
         "- Full breakdown by cause (bn): " + ", ".join(
             f"{k} {v:+.2f}" for k, v in rec.attribution.components().items() if abs(v) >= 0.005),
     ]
-    events = [e for e, on in (("the largest derivatives dealer defaulted", rec.shock.dealer_default),
+    events = [e for e, on in ((f"dealers and lenders called {rec.shock.margin_call_pct:.1f}% of invested assets as collateral "
+                               "(still ours, but locked up, so the liquidity ratio fell)", rec.shock.margin_call_pct > 0),
+                              ("the largest derivatives dealer defaulted", rec.shock.dealer_default),
                               ("markets froze, so forced sales were at fire-sale prices", rec.shock.stress_liquidity)) if on]
     if events:
         lines.append("- Market events this quarter: " + "; ".join(events))

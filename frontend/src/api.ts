@@ -25,6 +25,7 @@ export type Dashboard = {
   fx_exposure_usd_bn: number;
   counterparty_exposure_usd_bn: number;
   derivatives_mtm_usd_bn: number;
+  collateral_posted_usd_bn?: number;
   asset_values: Record<string, number>;
   liability_values: Record<string, number>;
   status: Record<string, "green" | "amber" | "red">;
