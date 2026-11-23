@@ -146,7 +146,7 @@ export function Desk(props: {
         <div className={`panel ticket${focus(2)}${focus(3)}`}>
           <h3><Term k="ticket_help" text={TICKET_TIP}>Trade ticket · Q{g.quarter}</Term></h3>
           {g.card?.rule && <div className="rule-banner"><b>⚡ RULE CHANGE</b> {g.card.rule}</div>}
-          {boss && <div className="boss-banner">🚨 BOSS ROUND: every lever is unlocked. This is the ticket that matters.</div>}
+          {boss && <div className="boss-banner">🚨 BOSS ROUND: this is the ticket that matters.</div>}
           {g.quarter > 1 && (
             <div className="holdings"><b>Fresh ticket.</b> Last quarter's swaps and puts were cash-settled when it ended. Your book now: cash {fmtNum(pos.cash_buffer_pct)}% of assets, collateral {pos.collateralized ? "on" : "off"}, {pos.dealers} dealer{pos.dealers === 3 ? "s" : ""}. <span className="muted">Each slider is a trade from here.</span></div>
           )}

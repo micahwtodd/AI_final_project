@@ -254,7 +254,7 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
         <div className="boss-warning" role="alert">
           <div className="boss-siren">🚨</div>
           <div><b>INTELLIGENCE BRIEFING · SOMETHING BIG IS COMING</b>
-            <div>Every lever is in your hands now. Whatever you hold when the market opens is all you'll have. Spend your last ticket wisely.</div></div>
+            <div>Whatever you hold when the market opens is all you'll have. Spend your last ticket wisely.</div></div>
         </div>
       )}
       <div className="next-bar">
