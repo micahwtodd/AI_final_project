@@ -29,29 +29,36 @@ export const LEVERS = {
     term: "interest_rate_swap",
     label: "Rate protection (swaps)",
     help: "Closes this % of the rate mismatch between assets and liabilities. Costs a little each quarter.",
-    min: 0, max: 120, step: 5, unit: "%",
+    tip: "Interest rate swaps that receive a fixed rate gain value when rates fall, so they close the rate mismatch between assets and liabilities: +100% closes all of it. Negative values pay fixed instead: they gain if rates rise but widen the mismatch. Costs a little each quarter.",
+    min: -150, max: 150, step: 5, unit: "%",
   },
   credit_shift_pct: {
     term: "credit_spread",
     label: "Move risky bonds to government bonds",
     help: "Sells this % of junk and BBB bonds and buys government bonds. Safer, but earns less.",
+    tip: "Sells this % of junk and BBB bonds and buys government bonds. Risky bonds pay extra yield (the credit spread): when spreads widen their prices fall, and a default is a permanent loss. Safer, but earns less. Negative values move back into riskier bonds.",
     min: -10, max: 50, step: 5, unit: "%",
   },
   equity_hedge_pct: {
     term: "put_option",
     label: "Stock-market insurance (puts)",
     help: "Protects this % of the guarantees you owe policyholders if markets fall. Costs a premium every quarter.",
+    tip: "Put options pay out when stocks fall. They protect this % of the stock-market guarantees you owe policyholders, and cost a premium every quarter whether or not they pay.",
     min: 0, max: 100, step: 10, unit: "%",
   },
   cash_buffer_pct: {
     term: "forced_selling",
     label: "Cash on hand",
     help: "Cash as % of invested assets. Pays for surrenders and margin calls without selling bonds at a loss, but earns less.",
+    tip: "Cash as % of invested assets. It pays surrenders and collateral calls without forced selling (selling bonds at a discount in a stressed market), but it earns less.",
     min: 1, max: 15, step: 1, unit: "%",
   },
 } as const;
 
 export type LeverKey = keyof typeof LEVERS;
+
+export const COUNTERPARTY_TIP = "With daily collateral, dealers post cash as your hedges gain, so a dealer failure costs little; it can also demand cash from you when hedges lose. Spreading hedges across 3 dealers limits what any one failure can cost.";
+export const TICKET_TIP = "Each slider starts at zero every quarter: it is a new trade added on top of what you already hold. Your positions carry over from quarter to quarter.";
 
 export const fmtBn = (x: number, digits = 2) => `${x < 0 ? "−" : ""}$${Math.abs(x).toFixed(digits)}bn`;
 export const fmtSigned = (x: number, digits = 2) => `${x >= 0 ? "+" : "−"}$${Math.abs(x).toFixed(digits)}bn`;

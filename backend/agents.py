@@ -13,6 +13,7 @@ import asyncio
 import os
 
 os.environ.setdefault("PYDANTIC_AI_NO_BANNER", "1")
+import re
 import secrets
 import time
 from dataclasses import dataclass, field
@@ -357,11 +358,20 @@ async def _run_agent(kind: str, prompt: str, run: RunCtx, history: list[ModelMes
 _HISTORY: dict[str, list[list[ModelMessage]]] = {}
 
 
+
+_OPENER = re.compile(r"""^\s*["'“]?\s*walk me through\b[^:.!?\n]*[:.!?]["'”]?\s*""", re.IGNORECASE)
+
+
+def strip_opener(text: str) -> str:
+    """Drop a stock "Walk me through ...:" opener from an agent reply (the persona used to encourage it)."""
+    out = _OPENER.sub("", text or "", count=1)
+    return (out[:1].upper() + out[1:]) if out else text
+
 async def ask(session, message: str, queue: asyncio.Queue, save: Callable[[Any], None], to: str | None = None,
               guard: bool = True) -> None:
     """Answer one learner question. Puts events on `queue` (and the audit trail)."""
     run_id = secrets.token_hex(4)
-    quarter = min(session.state.quarter, 4)
+    quarter = min(session.state.quarter, engine.n_quarters())
     if session.agent_mode == "solo":
         lead = "solo"
     elif to in WORKERS:
@@ -377,7 +387,8 @@ async def ask(session, message: str, queue: asyncio.Queue, save: Callable[[Any],
 
     run = RunCtx(session=session, run_id=run_id, emit=emit)
     t0 = time.time()
-    session.chat.append({"role": "user", "text": message, "run_id": run_id, "ts": t0, "to": lead})
+    chat_q = min(session.state.quarter, engine.n_quarters())  # each quarter gets its own chat tab
+    session.chat.append({"role": "user", "text": message, "run_id": run_id, "ts": t0, "to": lead, "quarter": chat_q})
     reply_text, terms = None, []
 
     blocked = safety.guard_message(message) if guard else None  # code layer: before any model sees it
@@ -410,6 +421,9 @@ async def ask(session, message: str, queue: asyncio.Queue, save: Callable[[Any],
         reply_text = {"no_key": OFFLINE_TEXT, "budget": BUDGET_TEXT,
                       "blocked_input": blocked["message"] if blocked else ""}.get(
             stopped or "", "Sorry, I couldn't finish that answer. Please try again or rephrase.")
+    reply_text = strip_opener(reply_text)
+    for sub_reply in run.subs:
+        sub_reply["text"] = strip_opener(sub_reply["text"])
     speaker = lead if stopped is None else "system"
     ticket = run.proposed[-1] if run.proposed else None
     if ticket:
@@ -419,7 +433,7 @@ async def ask(session, message: str, queue: asyncio.Queue, save: Callable[[Any],
                             "seconds": round(time.time() - t0, 2)})
     session.chat.append({"role": "agent", "agent": speaker, "agent_name": AGENT_NAMES.get(speaker),
                          "text": reply_text, "run_id": run_id, "stopped": stopped, "subs": run.subs,
-                         "proposed_ticket": ticket, "ts": time.time()})
+                         "proposed_ticket": ticket, "ts": time.time(), "quarter": chat_q})
     emit("system", "usage", {"spend_usd": round(session.spend_usd, 6), "budget_cap_usd": session.budget_cap_usd,
                              "blocked": session.spend_usd >= session.budget_cap_usd, "tokens": session.tokens,
                              "by_agent": session.by_agent})

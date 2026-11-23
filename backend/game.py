@@ -256,7 +256,7 @@ def view(s: Session) -> dict:
         "history": [_history_row(r, s) for r in s.state.history],
         "start_surplus_usd_bn": round(engine.surplus(s.start_state), 3),
         "usage": usage_view(s),
-        "chat": s.chat[-40:],
+        "chat": s.chat[-200:],
         "quiz_taken": sorted(s.quiz),
         "custom_inputs": sorted(s.overrides),
         "achievements": achievements.evaluate(s),

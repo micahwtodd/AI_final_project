@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, type Company, type Debrief, type GameView, type Health, type Reveal, type Review, type Shock, type Usage } from "./api";
+import { api, type Company, type Debrief, type GameView, type Reveal, type Review, type Shock, type Usage } from "./api";
 import { UsageMeter } from "./components/UsageMeter";
 import { CompanySelect } from "./screens/CompanySelect";
 import { Desk } from "./screens/Desk";
@@ -34,7 +34,6 @@ type Screen =
 export default function App() {
   const [screen, setScreen] = useState<Screen>({ name: "welcome" });
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [health, setHealth] = useState<Health | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [glossary, setGlossary] = useState<Glossary>({});
@@ -57,7 +56,6 @@ export default function App() {
 
   useEffect(() => {
     api.companies().then(setCompanies).catch((e) => setError(String(e)));
-    api.health().then(setHealth).catch(() => setHealth(null));
     fetch("/api/glossary").then((r) => r.json()).then(setGlossary).catch(() => undefined);
   }, []);
 
@@ -113,7 +111,6 @@ export default function App() {
           <div className="topbar-info">
             <span className="pill">{game.company}</span>
             <span className="pill">{quarterLabel}</span>
-            <span className="pill">Seed {game.seed}</span>
             <StreakChips a={game.achievements} />
             <span className="pill strong">Surplus <CountUp value={surplusShown} from={surplusShown} format={(v) => `$${v.toFixed(2)}bn`} /></span>
           </div>
@@ -127,9 +124,6 @@ export default function App() {
           onTrace={() => game && setScreen({ name: "trace", game, back: screen })}
           onSafety={() => setScreen({ name: "safety", back: screen })}
           onExperiments={() => setScreen({ name: "experiments", back: screen })} />
-        <div className={`pill status ${health?.key_found ? "ok" : "off"}`}>
-          {health?.key_found ? `AI colleagues: ${health.model} ready` : "AI colleagues offline"}
-        </div>
       </header>
 
       {error && (

@@ -1,7 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { api, type Action, type GameView, type Preview, type Shock, type Usage } from "../api";
 import { ChatPanel } from "../components/ChatPanel";
-import { LEVERS, type LeverKey } from "../labels";
+import { COUNTERPARTY_TIP, LEVERS, TICKET_TIP, type LeverKey } from "../labels";
+
+const LEVER_KEYS = Object.keys(LEVERS) as LeverKey[];
+type Deltas = Record<LeverKey, number>;
+type Terms = Pick<Action, "collateralized" | "dealers" | "accept_prt">;
+const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+const fmtNum = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(1));
 import { Meters } from "../components/Meters";
 import { BalanceSheetPanel } from "../components/BalanceSheet";
 import { Term } from "../components/Term";
@@ -23,7 +29,19 @@ export function Desk(props: {
   onUsage: (u: Partial<Usage>) => void;
 }) {
   const g = props.game;
-  const [draft, setDraft] = useState<Action>(g.pending ?? { ...g.action, accept_prt: null });
+  // The sliders are this quarter's trades: they start at zero and add to the positions carried in from
+  // earlier quarters (g.action). The engine works with the resulting positions.
+  const pos = g.action;
+  const deltasFrom = (a: Action | null | undefined): Deltas =>
+    Object.fromEntries(LEVER_KEYS.map((k) => [k, a ? Math.round((a[k] - pos[k]) * 100) / 100 : 0])) as Deltas;
+  const termsFrom = (a: Action | null | undefined): Terms =>
+    ({ collateralized: (a ?? pos).collateralized, dealers: (a ?? pos).dealers, accept_prt: a?.accept_prt ?? null });
+  const [delta, setDelta] = useState<Deltas>(() => deltasFrom(g.pending));
+  const [terms, setTerms] = useState<Terms>(() => termsFrom(g.pending));
+  const draft: Action = useMemo(() => ({
+    ...pos, ...terms,
+    ...Object.fromEntries(LEVER_KEYS.map((k) => [k, clamp(Math.round((pos[k] + delta[k]) * 100) / 100, LEVERS[k].min, LEVERS[k].max)])),
+  }), [pos, terms, delta]);
   const [preview, setPreview] = useState<Preview | null>(null);
   const timer = useRef<number | undefined>(undefined);
   const offersPrt = !!g.card?.offers_prt_deal && !g.prt_decided;
@@ -42,7 +60,8 @@ export function Desk(props: {
   };
 
   useEffect(() => {
-    setDraft(g.pending ?? { ...g.action, accept_prt: null });
+    setDelta(deltasFrom(g.pending));
+    setTerms(termsFrom(g.pending));
   }, [g.id, g.quarter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // live preview of the ticket (debounced)
@@ -54,8 +73,10 @@ export function Desk(props: {
     return () => window.clearTimeout(timer.current);
   }, [draft, g.id]);
 
-  const set = <K extends keyof Action>(k: K, v: Action[K]) => setDraft((d) => ({ ...d, [k]: v }));
-  const signed = !!g.pending && JSON.stringify(g.pending) === JSON.stringify(draft);
+  const set = <K extends keyof Terms>(k: K, v: Terms[K]) => setTerms((t) => ({ ...t, [k]: v }));
+  const signed = !!g.pending && LEVER_KEYS.every((k) => Math.abs(g.pending![k] - draft[k]) < 1e-6)
+    && g.pending.collateralized === draft.collateralized && g.pending.dealers === draft.dealers
+    && (g.pending.accept_prt ?? null) === (draft.accept_prt ?? null);
   const needsPrt = offersPrt && draft.accept_prt === null;
 
   return (
@@ -83,31 +104,37 @@ export function Desk(props: {
         )}
 
         <div className={focus(1).trim()}>
-        <ChatPanel onAnswered={() => { if (showGuide && guide <= 1) setGuide(2); }} gameId={g.id} chat={g.chat} mode={g.agent_mode} demo={g.demo} usage={props.usage} onUsage={props.onUsage}
-          onLoadTicket={(a) => setDraft({ ...a, accept_prt: offersPrt ? a.accept_prt : null })} />
+        <ChatPanel onAnswered={() => { if (showGuide && guide <= 1) setGuide(2); }} gameId={g.id} quarter={g.quarter} chat={g.chat} mode={g.agent_mode} demo={g.demo} usage={props.usage} onUsage={props.onUsage}
+          onLoadTicket={(a) => { setDelta(deltasFrom(a)); setTerms({ ...termsFrom(a), accept_prt: offersPrt ? a.accept_prt ?? null : null }); }} />
         </div>
       </div>
 
       <div className="desk-right">
         <div className={`panel ticket${focus(2)}${focus(3)}`}>
-          <h3>Trade ticket · Q{g.quarter}</h3>
-          {(Object.keys(LEVERS) as LeverKey[]).map((k) => {
+          <h3><Term k="ticket_help" text={TICKET_TIP}>Trade ticket · Q{g.quarter}</Term></h3>
+          {LEVER_KEYS.map((k) => {
             const L = LEVERS[k];
+            // slider range: steps of L.step around zero, so the position stays inside the lever's limits
+            const lo = -L.step * Math.floor((pos[k] - L.min) / L.step + 1e-9);
+            const hi = L.step * Math.floor((L.max - pos[k]) / L.step + 1e-9);
+            const d = delta[k];
             return (
               <div className="lever" key={k}>
                 <div className="lever-head">
-                  <label htmlFor={k}><Term k={L.term}>{L.label}</Term></label>
-                  <span className="lever-val">{draft[k]}{L.unit}</span>
+                  <label htmlFor={k}><Term k={L.term} text={L.tip}>{L.label}</Term></label>
+                  <span className="lever-val">{d > 0 ? "+" : d < 0 ? "−" : ""}{fmtNum(Math.abs(d))}{L.unit}</span>
                 </div>
-                <input id={k} type="range" min={L.min} max={L.max} step={L.step} value={draft[k]}
-                  onChange={(e) => set(k, Number(e.target.value))} />
-                <div className="small muted">{L.help}</div>
+                <input id={k} type="range" min={lo} max={hi} step={L.step} value={d}
+                  onChange={(e) => setDelta((x) => ({ ...x, [k]: Number(e.target.value) }))} />
+                {(pos[k] !== 0 || d !== 0) && (
+                  <div className="lever-pos">holding {fmtNum(pos[k])}{L.unit}{d !== 0 && <> → <b>{fmtNum(draft[k])}{L.unit}</b></>}</div>
+                )}
               </div>
             );
           })}
 
           <div className="lever">
-            <div className="lever-head"><label><Term k="collateral">Counterparty terms</Term></label></div>
+            <div className="lever-head"><label><Term k="collateral" text={COUNTERPARTY_TIP}>Counterparty terms</Term></label></div>
             <div className="toggle-row">
               <label><input type="checkbox" checked={draft.collateralized} onChange={(e) => set("collateralized", e.target.checked)} /> Daily collateral</label>
               <label>
@@ -118,7 +145,6 @@ export function Desk(props: {
                 </select>
               </label>
             </div>
-            <div className="small muted">Collateral means dealers post cash daily; if one fails you lose little. It can also demand cash from you.</div>
           </div>
 
           {offersPrt && (

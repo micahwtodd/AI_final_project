@@ -32,12 +32,11 @@ export function Meters(props: { dashboard: Dashboard; after?: Dashboard }) {
     <div className="meters">
       {meters(props.dashboard, props.after).map((m) => (
         <div key={m.key} className={`meter ${m.status ?? ""}`}>
-          <div className="meter-label">{m.term ? <Term k={m.term}>{m.label}</Term> : m.label}</div>
+          <div className="meter-label"><Term k={m.term ?? m.key} text={m.hint}>{m.label}</Term></div>
           <div className="meter-value">
             {m.value}
             {m.afterValue && m.afterValue !== m.value && <span className="meter-after"> → {m.afterValue}</span>}
           </div>
-          <div className="meter-hint">{m.hint}</div>
         </div>
       ))}
     </div>

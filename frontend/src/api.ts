@@ -128,6 +128,7 @@ export type ChatMsg = {
   stopped?: string | null;
   proposed_ticket?: Ticket | null;
   subs?: SubAnswer[];
+  quarter?: number;
 };
 
 export type SubAnswer = { agent: string; agent_name: string; text: string };

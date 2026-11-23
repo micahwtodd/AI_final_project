@@ -15,6 +15,7 @@ type Turn = {
   ticket?: Ticket | null;
   runId?: string;
   flagged?: boolean;
+  quarter: number;  // each quarter has its own chat tab
 };
 
 const SAMPLES = [
@@ -36,7 +37,7 @@ export const CAST: Record<string, { name: string; short: string; role: string; c
 function fromHistory(chat: ChatMsg[]): Turn[] {
   return chat.map((m) => ({
     role: m.role, text: m.text, agent: m.agent, agentName: m.agent_name, trace: [], subs: m.subs ?? [],
-    stopped: m.stopped ?? null, ticket: m.proposed_ticket ?? null, runId: m.run_id,
+    stopped: m.stopped ?? null, ticket: m.proposed_ticket ?? null, runId: m.run_id, quarter: m.quarter ?? 1,
   }));
 }
 
@@ -119,6 +120,7 @@ export function ChatPanel(props: {
   onLoadTicket: (a: Action) => void;
   onAnswered?: () => void;
   demo?: boolean;
+  quarter: number;
 }) {
   const [turns, setTurns] = useState<Turn[]>(() => fromHistory(props.chat));
   const [mode, setMode] = useState<AgentMode>(props.mode);
@@ -126,6 +128,7 @@ export function ChatPanel(props: {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [openTrace, setOpenTrace] = useState<number | null>(null);
+  const [tab, setTab] = useState(props.quarter);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -135,6 +138,7 @@ export function ChatPanel(props: {
   useEffect(() => {
     setMode(props.mode);
   }, [props.mode]);
+  useEffect(() => { setTab(props.quarter); }, [props.quarter]);  // a new quarter opens a fresh tab
   useEffect(() => {
     // newer browsers return a Promise from scrollIntoView; never hand it back to React as a cleanup
     void endRef.current?.scrollIntoView({ block: "nearest" });
@@ -148,9 +152,11 @@ export function ChatPanel(props: {
     if (!msg || busy) return;
     setText("");
     setBusy(true);
+    setTab(props.quarter);
     const lead = mode === "solo" ? "solo" : to === "team" ? "cro" : to;
-    setTurns((t) => [...t, { role: "user", text: msg, trace: [], subs: [] },
-      { role: "agent", text: "", agent: lead, agentName: CAST[lead].name, trace: [], subs: [], pending: true }]);
+    const quarter = props.quarter;
+    setTurns((t) => [...t, { role: "user", text: msg, trace: [], subs: [], quarter },
+      { role: "agent", text: "", agent: lead, agentName: CAST[lead].name, trace: [], subs: [], pending: true, quarter }]);
     setOpenTrace(null);
     const update = (fn: (t: Turn) => Turn) => setTurns((all) => all.map((t, i) => (i === all.length - 1 ? fn(t) : t)));
     try {
@@ -183,6 +189,15 @@ export function ChatPanel(props: {
     <div className="panel chat">
       <div className="chat-head">
         <h3>Ask your {mode === "team" ? "team" : "colleague"}</h3>
+        {props.quarter > 1 && (
+          <div className="chat-tabs" role="tablist" aria-label="Chat by quarter">
+            {Array.from({ length: props.quarter }, (_, i) => i + 1).map((q) => (
+              <button key={q} role="tab" aria-selected={tab === q} className={`chat-tab ${tab === q ? "on" : ""}`} onClick={() => setTab(q)}>
+                Q{q}{q === props.quarter ? " · now" : ""}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       {mode === "team" ? (
         <div className="cast-row">
@@ -203,8 +218,9 @@ export function ChatPanel(props: {
       )}
       {blocked && <div className="banner warn-banner">Budget cap reached: the AI colleagues are offline for this session. The game continues.</div>}
       <div className="chat-log">
-        {turns.length === 0 && <div className="muted small">Type your own question about this company's risks. Every number in a reply comes from the engine's tools; open Chat detail below to see who did what.</div>}
-        {turns.map((t, i) => (
+        {tab !== props.quarter && <div className="muted small past-note">Your Q{tab} conversation (saved). Questions you ask now go to the Q{props.quarter} tab.</div>}
+        {!turns.some((t) => t.quarter === tab) && <div className="muted small">Type your own question about this company's risks. Every number in a reply comes from the engine's tools; open Chat detail below to see who did what.</div>}
+        {turns.map((t, i) => t.quarter !== tab ? null : (
           <div key={i} className={`msg ${t.role}`} style={t.role === "agent" ? { borderLeftColor: CAST[t.agent ?? "system"]?.color } : undefined}>
             {t.role === "agent" && (
               <div className="msg-name" style={{ color: CAST[t.agent ?? "system"]?.color }}>
@@ -234,10 +250,10 @@ export function ChatPanel(props: {
         <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask about rates, credit, liquidity, hedges…" maxLength={2000} aria-label="Question for your colleagues" />
         <button className="primary" disabled={busy || !text.trim()}>{busy ? "Thinking…" : "Ask"}</button>
       </form>
-      {turns.some((t) => t.role === "agent" && (t.trace.length > 0 || t.subs.length > 0)) && (
+      {turns.some((t) => t.quarter === tab && t.role === "agent" && (t.trace.length > 0 || t.subs.length > 0)) && (
         <details className="chat-detail">
           <summary>Show chat detail <span className="muted small">· specialist answers, tool calls and costs</span></summary>
-          {turns.map((t, i) => t.role !== "agent" || (t.trace.length === 0 && t.subs.length === 0) ? null : (
+          {turns.map((t, i) => t.quarter !== tab || t.role !== "agent" || (t.trace.length === 0 && t.subs.length === 0) ? null : (
             <div key={i} className="detail-turn">
               <div className="detail-q">Q: {turns[i - 1]?.role === "user" ? turns[i - 1].text : "(question)"}</div>
               {t.subs.length > 0 && (

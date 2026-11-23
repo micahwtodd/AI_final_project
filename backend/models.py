@@ -104,7 +104,7 @@ class EventCard(BaseModel):
 
 class Action(BaseModel):
     """Absolute lever settings. Applying an Action trades the book to match it."""
-    rate_hedge_pct: float = Field(0, ge=0, le=120, description="% of the duration gap closed with swaps")
+    rate_hedge_pct: float = Field(0, ge=-150, le=150, description="% of the duration gap closed with receive-fixed swaps; negative pays fixed and widens the gap (a bet on rising rates)")
     credit_shift_pct: float = Field(0, ge=-10, le=50, description="% of below-IG and BBB moved into governments")
     equity_hedge_pct: float = Field(0, ge=0, le=100, description="% of variable annuity guarantee equity exposure hedged with puts")
     fx_hedge_pct: float = Field(0, ge=0, le=100, description="% of foreign assets hedged with forwards")

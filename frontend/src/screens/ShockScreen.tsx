@@ -35,6 +35,11 @@ export function ShockScreen(props: {
         <div className="paper-mast">THE MARKET DAILY · Q{s.quarter} · {s.era}</div>
         <h1 className="paper-headline">{s.headline}</h1>
         <p className="paper-body">{s.narrative}</p>
+        {s.real_world?.title && (
+          <div className="paper-real">
+            <span className="paper-real-tag">IN REAL LIFE</span> <b>{s.real_world.title}.</b> {s.real_world.text}
+          </div>
+        )}
       </div>
 
       <div className="shock-grid">
@@ -58,13 +63,6 @@ export function ShockScreen(props: {
               <div className="muted small">${s.surplus_before.toFixed(2)}bn → ${s.surplus_after.toFixed(2)}bn</div>
             </div>
           </div>
-          {s.real_world?.title && (
-            <div className="panel real-world">
-              <h3>In real life</h3>
-              <b>{s.real_world.title}</b>
-              <p className="small">{s.real_world.text}</p>
-            </div>
-          )}
         </div>
 
         <div className="panel cro">

@@ -694,9 +694,22 @@ def cat(state: str) -> Image.Image:
     fur, white = R["orange"], R["white_fur"]
     eye_col = hx("#3fae5a")
     if state == "nap":
-        s.region("tail", {(x, y) for x in range(8, 42) for y in range(39, 45)
-                          if abs(y - (41.5 + 1.5 * math.sin((x - 8) / 5))) < 1.6}, fur)
         s.region("body", ellipse(26, 33, 17, 9), fur, shade_right=0.8)
+        # the tail leaves the rump, curls down and wraps forward along the front of the body, tip up by the chin
+        path = [(42.5, 31), (44.5, 34), (44, 37.5), (41.5, 40.5), (37, 42), (31, 42.6), (25, 42.4), (20, 41.4),
+                (16.5, 39.6), (15, 37.2), (15.6, 35)]
+        tail = set()
+        for (x0, y0), (x1, y1) in zip(path, path[1:]):
+            n = int(max(abs(x1 - x0), abs(y1 - y0)) * 3) + 1
+            for i in range(n + 1):
+                cx, cy = x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n
+                tail |= ellipse(cx, cy, 1.7, 1.7)
+        s.region("tail", tail, [mix(c, INK, 0.22) for c in fur], hl=False)
+        for (x, y) in tail:  # a dark edge where the tail lies over the body, and tabby rings
+            if (x, y - 1) not in tail and s.owner.get((x, y - 1)) == "body":
+                s.px(x, y - 1, fur[0])
+            if (x + y) % 6 == 0:
+                s.tone(x, y, 0)
         s.region("head", ellipse(13, 32, 8, 7), fur)
         s.region("earL", poly([(6, 28), (8, 21), (12, 27)]), fur)
         s.region("earR", poly([(13, 26), (17, 21), (19, 28)]), fur)
@@ -740,9 +753,11 @@ def cat(state: str) -> Image.Image:
         s.px(24, 21, hx("#e88fa0"))
         for (x, y) in ((17, 8), (30, 8)):
             s.px(x, y, hx("#f2a3b3"))
-        for x in (11, 12, 13):  # whiskers
-            s.px(x, 21, white[1])
-            s.px(x + 24, 21, white[1])
+        whisker = hx("#d8cfc4")
+        for (x0, y0, x1, y1) in ((20, 22, 11, 20), (20, 23, 11, 25), (28, 22, 37, 20), (28, 23, 37, 25)):  # whiskers
+            for (x, y) in line_pts(x0, y0, x1, y1):
+                if (x, y) not in s.pts_of("muzzle"):
+                    s.px(x, y, whisker)
     else:  # hide: under the desk, eyes glowing in the shadow
         s.region("top", rect(0, 8, 47, 13), R["desk"])
         s.region("legL", rect(2, 14, 6, 47), R["desk"], shade_right=0.6)
