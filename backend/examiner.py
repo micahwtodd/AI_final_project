@@ -65,7 +65,7 @@ def key_text(key: dict, rec: QuarterRecord) -> str:
         f"- Mechanism: {key['mechanism_facts'][0]}",
         f"- SECOND FACTOR: {key['second_factor_label']} ({key['second_factor_usd_bn']:+.2f}bn). {key['second_factor_fact']}",
         f"- The learner's trades versus doing nothing this quarter: {key['hedge_effect_usd_bn']:+.2f}bn",
-        f"- Benchmark result minus the learner's result: {key['benchmark_change_usd_bn']:+.2f}bn",
+        f"- What a pro would do (the benchmark trades), result minus the learner's result: {key['benchmark_change_usd_bn']:+.2f}bn",
         "- What would have helped most: " + "; ".join(key["improvement_facts"]),
         "- Full breakdown by cause (bn): " + ", ".join(
             f"{k} {v:+.2f}" for k, v in rec.attribution.components().items() if abs(v) >= 0.005),

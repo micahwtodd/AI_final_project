@@ -152,7 +152,7 @@ export function Desk(props: {
                 const s = await props.run(() => api.advance(g.id));
                 if (s) props.onShock(s);
               }}>
-              End quarter Q{g.quarter} →
+              End Q{g.quarter} →
             </button>
           </div>
           {!g.pending && <div className="small muted">No ticket signed yet: ending the quarter keeps your current positions.</div>}

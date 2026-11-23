@@ -662,6 +662,6 @@ def improvement_facts(rec: QuarterRecord) -> list[str]:
     tol = max(0.005, 0.002 * abs(rec.surplus_before))
     helpful = sorted(((g, k) for k, g in rec.lever_gains.items() if g > tol), reverse=True)
     labels = {**LEVER_LABELS, "collateralized": "counterparty collateral", "dealers": "number of dealers"}
-    out = [f"{labels[k]}: you had {_lever_setting(k, rec.action)}, the benchmark {_lever_setting(k, bench)}; "
+    out = [f"{labels[k]}: you had {_lever_setting(k, rec.action)}, a pro {_lever_setting(k, bench)}; "
            f"that change alone would have added {g:+.2f}bn" for g, k in helpful[:2]]
     return out or ["no single lever change would have helped much this quarter: your trades held up"]

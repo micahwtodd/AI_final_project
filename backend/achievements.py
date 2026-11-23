@@ -9,7 +9,7 @@ BADGES: dict[str, dict] = {
     "called_it": {"name": "Called It", "icon": "🎯", "text": "Named the main driver of the quarter."},
     "full_marks": {"name": "Full Marks", "icon": "💯", "text": "Scored 100 on the Executive Summary in a quarter."},
     "better_than_nothing": {"name": "Better Than Nothing", "icon": "👍", "text": "Your trades beat doing nothing."},
-    "beat_benchmark": {"name": "Beat the Benchmark", "icon": "🏆", "text": "Matched or beat the expert benchmark."},
+    "beat_benchmark": {"name": "Beat the Pro", "icon": "🏆", "text": "Matched or beat what a pro would do."},
     "three_above_floor": {"name": "Three Above the Floor", "icon": "🛡️",
                           "text": "Three quarters in a row above the capital and liquidity floors."},
     "hat_trick": {"name": "Hat Trick", "icon": "🎩", "text": "Named the main driver three quarters in a row."},

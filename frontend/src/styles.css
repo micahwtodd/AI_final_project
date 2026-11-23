@@ -699,3 +699,10 @@ img.pixel.portrait { background: none !important; border-radius: 50%; }
 @media (max-width: 1250px) { .shock-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); } .shock-dash { grid-column: 1 / -1; }
   .shock-dash .meters { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); } }
 @media (max-width: 900px) { .shock-grid { grid-template-columns: 1fr; } }
+
+/* reveal: your ticket vs what a pro would do */
+.ticket-table { width: 100%; margin-bottom: 1rem; }
+.ticket-table th, .ticket-table td { padding: 0.35rem 0.5rem; text-align: right; }
+.ticket-table th:first-child, .ticket-table td:first-child { text-align: left; }
+.ticket-table tr.differs td { background: #fff6d6; font-weight: 600; }
+.ticket-table tr.differs td:first-child { box-shadow: inset 3px 0 0 #ffc72c; }

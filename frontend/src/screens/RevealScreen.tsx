@@ -28,11 +28,25 @@ function Bars(props: { rows: Row[]; unit?: string }) {
   );
 }
 
-function describe(a: Partial<Action>): string[] {
-  const out = (Object.keys(LEVERS) as LeverKey[]).map((k) => `${LEVERS[k].label}: ${a[k]}${LEVERS[k].unit}`);
-  out.push(`Collateral ${a.collateralized ? "on" : "off"}, ${a.dealers} dealer${a.dealers === 3 ? "s" : ""}`);
-  if (a.accept_prt !== undefined && a.accept_prt !== null) out.push(`Pension deal: ${a.accept_prt ? "accepted" : "declined"}`);
-  return out;
+/** One row per lever, with your setting and the pro's side by side; rows where you differ are highlighted. */
+function TicketTable(props: { you: Partial<Action>; pro: Partial<Action> }) {
+  const { you, pro } = props;
+  const rows: [string, string, string][] = (Object.keys(LEVERS) as LeverKey[]).map((k) => [
+    LEVERS[k].label, `${you[k] ?? 0}${LEVERS[k].unit}`, `${pro[k] ?? 0}${LEVERS[k].unit}`]);
+  rows.push(["Collateral", you.collateralized ? "On" : "Off", pro.collateralized ? "On" : "Off"]);
+  rows.push(["Dealers", String(you.dealers ?? 1), String(pro.dealers ?? 1)]);
+  if (pro.accept_prt !== undefined && pro.accept_prt !== null)
+    rows.push(["Pension deal", you.accept_prt ? "Accepted" : "Declined", pro.accept_prt ? "Accepted" : "Declined"]);
+  return (
+    <table className="table ticket-table">
+      <thead><tr><th></th><th>You</th><th>What a pro would do</th></tr></thead>
+      <tbody>
+        {rows.map(([label, y, p]) => (
+          <tr key={label} className={y !== p ? "differs" : ""}><td>{label}</td><td>{y}</td><td>{p}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  );
 }
 
 const CHECK_LABELS: Record<string, string> = {
@@ -65,7 +79,7 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
         <div className="examiner-head">
           <PixelSprite name={(u?.points ?? 0) >= 50 ? "vera_pleased" : "vera_concerned"} size={72} title="Vera Atrisk" />
           <div className="examiner-text">
-            <div className="cro-name">Vera Atrisk · your explanation, marked</div>
+            <div className="cro-name">Vera Atrisk · trade feedback</div>
             {r.review && <p className="cro-feedback">{r.review.reply_text}</p>}
             {r.review?.instruction_attempt && <div className="flag small">⚑ Your answer tried to instruct the grader. That part was ignored; only the finance content was marked.</div>}
             {r.marker === "keywords" && <div className="small muted">Marked by the keyword checker (AI examiner offline).</div>}
@@ -101,11 +115,11 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
             <div className="small muted">Total {r.total >= 0 ? "+" : "−"}${Math.abs(r.total).toFixed(2)}bn. ✓/✗ shows whether your explanation named the main and second causes. Every number comes from the engine.</div>
           </div>
           <div>
-            <h3>You vs doing nothing vs the benchmark</h3>
+            <h3>You vs doing nothing vs what a pro would do</h3>
             <Bars rows={[
               { label: "Your trades", value: r.comparison.you },
               { label: "Doing nothing", value: r.comparison.nothing },
-              { label: "Benchmark", value: r.comparison.benchmark },
+              { label: "What a pro would do", value: r.comparison.benchmark },
             ]} />
             <div className="score-chip">Results score this quarter <b><CountUp value={r.quarter_score} format={(v) => v.toFixed(0)} ms={1100} /></b> / 100</div>
             <h3 style={{ marginTop: "1rem" }}>What would have helped most</h3>
@@ -116,18 +130,15 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
 
       <div className="two-col">
         <div className="panel">
-          <h3>Debrief</h3>
-          <ul className="debrief">{r.debrief_text.map((t, i) => <li key={i}>{t}</li>)}</ul>
           <h3>The lesson</h3>
           <p>{r.lesson}</p>
+          <h3>Debrief</h3>
+          <ul className="debrief">{r.debrief_text.map((t, i) => <li key={i}>{t}</li>)}</ul>
           <p className="small muted">{r.source_note}</p>
         </div>
         <div className="panel">
-          <h3>Your ticket vs the benchmark</h3>
-          <div className="two-col tight">
-            <ul className="small">{describe(r.your_action).map((t) => <li key={t}>{t}</li>)}</ul>
-            <ul className="small">{describe(r.benchmark_action).map((t) => <li key={t}>{t}</li>)}</ul>
-          </div>
+          <h3>Your ticket vs what a pro would do</h3>
+          <TicketTable you={r.your_action} pro={r.benchmark_action} />
           <button className="primary wide" onClick={props.onNext}>
             {r.finished ? "See the year-end debrief →" : `On to Q${r.quarter + 1} →`}
           </button>

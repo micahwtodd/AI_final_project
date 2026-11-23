@@ -459,8 +459,8 @@ def quarter_debrief(rec: QuarterRecord) -> list[str]:
         + key["mechanism_facts"][0],
         f"The second-largest was {key['second_factor_label']} ({comps[key['second_factor']]:+.2f}bn).",
         f"Compared with doing nothing this quarter, your trades {'added' if hedge >= 0 else 'cost'} {_bn(hedge)}.",
-        (f"The benchmark trades would have done {_bn(gap)} better." if gap > 0.005
-         else f"You matched or beat the benchmark (by {_bn(-gap)})."),
+        (f"A pro's trades would have done {_bn(gap)} better." if gap > 0.005
+         else f"You matched or beat what a pro would do (by {_bn(-gap)})."),
     ]
     if rec.capital_breach:
         lines.append("Warning: the capital ratio ended below the 100% floor.")
@@ -491,7 +491,7 @@ def debrief(s: Session) -> dict:
         f"You ran {DISPLAY_NAMES.get(s.ticker, s.ticker)} through four quarters of market stress (seed {s.seed}).",
         f"Surplus went from ${start:.2f}bn to ${end:.2f}bn ({pct(end):+.1f}%).",
         f"Doing nothing all year would have ended at ${nothing_end:.2f}bn ({pct(nothing_end):+.1f}%); "
-        f"the benchmark trades at ${bench_end:.2f}bn ({pct(bench_end):+.1f}%).",
+        f"a pro's trades at ${bench_end:.2f}bn ({pct(bench_end):+.1f}%).",
         f"Your best quarter was Q{best.quarter} ({engine.card_for(best.quarter).title}); "
         f"the hardest was Q{worst.quarter} ({engine.card_for(worst.quarter).title}).",
     ]

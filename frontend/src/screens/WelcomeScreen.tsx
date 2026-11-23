@@ -26,8 +26,8 @@ const SLIDES: Slide[] = [
       <p>Your company has <b>assets</b> (money you have or are owed), and <b>liabilities</b> (money you owe to others).
         <b> Equity</b> is what is left over. Each component has different sensitivities to financial market risks.</p>
       <p>You must navigate the company through tumultuous markets: success is measured by <b>how much equity you preserve
-        and grow</b>. Most importantly, you'll have to explain your decisions to the Chief Risk Officer (CRO) based on
-        feedback from your elite team of experts.</p>
+        and grow</b>. You must rely on your elite team of experts for guidance, evaluate their feedback, recommend
+        protective trades, and explain your decisions to the CRO.</p>
       <p className="intro-note">The underlying data is based on real financials. These simulations will teach you how
         different companies have different exposures.</p>
     </>,
@@ -83,7 +83,7 @@ const SLIDES: Slide[] = [
     kicker: "How to win", title: "Scoring has two categories.",
     body: <div className="score-cats">
       <div className="score-cat"><span className="score-n">1</span>
-        <div><b>Results</b><div>Beat doing nothing and get close to the expert's benchmark.</div></div></div>
+        <div><b>Results</b><div>Beat doing nothing and get close to what a pro would do.</div></div></div>
       <div className="score-cat"><span className="score-n">2</span>
         <div><b>The Executive Summary</b><div>Explain what really happened in your own words, and Vera will critique you.</div></div></div>
       <p className="intro-warn">Every hedge costs money, so be thoughtful.</p>

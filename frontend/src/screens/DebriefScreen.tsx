@@ -9,7 +9,7 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
   const paths = [
     { label: "You", end: d.end_surplus },
     { label: "Doing nothing", end: d.nothing_end_surplus },
-    { label: "Benchmark", end: d.benchmark_end_surplus },
+    { label: "What a pro would do", end: d.benchmark_end_surplus },
   ];
   const max = Math.max(d.start_surplus, ...paths.map((p) => p.end));
 
@@ -21,7 +21,7 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
       <div className="two-col">
         <div className="panel center">
           <div className="big-score">{d.results_score.toFixed(0)}<span>/100</span></div>
-          <div><b>Results score</b>: how your trades did against doing nothing and the benchmark</div>
+          <div><b>Results score</b>: how your trades did against doing nothing and what a pro would do</div>
           <div className="small muted">Per quarter: {d.per_quarter.map((x, i) => `Q${i + 1} ${x.toFixed(0)}`).join(" · ")}
             {d.penalties ? ` · penalties −${d.penalties}` : ""}</div>
         </div>
