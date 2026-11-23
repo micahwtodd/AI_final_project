@@ -1,7 +1,7 @@
 // Small synthesized sound effects (Web Audio, no files). Off by default; the top-bar switch turns them on.
 import { useEffect, useState } from "react";
 
-export type Sfx = "register" | "alarm" | "bell" | "badge" | "whoosh" | "click";
+export type Sfx = "register" | "alarm" | "bell" | "badge" | "whoosh" | "click" | "boom" | "stamp";
 
 const KEY = "riskdesk.sound";
 let on = false;
@@ -84,6 +84,15 @@ export function play(name: Sfx) {
       break;
     case "click":
       tone(a, 880, 0, 0.06, "square", 0.04);
+      break;
+    case "boom": // a cartoon explosion: a falling whistle, then a long rumble
+      tone(a, 1400, 0, 0.7, "sine", 0.06, 300);
+      noise(a, 0.7, 1.8, 0.5);
+      tone(a, 70, 0.7, 1.6, "sawtooth", 0.18, 30);
+      break;
+    case "stamp": // a rubber stamp thunk
+      noise(a, 0, 0.06, 0.2);
+      tone(a, 160, 0, 0.12, "square", 0.06, 90);
       break;
   }
 }

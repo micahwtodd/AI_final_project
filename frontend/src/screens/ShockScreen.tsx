@@ -6,11 +6,13 @@ import { PixelSprite } from "../components/PixelSprite";
 import { CountUp } from "../components/Fx";
 import { MarketTape } from "../components/MarketTape";
 import { play } from "../sound";
+import { Nuke } from "../components/Nuke";
 
 export function ShockScreen(props: {
   shock: Shock;
   busy: boolean;
   firstTry: { review: Review; question: string } | null;
+  company: string;
   onSubmit: (text: string, notSure: boolean) => void;
 }) {
   const s = props.shock;
@@ -19,15 +21,17 @@ export function ShockScreen(props: {
   const breach = s.dashboard_after.status.capital === "red" || s.dashboard_after.status.liquidity === "red";
   useEffect(() => {
     if (second) return;
+    if (s.collapsed) return;  // the explosion has its own sound
     const t = setTimeout(() => play(breach || s.surplus_change < 0 ? "alarm" : "bell"), 500);
     return () => clearTimeout(t);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <section className={`shock ${s.quarter === 4 ? "boss" : ""}`}>
-      <MarketTape moves={s.market_moves} quarter={s.quarter} boss={s.quarter === 4} />
+    <section className={`shock ${s.boss ? "boss" : ""}`}>
+      {s.collapsed && !second && <Nuke company={props.company} surplus={s.surplus_after} />}
+      <MarketTape moves={s.market_moves} quarter={s.quarter} boss={!!s.boss} />
       <div className="newspaper paper-in">
-        {s.quarter === 4 && <div className="extra-edition">EXTRA EDITION</div>}
+        {s.boss && <div className="extra-edition">EXTRA EDITION</div>}
         <div className="paper-mast">THE MARKET DAILY · Q{s.quarter} · {s.era}</div>
         <h1 className="paper-headline">{s.headline}</h1>
         <p className="paper-body">{s.narrative}</p>
@@ -87,7 +91,7 @@ export function ShockScreen(props: {
           <div className="explain-row">
             {s.sample_answer && !second && <button className="ghost" onClick={() => setText(s.sample_answer!)}>Use a sample answer (demo)</button>}
             <button className="ghost" disabled={props.busy} onClick={() => props.onSubmit("", true)}>I'm not sure</button>
-            <button className="primary" disabled={props.busy || !text.trim()} onClick={() => { props.onSubmit(text, false); setText(""); }}>
+            <button className="gold-btn" disabled={props.busy || !text.trim()} onClick={() => { props.onSubmit(text, false); setText(""); }}>
               {props.busy ? <span className="spinner" aria-label="marking" /> : second ? "Submit second try" : "Submit explanation"}
             </button>
           </div>

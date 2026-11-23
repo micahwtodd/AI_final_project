@@ -1,7 +1,7 @@
 """Game sessions: the quarter loop the API drives. Deterministic; no model calls.
 
 Phases per quarter:  position -> (advance) -> explain -> (explain) -> position of next quarter
-After the fourth explain the session is "finished".
+After the last quarter's explain (or once the company collapses) the session is "finished".
 """
 
 from __future__ import annotations
@@ -111,10 +111,10 @@ def market_moves(shock) -> list[dict]:
 
 
 def _public_card(quarter: int) -> dict | None:
-    if not 1 <= quarter <= 4:
+    if not 1 <= quarter <= engine.n_quarters():
         return None
     c = engine.card_for(quarter)
-    return {"quarter": c.quarter, "title": c.title, "era": c.era, "signal_text": c.signal_text,
+    return {"quarter": c.quarter, "title": c.title, "era": c.era, "signal_text": c.signal_text, "boss": c.boss,
             "offers_prt_deal": c.offers_prt_deal, "glossary_terms": c.glossary_terms}
 
 
@@ -244,7 +244,8 @@ def view(s: Session) -> dict:
     return {
         "id": s.id, "ticker": s.ticker, "company": DISPLAY_NAMES.get(s.ticker, s.ticker),
         "seed": s.seed, "agent_mode": s.agent_mode, "demo": s.demo,
-        "quarter": min(s.state.quarter, 4) if s.phase != "explain" else s.state.quarter - 1,
+        "quarter": min(s.state.quarter, engine.n_quarters()) if s.phase != "explain" else s.state.quarter - 1,
+        "n_quarters": engine.n_quarters(), "collapsed": engine.collapsed(s.state),
         "phase": s.phase,
         "card": _public_card(s.state.quarter) if s.phase == "position" else None,
         "dashboard": engine.dashboard(s.state).model_dump(),
@@ -345,7 +346,8 @@ def advance(s: Session) -> dict:
         "surplus_change": change,
         "dashboard_before": before_dash.model_dump(), "dashboard_after": engine.dashboard(new_state).model_dump(),
         "sample_answer": card.sample_answer if s.demo else None,
-        "real_world": card.real_world,
+        "real_world": card.real_world, "boss": card.boss,
+        "collapsed": rec.surplus_after <= 0, "nothing_collapsed": rec.nothing_surplus_after <= 0,
         "question": f"Surplus {'fell' if rec.surplus_after < rec.surplus_before else 'rose'} "
                     f"${abs(change):.2f} billion. Walk me through why.",
     }
@@ -400,7 +402,7 @@ async def explain(s: Session, text: str, not_sure: bool = False) -> dict:
     s.understanding[q] = {**pts, "not_sure": not_sure, "attempts": len(attempts)}
     s.explanations[q] = {"text": text, "not_sure": not_sure, "ts": time.time(), "review": review.model_dump(),
                          "marker": marker}
-    s.phase = "finished" if s.state.quarter > 4 else "position"
+    s.phase = "finished" if s.state.quarter > engine.n_quarters() or engine.collapsed(s.state) else "position"
     if s.phase == "finished":
         s.timings["finished"] = time.time()
     _save(s)
@@ -426,6 +428,10 @@ def reveal_payload(s: Session, rec: QuarterRecord) -> dict:
                         for k, v in rec.attribution.components().items() if k != "fx" or engine.fx_enabled()],
         "total": rec.attribution.total,
         "comparison": {"you": round(you, 3), "nothing": round(nothing, 3), "benchmark": round(bench, 3)},
+        "collapsed": {"you": rec.surplus_after <= 0, "nothing": rec.nothing_surplus_after <= 0,
+                      "benchmark": (rec.benchmark_surplus_after or 1) <= 0},
+        "surplus_before": rec.surplus_before, "lever_gains": rec.lever_gains,
+        "title": card.title, "boss": card.boss, "n_quarters": engine.n_quarters(),
         "quarter_score": round(100 * engine.quarter_score(rec), 1),
         "main_driver": key["main_driver"], "second_factor": key["second_factor"],
         "debrief_text": quarter_debrief(rec),
@@ -471,14 +477,14 @@ def quarter_debrief(rec: QuarterRecord) -> list[str]:
 
 def _campaign(start: GameState, strategy: str) -> float:
     s = start
-    for q in range(1, 5):
+    for q in range(1, engine.n_quarters() + 1):
         s, _ = engine.play_quarter(s, None if strategy == "nothing" else engine.card_for(q).benchmark_action)
     return engine.surplus(s)
 
 
 def debrief(s: Session) -> dict:
     if s.phase != "finished":
-        raise GameError("The debrief is available after the fourth quarter.")
+        raise GameError("The debrief is available when the game is over.")
     hist = s.state.history
     start = engine.surplus(s.start_state)
     end = engine.surplus(s.state)
@@ -487,14 +493,19 @@ def debrief(s: Session) -> dict:
     best = max(hist, key=lambda r: engine.quarter_score(r))
     worst = min(hist, key=lambda r: engine.quarter_score(r))
     pct = lambda x: 100 * (x - start) / start  # noqa: E731
+    money = lambda x: f"{'−' if x < 0 else ''}${abs(x):.2f}bn"  # noqa: E731
     text = [
-        f"You ran {DISPLAY_NAMES.get(s.ticker, s.ticker)} through four quarters of market stress (seed {s.seed}).",
-        f"Surplus went from ${start:.2f}bn to ${end:.2f}bn ({pct(end):+.1f}%).",
-        f"Doing nothing all year would have ended at ${nothing_end:.2f}bn ({pct(nothing_end):+.1f}%); "
-        f"a pro's trades at ${bench_end:.2f}bn ({pct(bench_end):+.1f}%).",
-        f"Your best quarter was Q{best.quarter} ({engine.card_for(best.quarter).title}); "
-        f"the hardest was Q{worst.quarter} ({engine.card_for(worst.quarter).title}).",
+        (f"{DISPLAY_NAMES.get(s.ticker, s.ticker)} collapsed in Q{hist[-1].quarter}: its equity was wiped out (seed {s.seed})."
+         if engine.collapsed(s.state) else
+         f"You ran {DISPLAY_NAMES.get(s.ticker, s.ticker)} through {len(hist)} quarters of market stress (seed {s.seed})."),
+        f"Surplus went from {money(start)} to {money(end)} ({pct(end):+.1f}%).",
+        f"Doing nothing all game would have ended at {money(nothing_end)} ({pct(nothing_end):+.1f}%"
+        f"{', a collapse' if nothing_end <= 0 else ''}); "
+        f"a pro's trades at {money(bench_end)} ({pct(bench_end):+.1f}%).",
     ]
+    if engine.quarter_score(best) > engine.quarter_score(worst) + 1e-9:
+        text.append(f"Your best quarter was Q{best.quarter} ({engine.card_for(best.quarter).title}); "
+                    f"the hardest was Q{worst.quarter} ({engine.card_for(worst.quarter).title}).")
     if sc["penalties"]:
         text.append(f"{sc['penalties']} points were deducted for ending quarters below the capital or liquidity floor.")
     return {
@@ -502,7 +513,8 @@ def debrief(s: Session) -> dict:
         "results_score": sc["results_score"], "per_quarter": sc["per_quarter"], "penalties": sc["penalties"],
         "start_surplus": round(start, 3), "end_surplus": round(end, 3),
         "nothing_end_surplus": round(nothing_end, 3), "benchmark_end_surplus": round(bench_end, 3),
-        "text": text, "lessons": [{"quarter": q, "title": engine.card_for(q).title, "lesson": engine.card_for(q).lesson} for q in range(1, 5)],
+        "collapsed": engine.collapsed(s.state), "n_quarters": engine.n_quarters(),
+        "text": text, "lessons": [{"quarter": r.quarter, "title": engine.card_for(r.quarter).title, "lesson": engine.card_for(r.quarter).lesson} for r in hist],
         "minutes_played": round((s.timings.get("finished", time.time()) - s.timings.get("started", s.created_at)) / 60, 1),
         "history": [_history_row(r, s) for r in hist],
         "before_after": before_after(s),
@@ -563,7 +575,7 @@ def submit_quiz(s: Session, when: str, answers: dict[str, str], confidence: dict
     if when in s.quiz:
         raise GameError("This quiz was already taken.")
     if when == "post" and s.phase != "finished":
-        raise GameError("The after-game quiz opens once the four quarters are played.")
+        raise GameError("The after-game quiz opens once the game is over.")
     q = _quiz_data()
     items = q["forms"][FORM_FOR[when]]
     answers = {**answers, **s.quiz_checked.get(when, {})}  # a checked answer cannot be changed afterwards

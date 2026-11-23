@@ -153,7 +153,7 @@ export function QuizScreen(props: {
           <div className="quiz-nav">
             <button className="ghost" onClick={() => setStep(nq - 1)}>← Back</button>
             <span className="small muted">{Object.keys(answers).length}/{nq} answered · {Object.keys(conf).length}/{form.confidence.length} rated</span>
-            <button className="primary" disabled={busy || Object.keys(answers).length < nq || Object.keys(conf).length < form.confidence.length} onClick={save}>
+            <button className="gold-btn" disabled={busy || Object.keys(answers).length < nq || Object.keys(conf).length < form.confidence.length} onClick={save}>
               {pre ? "Save and go to the desk →" : "Save and see my results →"}
             </button>
           </div>

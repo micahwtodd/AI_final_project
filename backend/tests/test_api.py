@@ -1,9 +1,10 @@
-"""End-to-end API test: a full four-quarter game, plus phase guards."""
+"""End-to-end API test: a full game, plus phase guards."""
 
 from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
+from backend import engine
 from backend.main import app
 
 client = TestClient(app)
@@ -21,7 +22,7 @@ def test_full_game_end_to_end():
     assert g["phase"] == "position" and g["quarter"] == 1 and g["card"]["title"]
     assert "headline" not in g["card"]  # the shock stays hidden until the quarter ends
 
-    for q in range(1, 5):
+    for q in range(1, engine.n_quarters() + 1):
         action = {"rate_hedge_pct": 50, "equity_hedge_pct": 40, "fx_hedge_pct": 50, "cash_buffer_pct": 8,
                   "collateralized": True, "dealers": 3, "accept_prt": q == 2}
         pv = client.post(f"/api/game/{gid}/preview", json={"action": action}).json()
@@ -43,10 +44,10 @@ def test_full_game_end_to_end():
         assert abs(sum(a["value"] for a in rev["attribution"]) - rev["total"]) < 1e-3
         assert set(rev["comparison"]) == {"you", "nothing", "benchmark"}
         assert rev["debrief_text"] and rev["lesson"]
-        assert rev["finished"] == (q == 4)
+        assert rev["finished"] == (q == engine.n_quarters() or rev["collapsed"]["you"])
 
     d = client.get(f"/api/game/{gid}/debrief").json()
-    assert 0 <= d["results_score"] <= 100 and len(d["per_quarter"]) == 4 and d["text"]
+    assert 0 <= d["results_score"] <= 100 and len(d["per_quarter"]) == engine.n_quarters() and d["text"]
     assert client.get(f"/api/game/{gid}").json()["phase"] == "finished"
 
 

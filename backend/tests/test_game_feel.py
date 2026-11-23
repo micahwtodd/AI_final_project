@@ -15,7 +15,7 @@ GOOD = ("Interest rates moved the most. Because our liabilities are longer than 
 def _play(strategy: str) -> tuple[str, list[dict], dict]:
     gid = client.post("/api/game", json={"ticker": "JXN", "seed": 409}).json()["id"]
     reveals = []
-    for q in range(1, 5):
+    for q in range(1, engine.n_quarters() + 1):
         act = engine.card_for(q).benchmark_action.model_dump() if strategy == "benchmark" else {"cash_buffer_pct": 3}
         client.post(f"/api/game/{gid}/commit", json={"actions": act})
         client.post(f"/api/game/{gid}/advance")
@@ -55,7 +55,7 @@ def test_grade_cutoffs():
 def _campaign(ticker: str, strategy: str):
     from backend.calibration import load_profile
     st = engine.build_state(load_profile(ticker), 409)
-    for q in range(1, 5):
+    for q in range(1, engine.n_quarters() + 1):
         st, _ = engine.play_quarter(st, engine.card_for(q).benchmark_action if strategy == "benchmark" else None)
     return st.history
 

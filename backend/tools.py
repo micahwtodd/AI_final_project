@@ -65,8 +65,8 @@ def get_past_quarter(s: GameState, n: int, revealed: set[int]) -> dict:
 
 
 def get_news_signal(s: GameState) -> dict:
-    if s.quarter > 4:
-        return {"error": "The year is over."}
+    if s.quarter > engine.n_quarters():
+        return {"error": "The game is over."}
     c = engine.card_for(s.quarter)
     return {"quarter": c.quarter, "title": c.title, "wire": c.signal_text,
             "pension_deal_on_offer": c.offers_prt_deal and not s.prt_decided,

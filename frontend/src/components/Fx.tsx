@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { play } from "../sound";
-import { SEASONS, SEASON_ICON } from "../labels";
+import { SEASONS, SEASON_ICON, SEASON_NAME } from "../labels";
 
 // Overlays go straight onto <body>: the screen transition animates a transform, which would
 // otherwise pin position:fixed overlays to the page instead of the window.
@@ -59,10 +59,10 @@ export function Confetti(props: { pieces?: number }) {
 
 /** Full-width banner that sweeps in at the start of a quarter. Click to dismiss. */
 const seen = new Set<string>();
-export function QuarterSplash(props: { id: string; quarter: number; title: string; era?: string }) {
+export function QuarterSplash(props: { id: string; quarter: number; of: number; boss?: boolean; title: string; era?: string }) {
   const key = `${props.id}-${props.quarter}`;
   const [show, setShow] = useState(!seen.has(key));
-  const boss = props.quarter === 4;
+  const boss = !!props.boss;
   useEffect(() => {
     seen.add(key);
     if (!show) return;
@@ -76,13 +76,13 @@ export function QuarterSplash(props: { id: string; quarter: number; title: strin
       <div className="q-splash-band" onAnimationEnd={(e) => { if (e.animationName === "band-in" || e.animationName === "boss-in") setShow(false); }}>
         {boss ? (
           <>
-            <div className="q-splash-boss">⚠ FINAL QUARTER · WINTER ⚠</div>
+            <div className="q-splash-boss">⚠ FINAL QUARTER · THE CRASH ⚠</div>
             <div className="q-splash-q">BOSS ROUND</div>
             <div className="q-splash-title">{props.title}. Survive this one.</div>
           </>
         ) : (
           <>
-            <div className="q-splash-q">QUARTER {props.quarter} <span>of 4 · {SEASON_ICON[SEASONS[props.quarter]]} {SEASONS[props.quarter]}</span></div>
+            <div className="q-splash-q">QUARTER {props.quarter} <span>of {props.of} · {SEASON_ICON[SEASONS[props.quarter]]} {SEASON_NAME[SEASONS[props.quarter]]}</span></div>
             <div className="q-splash-title">{props.title}</div>
           </>
         )}

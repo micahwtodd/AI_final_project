@@ -9,7 +9,7 @@ import { GuideBar } from "../components/GuideBar";
 import { DeskCat } from "../components/PixelSprite";
 import { QuarterSplash } from "../components/Fx";
 import { play } from "../sound";
-import { SEASONS, SEASON_ICON } from "../labels";
+import { SEASONS, SEASON_ICON, SEASON_NAME } from "../labels";
 
 type Run = <T>(fn: () => Promise<T>) => Promise<T | undefined>;
 
@@ -60,7 +60,7 @@ export function Desk(props: {
 
   return (
     <section className="desk">
-      {g.card && <QuarterSplash id={g.id} quarter={g.card.quarter} title={g.card.title} era={g.card.era} />}
+      {g.card && <QuarterSplash id={g.id} quarter={g.card.quarter} of={g.n_quarters} boss={!!g.card.boss} title={g.card.title} era={g.card.era} />}
       {showGuide && <GuideBar step={guide} onNext={() => setGuide((x) => x + 1)} onHide={hideGuide} />}
       <div className="desk-dash">
         <div className="panel">
@@ -75,8 +75,8 @@ export function Desk(props: {
 
       <div className="desk-mid">
         {g.card && (
-          <div className={`panel wire${focus(0)}${g.card.quarter === 4 ? " boss-wire" : ""}`}>
-            <div className="wire-tag">NEWS WIRE · Q{g.card.quarter} · {SEASON_ICON[SEASONS[g.card.quarter]]} {SEASONS[g.card.quarter].toUpperCase()}{g.card.quarter === 4 && <span className="boss-tag">⚠ BOSS ROUND · FINAL QUARTER</span>}</div>
+          <div className={`panel wire${focus(0)}${g.card.boss ? " boss-wire" : ""}`}>
+            <div className="wire-tag">NEWS WIRE · Q{g.card.quarter} · {SEASON_ICON[SEASONS[g.card.quarter]]} {SEASON_NAME[SEASONS[g.card.quarter]].toUpperCase()}{g.card.boss && <span className="boss-tag">⚠ BOSS ROUND · FINAL QUARTER</span>}</div>
             <h2>{g.card.title}</h2>
             <p className="wire-text">{g.card.signal_text}</p>
           </div>
@@ -140,6 +140,7 @@ export function Desk(props: {
           )}
 
           <div className="ticket-buttons">
+            <div className="btn-col">
             <button className="primary" disabled={props.busy || signed || needsPrt}
               onClick={async () => {
                 const r = await props.run(() => api.commit(g.id, draft));
@@ -147,13 +148,18 @@ export function Desk(props: {
               }}>
               {signed ? "Ticket signed ✓" : needsPrt ? "Decide on the pension deal" : "Sign trade ticket"}
             </button>
-            <button className="danger" disabled={props.busy || (!signed && !!g.pending) || needsPrt}
+            <span className="btn-note">Locks in your trades. You can still ask the team before ending the quarter.</span>
+            </div>
+            <div className="btn-col">
+            <button className="gold-btn" disabled={props.busy || (!signed && !!g.pending) || needsPrt}
               onClick={async () => {
                 const s = await props.run(() => api.advance(g.id));
                 if (s) props.onShock(s);
               }}>
               End Q{g.quarter} →
             </button>
+            <span className="btn-note">The market moves. No going back.</span>
+            </div>
           </div>
           {!g.pending && <div className="small muted">No ticket signed yet: ending the quarter keeps your current positions.</div>}
           {g.pending && !signed && <div className="small warn">You changed the ticket after signing. Sign again to use the new trades.</div>}

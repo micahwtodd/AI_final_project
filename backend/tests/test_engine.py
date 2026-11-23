@@ -34,7 +34,7 @@ def test_start_surplus_matches_profile(p):
 def test_attribution_sums_to_surplus_change_every_quarter(p, strategy):
     """Assets - liabilities = surplus after every step: each quarter's P&L by cause adds up exactly."""
     s = engine.build_state(p, SEED)
-    for q in range(1, 5):
+    for q in range(1, engine.n_quarters() + 1):
         card = engine.card_for(q)
         act = {
             "nothing": None,
@@ -96,7 +96,7 @@ def test_full_fx_hedge_neutralises_fx():
 def test_same_seed_same_result_and_different_seed_differs():
     def run(seed):
         s = engine.build_state(load_profile("LNC"), seed)
-        for q in range(1, 5):
+        for q in range(1, engine.n_quarters() + 1):
             s, _ = engine.play_quarter(s, engine.card_for(q).benchmark_action)
         return [r.model_dump() for r in s.history]
 
@@ -124,7 +124,7 @@ def test_collateral_and_more_dealers_cut_counterparty_loss():
 
 def test_credit_shift_reduces_credit_losses():
     s = fresh("CRBG")
-    shock = engine.card_for(3).base_shock
+    shock = engine.card_for(4).base_shock  # the credit quarter
     _, base = engine.apply_shock(s, shock)
     _, shifted = engine.apply_shock(engine.apply_action(s, Action(credit_shift_pct=30, cash_buffer_pct=1)), shock)
     assert shifted.defaults > base.defaults
@@ -134,24 +134,24 @@ def test_credit_shift_reduces_credit_losses():
 def test_pension_deal_adds_premium_margin_and_long_liabilities():
     s = fresh("MET")
     s.quarter = 2
-    took = engine.apply_action(s, Action(cash_buffer_pct=s.action.cash_buffer_pct, accept_prt=True))
+    took = engine.apply_action(s, Action(cash_buffer_pct=s.action.cash_buffer_pct, accept_prt=True), True)
     assert took.prt_decided and took.liabilities["prt"] > s.liabilities["prt"]
     assert engine.surplus(took) > engine.surplus(s)
     assert engine.dashboard(took).capital_ratio_pct < engine.dashboard(s).capital_ratio_pct
-    again = engine.apply_action(took, Action(cash_buffer_pct=s.action.cash_buffer_pct, accept_prt=True))
+    again = engine.apply_action(took, Action(cash_buffer_pct=s.action.cash_buffer_pct, accept_prt=True), True)
     assert again.liabilities["prt"] == pytest.approx(took.liabilities["prt"])  # offered once
 
 
 def test_scores_and_answer_key():
     s = fresh("MET")
-    for q in range(1, 5):
+    for q in range(1, engine.n_quarters() + 1):
         s, rec = engine.play_quarter(s, engine.card_for(q).benchmark_action)
         key = engine.answer_key(rec)
         assert key["main_driver"] in engine.ATTRIBUTION_LABELS and key["mechanism_facts"]
     sc = engine.score(s.history)
     assert 0 <= sc["results_score"] <= 100
-    assert len(sc["per_quarter"]) == 4
-    assert s.quarter == 5
+    assert len(sc["per_quarter"]) == engine.n_quarters()
+    assert s.quarter == engine.n_quarters() + 1
 
 
 def test_benchmark_beats_doing_nothing_for_most_companies():
@@ -160,8 +160,25 @@ def test_benchmark_beats_doing_nothing_for_most_companies():
         res = {}
         for name in ("nothing", "benchmark"):
             s = engine.build_state(p, SEED)
-            for q in range(1, 5):
+            for q in range(1, engine.n_quarters() + 1):
                 s, _ = engine.play_quarter(s, None if name == "nothing" else engine.card_for(q).benchmark_action)
             res[name] = engine.surplus(s)
         better += res["benchmark"] > res["nothing"]
     assert better == len(PROFILES)
+
+
+def test_boss_round_collapses_doing_nothing_but_not_a_pro():
+    """Every company collapses if it does nothing all game; a pro's trades survive the boss round."""
+    for p in PROFILES:
+        for name in ("nothing", "benchmark"):
+            s = engine.build_state(p, SEED)
+            for q in range(1, engine.n_quarters() + 1):
+                s, _ = engine.play_quarter(s, None if name == "nothing" else engine.card_for(q).benchmark_action)
+            assert engine.collapsed(s) == (name == "nothing"), (p.ticker, name, engine.surplus(s))
+
+
+def test_a_collapse_scores_zero_for_quarters_never_reached():
+    s = fresh("EQH")
+    s, rec = engine.play_quarter(s, None)
+    rec.surplus_after = -1.0
+    assert engine.score([rec])["per_quarter"][1:] == [0.0] * (engine.n_quarters() - 1)

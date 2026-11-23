@@ -117,7 +117,7 @@ def test_fx_is_switched_off_everywhere():
     for t in ["MET", "PRU", "JXN"]:
         st = engine.build_state(load_profile(t), 409)
         assert st.foreign_share == 0 and engine.dashboard(st).fx_exposure_usd_bn == 0
-    for q in range(1, 5):
+    for q in range(1, engine.n_quarters() + 1):
         _, shock = engine.realize_shock(engine.card_for(q), 409)
         assert shock.fx_pct == 0
         assert engine.card_for(q).benchmark_action.fx_hedge_pct == 0

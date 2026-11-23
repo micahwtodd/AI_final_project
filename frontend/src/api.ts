@@ -64,6 +64,7 @@ export type Card = {
   era: string;
   signal_text: string;
   offers_prt_deal: boolean;
+  boss?: boolean;
   glossary_terms: string[];
 };
 
@@ -103,6 +104,8 @@ export type GameView = {
   quiz_taken: string[];
   custom_inputs: string[];
   achievements: Achievements;
+  n_quarters: number;
+  collapsed: boolean;
 };
 
 export type Usage = {
@@ -169,6 +172,9 @@ export type Shock = {
   dashboard_after: Dashboard;
   question: string;
   sample_answer: string | null;
+  boss?: boolean;
+  collapsed?: boolean;
+  nothing_collapsed?: boolean;
 };
 
 export type Reveal = {
@@ -177,6 +183,12 @@ export type Reveal = {
   attribution: { key: string; label: string; value: number }[];
   total: number;
   comparison: { you: number; nothing: number; benchmark: number };
+  collapsed?: { you: boolean; nothing: boolean; benchmark: boolean };
+  lever_gains?: Record<string, number>;
+  title?: string;
+  boss?: boolean;
+  n_quarters?: number;
+  surplus_before?: number;
   quarter_score: number;
   debrief_text: string[];
   lesson: string;
@@ -214,6 +226,8 @@ export type Debrief = {
   end_surplus: number;
   nothing_end_surplus: number;
   benchmark_end_surplus: number;
+  collapsed?: boolean;
+  n_quarters?: number;
   text: string[];
   lessons: { quarter: number; title: string; lesson: string }[];
   minutes_played: number;

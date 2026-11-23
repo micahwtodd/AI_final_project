@@ -17,8 +17,12 @@ export const LIABILITY_LABELS: Record<string, string> = {
   guarantee: "Stock-market guarantees (VA guarantees)",
 };
 
-export const SEASONS = ["", "spring", "summer", "fall", "winter"] as const;
-export const SEASON_ICON: Record<string, string> = { spring: "🌸", summer: "☀️", fall: "🍂", winter: "❄️" };
+export const SEASONS = ["", "spring", "summer", "fall", "winter", "crash"] as const;
+export const SEASON_ICON: Record<string, string> = { spring: "🌸", summer: "☀️", fall: "🍂", winter: "❄️", crash: "💥" };
+/** What each quarter is called on screen: the four seasons, then the boss round. */
+export const SEASON_NAME: Record<string, string> = { spring: "spring", summer: "summer", fall: "fall", winter: "winter", crash: "the crash" };
+/** The icon on each quarter's lesson card. */
+export const LESSON_ICON: Record<number, string> = { 1: "📈", 2: "📉", 3: "🔻", 4: "💳", 5: "💥" };
 
 export const LEVERS = {
   rate_hedge_pct: {
@@ -31,7 +35,7 @@ export const LEVERS = {
     term: "credit_spread",
     label: "Move risky bonds to government bonds",
     help: "Sells this % of junk and BBB bonds and buys government bonds. Safer, but earns less.",
-    min: -10, max: 30, step: 5, unit: "%",
+    min: -10, max: 50, step: 5, unit: "%",
   },
   equity_hedge_pct: {
     term: "put_option",

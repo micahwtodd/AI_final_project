@@ -15,7 +15,7 @@ BADGES: dict[str, dict] = {
     "hat_trick": {"name": "Hat Trick", "icon": "🎩", "text": "Named the main driver three quarters in a row."},
     "boss_beaten": {"name": "Boss Beaten", "icon": "👑",
                     "text": "Final quarter: stayed above both floors and beat doing nothing."},
-    "clean_sheet": {"name": "Clean Sheet", "icon": "🧼", "text": "All four quarters above both floors."},
+    "clean_sheet": {"name": "Clean Sheet", "icon": "🧼", "text": "Every quarter above both floors."},
 }
 
 
@@ -56,10 +56,10 @@ def evaluate(s) -> dict:
             award("three_above_floor", q)
         if explain_run >= 3:
             award("hat_trick", q)
-        if q == 4 and _above_floors(r) and r.surplus_after > (r.nothing_surplus_after or 0) + 0.005:
+        if q == engine.n_quarters() and _above_floors(r) and r.surplus_after > (r.nothing_surplus_after or 0) + 0.005:
             award("boss_beaten", q)
-    if len(revealed) == 4 and all(_above_floors(r) for r in revealed):
-        award("clean_sheet", 4)
+    if len(revealed) == engine.n_quarters() and all(_above_floors(r) for r in revealed):
+        award("clean_sheet", engine.n_quarters())
     return {"earned": earned, "streaks": {"floor": floor_run, "explain": explain_run},
             "available": len(BADGES)}
 

@@ -1,8 +1,8 @@
 """Check the engine's tuning targets across the six companies (seed 409 by default).
 
-Targets (build plan 5.3), true for at least four of six companies:
-  1. Doing nothing loses 15 to 35% of surplus over the campaign.
-  2. The benchmark loses under 10%.
+Targets (five-quarter campaign, Gate 1 feedback), checked for each company:
+  1. Doing nothing all game collapses the company (surplus at or below zero after the boss round).
+  2. A pro (the benchmark trades) survives, losing under 60%.
   3. Hedging everything to the maximum scores below the benchmark (cost).
   4. No single lever wins alone (each single-lever strategy scores below the benchmark).
 
@@ -21,7 +21,7 @@ from backend import engine  # noqa: E402
 from backend.calibration import load_all_profiles  # noqa: E402
 from backend.models import Action  # noqa: E402
 
-MAX = Action(rate_hedge_pct=120, credit_shift_pct=30, equity_hedge_pct=100,
+MAX = Action(rate_hedge_pct=120, credit_shift_pct=50, equity_hedge_pct=100,
              cash_buffer_pct=15, collateralized=True, dealers=3, accept_prt=False)
 
 
@@ -39,7 +39,7 @@ def run(profile, seed: int, strategy) -> tuple[float, float, list]:
     """strategy: None (do nothing), 'benchmark', or a fixed Action used every quarter."""
     s = engine.build_state(profile, seed)
     s0 = engine.surplus(s)
-    for q in range(1, 5):
+    for q in range(1, engine.n_quarters() + 1):
         card = engine.card_for(q)
         if strategy is None:
             act = None
@@ -61,7 +61,7 @@ def main() -> None:
 
     hits = [0, 0, 0, 0]
     profiles = load_all_profiles()
-    print(f"seed {args.seed}   (surplus change over 4 quarters; score 0-100)")
+    print(f"seed {args.seed}   (surplus change over {engine.n_quarters()} quarters; score 0-100)")
     print(f"{'':5} {'nothing%':>9} {'bench%':>8} {'bench sc':>8} {'max%':>7} {'max sc':>7}  single-lever scores")
     for p in profiles:
         n_pct, n_sc, n_hist = run(p, args.seed, None)
@@ -69,7 +69,7 @@ def main() -> None:
         m_pct, m_sc, _ = run(p, args.seed, MAX)
         start_cash = engine.build_state(p, args.seed).action.cash_buffer_pct
         singles = {k: run(p, args.seed, a)[1] for k, a in single_levers(start_cash).items()}
-        t = [-35 <= n_pct <= -15, b_pct > -10, m_sc < b_sc, all(v < b_sc for v in singles.values())]
+        t = [n_pct <= -100, b_pct > -60, m_sc < b_sc, all(v < b_sc for v in singles.values())]
         hits = [h + int(x) for h, x in zip(hits, t)]
         marks = "".join("Y" if x else "." for x in t)
         sl = " ".join(f"{k.split()[0]}:{v:.0f}" for k, v in singles.items())
@@ -80,7 +80,7 @@ def main() -> None:
                 for r in hist:
                     comps = " ".join(f"{k[:6]}:{v:+.2f}" for k, v in r.attribution.components().items())
                     print(f"   Q{r.quarter} sev {r.severity} dS {r.surplus_after - r.surplus_before:+.2f}  {comps}")
-    print(f"\ntargets met (of {len(profiles)}): nothing 15-35% loss: {hits[0]}  benchmark <10%: {hits[1]}  "
+    print(f"\ntargets met (of {len(profiles)}): nothing collapses: {hits[0]}  pro survives (<60% loss): {hits[1]}  "
           f"max below benchmark: {hits[2]}  no single lever wins: {hits[3]}")
 
 

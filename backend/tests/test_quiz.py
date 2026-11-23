@@ -7,6 +7,7 @@ from collections import Counter
 
 from fastapi.testclient import TestClient
 
+from backend import engine
 from backend.env import REPO_DIR
 from backend.main import app
 
@@ -41,7 +42,7 @@ def test_quiz_flow_saves_before_and_after_figures():
     assert client.post(f"/api/quiz/{gid}/pre", json={"answers": {}, "confidence": CONF}).status_code == 409  # once only
     assert client.post(f"/api/quiz/{gid}/post", json={"answers": {}, "confidence": CONF}).status_code == 409  # not yet
     assert "pre" in client.get(f"/api/game/{gid}").json()["quiz_taken"]
-    for _ in range(4):
+    for _ in range(engine.n_quarters()):
         client.post(f"/api/game/{gid}/advance")
         client.post(f"/api/game/{gid}/explain", json={"text": "", "not_sure": True})
     wrong = {k: ("A" if v != "A" else "B") for k, v in key("B").items()}

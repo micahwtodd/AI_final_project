@@ -1,5 +1,5 @@
 {
-  "_note": "Examiner reliability: eight sample explanations of the same quarter with the checks a careful marker should give. Quarter: Prudential, seed 409, Q1 (The Inflation Surprise), no trades. Engine truth: main driver interest rates (+3.43bn: rates rose and the longer liabilities fell more); second factor equity markets (-2.83bn: stocks fell, raising the guarantees); most helpful levers: cash on hand, currency protection. Draft for Micah to approve.",
+  "_note": "Examiner reliability: eight sample explanations of the same quarter with the checks a careful marker should give. Quarter: Prudential, seed 409, Q1 (The Inflation Surprise), no trades. Engine truth (five-quarter campaign): main driver interest rates (+2.25bn: rates rose and the longer liabilities fell more); second factor equity markets (-0.88bn: stocks fell, raising the guarantees); most helpful lever: cash on hand. Draft for Micah to approve.",
   "scenario": {"ticker": "PRU", "seed": 409, "quarter": 1, "actions": null},
   "samples": [
     {"id": "E1", "kind": "good, complete", "text": "Interest rates jumped. Our liabilities are longer than our assets, so their value fell more than our bonds did, which lifted surplus. Stocks fell too, which made the market guarantees more expensive. Holding more cash and some currency protection would have helped.",

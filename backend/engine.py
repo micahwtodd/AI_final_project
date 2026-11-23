@@ -37,6 +37,16 @@ def card_for(quarter: int) -> EventCard:
     return campaign()[quarter - 1]
 
 
+def n_quarters() -> int:
+    """How many quarters the campaign runs (the number of event cards)."""
+    return len(campaign())
+
+
+def collapsed(s: GameState) -> bool:
+    """The company has failed: surplus (equity) is zero or below."""
+    return surplus(s) <= 0
+
+
 def reload_data() -> None:
     assumptions.cache_clear()
     campaign.cache_clear()
@@ -157,7 +167,9 @@ def build_state(profile: CompanyProfile, seed: int) -> GameState:
     if base_l > 0:
         s.liability_duration_scale = round(min(sg["scale_max"], max(sg["scale_min"], target_l / base_l)), 4)
     # bring cash to the 1% floor if the profile has less
-    return _set_cash(s, s.action.cash_buffer_pct)
+    s = _set_cash(s, s.action.cash_buffer_pct)
+    s.boss_severity = calibrate_boss(s)
+    return s
 
 
 # ---------------------------------------------------------------- dashboard
@@ -242,7 +254,7 @@ def apply_action(state: GameState, action: Action, offers_prt: bool | None = Non
 
     # pension risk transfer deal (only when this quarter's card offers it)
     if offers_prt is None:
-        offers_prt = 1 <= s.quarter <= 4 and card_for(s.quarter).offers_prt_deal
+        offers_prt = 1 <= s.quarter <= n_quarters() and card_for(s.quarter).offers_prt_deal
     if offers_prt and not s.prt_decided and action.accept_prt is not None:
         s.prt_decided = True
         if action.accept_prt:
@@ -302,11 +314,17 @@ def preview_action(state: GameState, action: Action) -> dict:
 
 # ---------------------------------------------------------------- shocks
 
-def realize_shock(card: EventCard, seed: int) -> tuple[float, ShockVector]:
+BOSS_BOUNDS = {"rate_bp": (-400, 400), "equity_pct": (-85, 50), "hy_default_pct": (0, 35), "ig_loss_pct": (0, 10),
+               "mortgage_loss_pct": (0, 10), "lapse_mult": (0, 4), "ig_spread_bp": (-200, 700), "hy_spread_bp": (-500, 2000)}
+
+
+def realize_shock(card: EventCard, seed: int, boss_severity: float = 1.0) -> tuple[float, ShockVector]:
     """actual = base x severity x (1 + small noise). Seeded by (seed, quarter): reproducible and path-independent."""
     a = assumptions()
     rng = random.Random(f"{seed}-{card.quarter}")
     sev = rng.choice(a["severity_levels"])
+    if card.boss:
+        sev = boss_severity  # the draw above still happens, so the noise is unchanged
     base = card.base_shock.model_dump()
     out = {}
     for k, v in base.items():
@@ -318,7 +336,36 @@ def realize_shock(card: EventCard, seed: int) -> tuple[float, ShockVector]:
             out[k] = round(v * sev * (1 + rng.gauss(0, a["noise_sd"])), 2)
     if not fx_enabled():
         out["fx_pct"] = 0.0  # the random draw above still happens, so other moves are unchanged
+    if card.boss:  # keep a scaled-up crash physically sensible (rates cannot fall far below zero, etc.)
+        for k, (lo, hi) in BOSS_BOUNDS.items():
+            out[k] = min(hi, max(lo, out[k]))
     return sev, ShockVector(**out)
+
+
+def calibrate_boss(start: GameState) -> float:
+    """The boss-round strength at which doing nothing all game ends with surplus at about -5% of the start.
+    It depends only on the company and seed (never on the player's trades), so every company collapses
+    if left unprotected, while a well-hedged book survives."""
+    cards = campaign()
+    if not any(c.boss for c in cards):
+        return 1.0
+    target = -0.05 * surplus(start)
+    pre = start
+    for c in cards:
+        if c.boss:
+            break
+        pre, _ = apply_shock(pre, realize_shock(c, start.seed)[1])
+    boss = next(c for c in cards if c.boss)
+    end = lambda k: surplus(apply_shock(pre, realize_shock(boss, start.seed, k)[1])[0])  # noqa: E731
+    lo, hi = 0.3, 4.0
+    if end(hi) > target:
+        return hi
+    if end(lo) <= target:
+        return lo
+    for _ in range(30):
+        mid = (lo + hi) / 2
+        lo, hi = (lo, mid) if end(mid) <= target else (mid, hi)
+    return round(hi, 4)
 
 
 def _carry(s: GameState) -> float:
@@ -491,7 +538,7 @@ def play_quarter(state: GameState, action: Action | None) -> tuple[GameState, Qu
     card = card_for(state.quarter)
     start = state
     traded = apply_action(start, action) if action is not None else start
-    sev, shock = realize_shock(card, state.seed)
+    sev, shock = realize_shock(card, state.seed, state.boss_severity)
     before = surplus(start)
     after_state, att = apply_shock(traded, shock)
     cf = counterfactual(start, card, state.seed)
@@ -533,7 +580,7 @@ def lever_gains(start: GameState, action: Action, card: EventCard, shock: ShockV
 
 def counterfactual(start_state: GameState, card: EventCard, seed: int) -> dict:
     """The same quarter and seed, rerun twice: doing nothing, and with the card's benchmark action."""
-    _, shock = realize_shock(card, seed)
+    _, shock = realize_shock(card, seed, start_state.boss_severity)
     out = {}
     for name, st in (("nothing", start_state),
                      ("benchmark", apply_action(start_state, card.benchmark_action, card.offers_prt_deal))):
@@ -583,6 +630,8 @@ def score(history: list[QuarterRecord]) -> dict:
         return {"results_score": 0, "per_quarter": [], "penalties": 0}
     c = assumptions()["score"]
     per_q = [quarter_score(r) for r in history]
+    if history[-1].surplus_after <= 0:  # the company collapsed: the quarters it never reached score zero
+        per_q += [0.0] * max(0, n_quarters() - len(history))
     # a breach the benchmark trades would also have suffered that quarter is not penalized
     penalties = c["breach_penalty"] * sum(penalized_breaches(r) for r in history)
     raw = 100 * sum(per_q) / len(per_q) - penalties

@@ -42,7 +42,7 @@ export default function App() {
 
   // The office outside changes with the quarter: spring, summer, fall, winter; shock screens are stormy.
   const sceneArt = (() => {
-    if (screen.name === "desk") return `office_${SEASONS[Math.min(4, screen.game.card?.quarter ?? screen.game.quarter)]}`;
+    if (screen.name === "desk") return `office_${SEASONS[Math.min(SEASONS.length - 1, screen.game.card?.quarter ?? screen.game.quarter)]}`;
     if (screen.name === "shock") return `office_${SEASONS[screen.shock.quarter]}_storm`;
     if (screen.name === "reveal") return `office_${SEASONS[screen.shock.quarter]}`;
     if (screen.name === "debrief" || (screen.name === "quiz" && screen.when === "post")) return "office_winter";
@@ -97,8 +97,8 @@ export default function App() {
     screen.name === "shock" || screen.name === "reveal"
       ? `Q${screen.shock.quarter} results`
       : screen.name === "debrief"
-        ? "Year end"
-        : `Quarter ${game ? Math.min(game.quarter, 4) : 1} of 4`;
+        ? "Game over"
+        : `Quarter ${game ? Math.min(game.quarter, game.n_quarters) : 1} of ${game?.n_quarters ?? 5}`;
   const surplusShown =
     screen.name === "shock" ? screen.shock.surplus_after : game ? game.dashboard.surplus_usd_bn : 0;
 
@@ -178,6 +178,7 @@ export default function App() {
           <ShockScreen
             key={`${screen.shock.quarter}-${screen.firstTry ? 2 : 1}`}
             shock={screen.shock}
+            company={screen.game.company}
             busy={busy}
             firstTry={screen.firstTry}
             onSubmit={async (text, notSure) => {

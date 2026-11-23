@@ -70,6 +70,15 @@ def key_text(key: dict, rec: QuarterRecord) -> str:
         "- Full breakdown by cause (bn): " + ", ".join(
             f"{k} {v:+.2f}" for k, v in rec.attribution.components().items() if abs(v) >= 0.005),
     ]
+    events = [e for e, on in (("the largest derivatives dealer defaulted", rec.shock.dealer_default),
+                              ("markets froze, so forced sales were at fire-sale prices", rec.shock.stress_liquidity)) if on]
+    if events:
+        lines.append("- Market events this quarter: " + "; ".join(events))
+    if rec.surplus_after <= 0:
+        lines.append("- THE COMPANY COLLAPSED: surplus (equity) ended at or below zero, so its equity was wiped out. "
+                     "Saying so is correct.")
+    elif rec.nothing_surplus_after is not None and rec.nothing_surplus_after <= 0:
+        lines.append("- Doing nothing would have collapsed the company (surplus at or below zero); the learner's trades kept it alive.")
     return "\n".join(lines)
 
 

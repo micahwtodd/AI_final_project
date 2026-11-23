@@ -16,8 +16,8 @@ const Face = (p: { name: string; who: string; role: string; line: string }) => (
 const SLIDES: Slide[] = [
   {
     kicker: "The job", title: "You just got hired.",
-    body: <>Welcome aboard! You're the new junior risk analyst at a real US life insurer. You have <b>four quarters</b> to
-      keep the company standing… but the markets will not be kind.</>,
+    body: <>Welcome aboard! You're the new junior risk analyst at a real US life insurer. You have <b>five quarters</b> to
+      keep the company standing… and the last one is a Great Depression. If equity hits zero, the company collapses.</>,
     art: <PixelSprite name="cat_alert" size={150} title="Convexity the office cat, on alert" />,
   },
   {
@@ -159,7 +159,7 @@ export function WelcomeScreen(props: { onDone: () => void }) {
           <div className="dots" aria-label={`Slide ${i + 1} of ${SLIDES.length}`}>
             {SLIDES.map((_, k) => <button key={k} className={`dot ${k === i ? "on" : ""}`} onClick={() => setI(k)} aria-label={`Slide ${k + 1}`} />)}
           </div>
-          <button className="primary" onClick={() => (last ? props.onDone() : setI(i + 1))}>
+          <button className={last ? "gold-btn" : "primary"} onClick={() => (last ? props.onDone() : setI(i + 1))}>
             {last ? "Pick your company →" : "Next →"}
           </button>
         </div>

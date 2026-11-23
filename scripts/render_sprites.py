@@ -777,6 +777,9 @@ SEASONS = {
                  trees=("#c8551f", "#f0a030"), weather="leaves"),
     "winter": dict(sky=("#76879e", "#e3e9f0"), cloud=("#f4f6f9", "#cfd7e2"), far="#a9b5c4",
                    trees=("#c9d6e2", "#f2f6fa"), weather="snow"),
+    # the boss round: a smoky red sky over the city, bare trees, falling ash
+    "crash": dict(sky=("#3a1418", "#d9774a"), cloud=("#5a4a4a", "#3a2e30"), far="#6b5658",
+                  trees=("#4a3a30", "#6a5444"), weather="ash"),
 }
 
 
@@ -917,6 +920,13 @@ def office(season: str = "day", storm: bool = False) -> Image.Image:
             p[x0, y0] = hx("#ffffff")
             if storm and x0 + 1 < W:
                 p[x0 + 1, y0] = hx("#e6edf5")
+    if wx == "ash":  # grey ash and a few embers
+        for _ in range(420 if not storm else 800):
+            x0, y0 = rnd.randint(0, W - 1), rnd.randint(win_top, win_bot - 1)
+            p[x0, y0] = mix(p[x0, y0], hx("#b8b0aa"), 0.8)
+        for _ in range(40):
+            x0, y0 = rnd.randint(0, W - 1), rnd.randint(win_top + 40, win_bot - 1)
+            p[x0, y0] = hx("#ffb347")
     if wx == "sun" and not storm:  # summer birds
         for bx, by in ((120, 60), (134, 54), (300, 48), (312, 56)):
             for dx, dy in ((-2, -1), (-1, 0), (0, 1), (1, 0), (2, -1)):
@@ -1063,7 +1073,7 @@ def office(season: str = "day", storm: bool = False) -> Image.Image:
 
 # ---------------------------------------------------------------- build + contact sheets
 
-OFFICES = [("day", False)] + [(s, st) for s in ("spring", "summer", "fall", "winter") for st in (False, True)]
+OFFICES = [("day", False)] + [(s, st) for s in ("spring", "summer", "fall", "winter", "crash") for st in (False, True)]
 
 
 def office_name(season: str, storm: bool) -> str:
@@ -1102,7 +1112,7 @@ def build() -> None:
         sheet.paste(big, (x, y), big)
         dr.text((x, y + 64 * scale + 2), name, fill=hx("#0d1f3c"), font=font)
     sheet.save(EVIDENCE / "sprites_contact_sheet.png")
-    grid = Image.new("RGB", (480 * 3 + 20, 270 * 3 + 20), WHITE)
+    grid = Image.new("RGB", (480 * 3 + 20, 270 * 4 + 30), WHITE)
     for i, name in enumerate(offices):
         grid.paste(offices[name], ((i % 3) * 490, (i // 3) * 280))
     grid.save(EVIDENCE / "office_backgrounds.png")

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api, type BeforeAfter, type Debrief, type GameView } from "../api";
 import { BadgeShelf, ReportCardPanel } from "../components/Badges";
 import { Confetti } from "../components/Fx";
+import { LESSON_ICON } from "../labels";
 
 export function DebriefScreen(props: { debrief: Debrief; game: GameView; onRestart: () => void }) {
   const d = props.debrief;
@@ -15,9 +16,10 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
 
   return (
     <section className="debrief-screen">
-      {d.report_card && (d.report_card.grade.startsWith("A") || d.report_card.grade.startsWith("B")) && <Confetti pieces={110} />}
+      {!d.collapsed && d.report_card && (d.report_card.grade.startsWith("A") || d.report_card.grade.startsWith("B")) && <Confetti pieces={110} />}
+      {d.collapsed && <div className="collapse-banner">💥 {props.game.company.toUpperCase()} COLLAPSED · THE ECONOMY IS TOAST 🍞</div>}
       {d.report_card && <ReportCardPanel rc={d.report_card} results={d.results_score} understanding={d.understanding_score} />}
-      <div className="muted center-text">Year-end debrief · {props.game.company} · seed {props.game.seed} · {d.minutes_played} minutes played</div>
+      <div className="muted center-text">Final debrief · {props.game.company} · seed {props.game.seed} · {d.minutes_played} minutes played</div>
       <div className="two-col">
         <div className="panel center">
           <div className="big-score">{d.results_score.toFixed(0)}<span>/100</span></div>
@@ -29,7 +31,7 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
           <div className="big-score">{d.understanding_score.toFixed(0)}<span>/100</span></div>
           <div><b>Executive Summary score</b>: how well you explained each quarter to Vera</div>
           <div className="curve" aria-label="Executive Summary score by quarter">
-            {[1, 2, 3, 4].map((q) => {
+            {Array.from({ length: d.n_quarters ?? 5 }, (_, i) => i + 1).map((q) => {
               const v = d.understanding_per_quarter[String(q)] ?? 0;
               return (
                 <div key={q} className="curve-col">
@@ -45,27 +47,30 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
 
       <div className="two-col">
         <div className="panel">
-          <h3>Surplus at year end</h3>
+          <h3>Surplus at the end</h3>
           <div className="end-bars">
             <div className="end-bar"><div className="fill start" style={{ width: `${(100 * d.start_surplus) / max}%` }} /><span>Start ${d.start_surplus.toFixed(2)}bn</span></div>
             {paths.map((p) => (
               <div className="end-bar" key={p.label}>
                 <div className={`fill ${p.label === "You" ? "you" : ""}`} style={{ width: `${(100 * Math.max(0, p.end)) / max}%` }} />
-                <span>{p.label} ${p.end.toFixed(2)}bn ({pct(p.end)})</span>
+                <span>{p.label} {p.end < 0 ? "−" : ""}${Math.abs(p.end).toFixed(2)}bn ({pct(p.end)}){p.end <= 0 && <span className="boom-tag">💥 COLLAPSED</span>}</span>
               </div>
             ))}
           </div>
           <ul className="debrief">{d.text.map((t, i) => <li key={i}>{t}</li>)}</ul>
         </div>
         <div className="panel">
-          <h3>The four lessons</h3>
-          {d.lessons.map((l) => (
-            <div key={l.quarter} className="lesson">
-              <b>Q{l.quarter} · {l.title}</b>
-              <p className="small">{l.lesson}</p>
-            </div>
-          ))}
-          <button className="primary wide no-print" onClick={props.onRestart}>Play again</button>
+          <h3>Your lesson cards ({d.lessons.length} of {d.n_quarters ?? 5} collected)</h3>
+          <div className="lesson-deck">
+            {d.lessons.map((l) => (
+              <div key={l.quarter} className="lesson-card mini">
+                <div className="lesson-top"><span>Q{l.quarter}</span><span>{LESSON_ICON[l.quarter] ?? "📘"}</span></div>
+                <div className="lesson-title">{l.title}</div>
+                <p className="lesson-text">{l.lesson}</p>
+              </div>
+            ))}
+          </div>
+          <button className="gold-btn wide no-print" onClick={props.onRestart}>Play again</button>
         </div>
       </div>
 

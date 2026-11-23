@@ -96,6 +96,7 @@ class EventCard(BaseModel):
     offers_prt_deal: bool = False
     sample_answer: str = ""
     real_world: dict = {}  # {"title", "text"}: the real episode this quarter echoes
+    boss: bool = False  # the boss round: its strength is calibrated so doing nothing all game collapses the company
 
 
 # ---------- the learner's levers ----------
@@ -103,7 +104,7 @@ class EventCard(BaseModel):
 class Action(BaseModel):
     """Absolute lever settings. Applying an Action trades the book to match it."""
     rate_hedge_pct: float = Field(0, ge=0, le=120, description="% of the duration gap closed with swaps")
-    credit_shift_pct: float = Field(0, ge=-10, le=30, description="% of below-IG and BBB moved into governments")
+    credit_shift_pct: float = Field(0, ge=-10, le=50, description="% of below-IG and BBB moved into governments")
     equity_hedge_pct: float = Field(0, ge=0, le=100, description="% of variable annuity guarantee equity exposure hedged with puts")
     fx_hedge_pct: float = Field(0, ge=0, le=100, description="% of foreign assets hedged with forwards")
     cash_buffer_pct: float = Field(3, ge=1, le=15, description="Cash as % of invested assets")
@@ -173,7 +174,7 @@ class QuarterRecord(BaseModel):
 class GameState(BaseModel):
     ticker: str
     seed: int
-    quarter: int = 1  # quarter about to be played (1-4); 5 means finished
+    quarter: int = 1  # quarter about to be played; n_quarters() + 1 means finished
     assets: dict[str, float]
     liabilities: dict[str, float]
     annuity_account_value: float  # book value paid on surrender
@@ -193,3 +194,4 @@ class GameState(BaseModel):
     action: Action = Action()
     prt_decided: bool = False
     history: list[QuarterRecord] = []
+    boss_severity: float = 1.0  # set by build_state: the boss shock's strength for this company

@@ -1,5 +1,5 @@
 {
-  "_note": "Fixed four-quarter campaign. Magnitudes are stylized approximations of the historical quarter each card echoes, for Micah to verify or adjust. A shock is a vector of market moves, never a dollar loss; the engine turns it into profit and loss using each company's own balance sheet. ig_loss_pct is the credit loss rate on BBB-rated holdings (A-rated lose 15% of that rate, AAA none); hy_default_pct is the default rate on below-investment-grade bonds (40% recovery). sample_answer is shown only in Demo mode (Jackson, seed 409) so a grader can see the marking without knowing insurance; it is written for a quarter played with no trades.",
+  "_note": "Fixed five-quarter campaign: one dominant risk per quarter (rates up, stocks down, rates down, credit), then the Great Depression boss round where everything hits at once. Magnitudes are stylized approximations of the historical episodes, for Micah to verify or adjust. A shock is a vector of market moves, never a dollar loss; the engine turns it into profit and loss using each company's own balance sheet. ig_loss_pct is the credit loss rate on BBB-rated holdings (A-rated lose 15% of that rate, AAA none); hy_default_pct is the default rate on below-investment-grade bonds (40% recovery). The boss round's strength is calibrated per company and seed so that doing nothing all game collapses the company (surplus below zero); base_shock there is the shape of the crash, and the engine caps a few moves (rates no more than 4 points, stocks no more than 85%). benchmark_action is 'what a pro would do'. sample_answer is shown only in Demo mode (Jackson, seed 409), written for a quarter played with no trades.",
   "cards": [
     {
       "id": "rate_spike",
@@ -8,182 +8,226 @@
       "era": "Echoes 2022",
       "signal_text": "WIRE: Consumer prices ran hotter than forecast for a third straight month. Some economists say the central bank is 'behind the curve'; others expect inflation to fade on its own.",
       "headline": "CENTRAL BANK HIKES AGAIN; BOND YIELDS SURGE",
-      "narrative": "Rates jumped across the curve in a matter of weeks. Annuity buyers can now get a better rate at a competitor, and some policyholders are surrendering to move their money. Stocks sold off.",
+      "narrative": "Rates jumped across the curve in a matter of weeks. Competitors now pay more on new annuities, so policyholders are surrendering to move their money, and the bonds sold to pay them fetch less than they cost. Stocks barely moved.",
       "primary_risk": "interest_rate",
       "secondary_risks": [
-        "liquidity",
+        "liquidity"
+      ],
+      "base_shock": {
+        "rate_bp": 60,
+        "ig_spread_bp": 10,
+        "hy_spread_bp": 30,
+        "equity_pct": -3,
+        "lapse_mult": 10,
+        "stress_liquidity": true
+      },
+      "lesson": "When rates rise fast, bonds and liabilities both fall in value, and the mismatch between them can even help. The real danger is cash: policyholders surrender to chase higher rates elsewhere, and without cash on hand you sell bonds at a loss to pay them. Swaps that gain when rates fall lose money now, and demand collateral the same quarter.",
+      "benchmark_action": {
+        "rate_hedge_pct": 0,
+        "credit_shift_pct": 0,
+        "equity_hedge_pct": 0,
+        "cash_buffer_pct": 12,
+        "fx_hedge_pct": 0,
+        "collateralized": true,
+        "dealers": 3
+      },
+      "glossary_terms": [
+        "surrender",
+        "crediting_rate",
+        "forced_selling",
+        "liquidity_ratio",
+        "margin_call"
+      ],
+      "source_note": "Stylized on 2022, when the US 10-year Treasury yield rose roughly 2.3 percentage points over the year. One quarter here compresses part of that move, plus a surge in surrenders. A typical draw (1.0x) is a 1 percentage point rise in rates.",
+      "sample_answer": "Interest rates jumped, and that was the main driver. Our liabilities are longer than our assets, so their value fell more than our bonds did, which actually lifted surplus. The second factor was the surrender wave: policyholders cashed out to chase higher rates, and paying them meant selling bonds at a loss. More cash on hand would have avoided the fire sale.",
+      "real_world": {
+        "title": "2022: the fastest rate hikes in 40 years",
+        "text": "Inflation hit its highest level in four decades and the Federal Reserve raised rates at the fastest pace since the early 1980s. The 10-year Treasury yield rose by more than 2 percentage points over the year and bond prices fell sharply. Annuity holders cashed out in record numbers to chase higher rates elsewhere."
+      }
+    },
+    {
+      "id": "equity_crash",
+      "quarter": 2,
+      "title": "The Bubble Bursts",
+      "era": "Echoes 2000-2002",
+      "signal_text": "WIRE: Tech stocks trade at record multiples of earnings. A few strategists warn the rally is running on hype; most say this time is different.",
+      "headline": "STOCKS PLUNGE AS THE TECH BUBBLE BURSTS",
+      "narrative": "Stocks fell by about a fifth in a few weeks as investors gave up on sky-high valuations. Customers' variable annuity accounts shrank, so the guarantees we wrote on them are now worth much more, and our own stock and private equity holdings fell too. Bonds barely moved.",
+      "primary_risk": "equity",
+      "secondary_risks": [
+        "interest_rate"
+      ],
+      "base_shock": {
+        "rate_bp": -15,
+        "ig_spread_bp": 10,
+        "hy_spread_bp": 40,
+        "equity_pct": -30,
+        "lapse_mult": 1.0
+      },
+      "lesson": "A variable annuity guarantee is a promise to pay when markets fall: when stocks drop, what you owe rises at exactly the wrong time, on top of losses on your own stock holdings. Stock-market puts pay off in that same fall. They cost a premium every quarter, which is why you buy them before the crash, not after.",
+      "benchmark_action": {
+        "rate_hedge_pct": 0,
+        "credit_shift_pct": 0,
+        "equity_hedge_pct": 90,
+        "cash_buffer_pct": 6,
+        "fx_hedge_pct": 0,
+        "collateralized": true,
+        "dealers": 3
+      },
+      "glossary_terms": [
+        "variable_annuity_guarantee",
+        "separate_account",
+        "put_option",
+        "alternatives",
+        "hedge_ratio"
+      ],
+      "source_note": "Stylized on 2000-2002, when the S&P 500 fell about 49% from peak to trough. One quarter here compresses part of that: a typical draw (1.0x) is a stock fall of a little over 20%.",
+      "sample_answer": "Stocks crashed, and that was the main driver. Falling markets shrank customers' annuity accounts, so the guarantees we wrote became more expensive for us, and our own stock and alternative holdings fell too. Rates dipped slightly as the second factor, which hurt a little because our liabilities are longer than our assets. Stock-market puts would have offset most of the guarantee loss.",
+      "real_world": {
+        "title": "2000-2002: the dot-com bust",
+        "text": "After a boom in internet stocks, the Nasdaq fell nearly 80% from its March 2000 peak and the S&P 500 lost about half its value by late 2002. Insurers that had sold variable annuities with generous guarantees saw what they owed jump just as their own stock holdings fell."
+      }
+    },
+    {
+      "id": "rate_fall",
+      "quarter": 3,
+      "title": "Lower for Longer",
+      "era": "Echoes 2019-2020",
+      "signal_text": "WIRE: Growth is slowing and inflation keeps undershooting the target. Bond traders are betting the central bank will cut rates, possibly a lot.",
+      "headline": "RATES TUMBLE TO RECORD LOWS",
+      "narrative": "The central bank cut rates and long bond yields fell to record lows. Our promises to policyholders stretch decades into the future, further than our bonds, so their value rose by more than our bonds did. Guarantees got more expensive too. Policyholders are happy to stay put.",
+      "primary_risk": "interest_rate",
+      "secondary_risks": [
         "equity"
       ],
       "base_shock": {
-        "rate_bp": 85,
-        "ig_spread_bp": 29,
-        "hy_spread_bp": 98,
-        "equity_pct": -10.35,
-        "fx_pct": 4.5,
-        "lapse_mult": 1.6
+        "rate_bp": -140,
+        "ig_spread_bp": 5,
+        "hy_spread_bp": 20,
+        "equity_pct": -2,
+        "lapse_mult": 0.9
       },
-      "lesson": "When rates rise fast, the value of bonds and of liabilities both fall, and what matters is the mismatch between them. Policyholders also surrender to chase higher rates, so you need cash on hand or you sell bonds at a loss. Collateralized swaps that lose money when rates rise demand cash the same quarter.",
+      "lesson": "When rates fall, long liabilities rise in value by more than shorter bonds: that duration gap is a life insurer's main rate risk. Interest rate swaps that gain when rates fall close the gap. The catch is the one you met when rates rose: the same swaps lose money, and demand collateral, when rates go up.",
       "benchmark_action": {
-        "rate_hedge_pct": 20,
+        "rate_hedge_pct": 100,
         "credit_shift_pct": 0,
-        "equity_hedge_pct": 50,
+        "equity_hedge_pct": 0,
+        "cash_buffer_pct": 5,
         "fx_hedge_pct": 0,
-        "cash_buffer_pct": 7,
         "collateralized": true,
         "dealers": 3
       },
       "glossary_terms": [
         "duration",
         "duration_gap",
-        "surrender",
-        "margin_call",
-        "liquidity_ratio"
+        "dv01",
+        "interest_rate_swap",
+        "convexity"
       ],
-      "source_note": "Stylized on 2022: US 10-year Treasury yield rose roughly 2.3 percentage points over the year, with the S&P 500 down about 19%. The quarter here compresses part of that move. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode for rates; spreads, credit losses and stocks run about 15% larger (re-tuned when currency risk was removed). A typical draw (1.0x) is about 70 to 80% of the episode.",
-      "sample_answer": "Interest rates jumped. Our liabilities and guarantees are more rate-sensitive than our assets, so their value fell more than our bonds did, which lifted surplus. Stocks fell too, which made the market guarantees more expensive. Stock-market insurance would have softened that.",
+      "source_note": "Stylized on 2019-2020, when the US 10-year Treasury yield fell about 2.7 percentage points. A typical draw (1.0x) here is a 1 percentage point fall in one quarter.",
+      "sample_answer": "Interest rates fell sharply, and that was the main driver. Our liabilities are longer than our assets, so their value rose more than our bonds did and surplus fell. Stocks dipped a little as the second factor. Rate swaps that gain when rates fall would have closed most of that gap.",
       "real_world": {
-        "title": "2022: the fastest rate hikes in 40 years",
-        "text": "Inflation hit its highest level in four decades and the Federal Reserve raised rates at the fastest pace since the early 1980s. The 10-year Treasury yield rose by more than 2 percentage points over the year, bond prices fell sharply, and the S&P 500 fell about 19%. Some annuity holders cashed out to chase higher rates elsewhere."
-      }
-    },
-    {
-      "id": "pension_deal",
-      "quarter": 2,
-      "title": "The Pension Deal",
-      "era": "Echoes the 2012 GM and Verizon pension transfers",
-      "signal_text": "WIRE: A large manufacturer is shopping its pension plan to insurers. Bond yields are edging higher and stocks are drifting; most strategists expect a quiet quarter.",
-      "headline": "MANUFACTURER HANDS PENSION PLAN TO AN INSURER; MARKETS DRIFT",
-      "narrative": "A quiet quarter for markets: rates edged higher and stocks drifted lower. The big decision was on your desk. Taking on a company's pension plan brings in premium and long, predictable payments to retirees, but it uses capital and lengthens the liabilities your assets have to match.",
-      "primary_risk": "growth_vs_capital",
-      "secondary_risks": [
-        "interest_rate",
-        "equity"
-      ],
-      "base_shock": {
-        "rate_bp": 20,
-        "ig_spread_bp": 9,
-        "hy_spread_bp": 23,
-        "equity_pct": -3.45,
-        "fx_pct": 9,
-        "lapse_mult": 1.0
-      },
-      "lesson": "Quiet quarters are when growth decisions get made. A pension deal brings premium and long liabilities: it grows the business but uses capital and lengthens the liabilities you have to match, so it widens the rate mismatch unless you add rate protection.",
-      "benchmark_action": {
-        "rate_hedge_pct": 70,
-        "credit_shift_pct": 0,
-        "equity_hedge_pct": 50,
-        "fx_hedge_pct": 0,
-        "cash_buffer_pct": 5,
-        "collateralized": true,
-        "dealers": 3,
-        "accept_prt": true
-      },
-      "glossary_terms": [
-        "pension_risk_transfer",
-        "capital_ratio",
-        "duration_gap"
-      ],
-      "source_note": "Stylized on 2012, when General Motors and Verizon transferred large parts of their pension obligations to Prudential, starting a wave of pension risk transfer deals. Market moves this quarter are modest by design.",
-      "offers_prt_deal": true,
-      "sample_answer": "Rates rose a little, and because our liabilities are longer than our assets that helped surplus slightly. Stocks drifted lower, which nudged up the stock-market guarantees. The pension deal adds long liabilities, so it uses capital and widens the rate mismatch; more rate protection would offset that.",
-      "real_world": {
-        "title": "2012: GM and Verizon hand their pensions to Prudential",
-        "text": "General Motors and Verizon transferred large parts of their pension obligations to Prudential, GM's covering roughly $25 billion. It started a wave of pension risk transfer deals that insurers still compete for: steady, long-dated business that grows the balance sheet but uses capital."
+        "title": "2019-2020: rates fall toward zero",
+        "text": "Slowing growth in 2019 and then the pandemic pushed US interest rates to record lows: the 10-year Treasury yield fell from about 3.2% in late 2018 to near 0.5% in 2020. Long promises made at higher rates became far more expensive to back, and several large life insurers took big charges on their guaranteed products."
       }
     },
     {
       "id": "credit_crunch",
-      "quarter": 3,
-      "title": "The Credit Crunch",
-      "era": "Echoes Q4 2008",
-      "signal_text": "WIRE: Two mid-sized lenders have delayed earnings. Junk-bond issuance has stalled and some funds are limiting withdrawals. Officials say the system is 'well capitalized'.",
-      "headline": "CREDIT MARKETS FREEZE; DEFAULTS SPIKE; STOCKS PLUNGE",
-      "narrative": "Investors fled to safety. Government bond yields fell sharply while corporate bond spreads blew out. Several high-yield issuers defaulted, commercial mortgages took losses, and stock markets fell more than 20%. Market liquidity dried up: selling anything but government bonds means accepting a steep discount.",
+      "quarter": 4,
+      "title": "The Junk Bond Rout",
+      "era": "Echoes 2015-2016",
+      "signal_text": "WIRE: Oil prices have halved in a year. Energy companies borrowed heavily when oil was expensive, and rating agencies are starting to downgrade them.",
+      "headline": "JUNK BONDS CRASH AS DEFAULTS MOUNT",
+      "narrative": "A wave of defaults hit oil and gas companies and investors dumped risky corporate bonds. Our below-investment-grade bonds lost value and some issuers stopped paying altogether. Weaker investment-grade bonds and commercial mortgages took smaller losses. Stocks dipped, and government bond yields fell as money fled to safety.",
       "primary_risk": "credit",
       "secondary_risks": [
-        "equity",
-        "liquidity",
-        "interest_rate"
+        "equity"
       ],
       "base_shock": {
-        "rate_bp": -95,
-        "ig_spread_bp": 207,
-        "hy_spread_bp": 575,
-        "ig_loss_pct": 0.402,
-        "hy_default_pct": 3.45,
-        "mortgage_loss_pct": 0.805,
-        "equity_pct": -18.4,
-        "fx_pct": 5.5,
-        "lapse_mult": 1.15,
-        "stress_liquidity": true
+        "rate_bp": -20,
+        "ig_spread_bp": 80,
+        "hy_spread_bp": 400,
+        "ig_loss_pct": 1.5,
+        "hy_default_pct": 10,
+        "mortgage_loss_pct": 0.5,
+        "equity_pct": -6,
+        "lapse_mult": 1.0
       },
-      "lesson": "Credit spread widening lowers bond prices even if nothing defaults; defaults are a separate, permanent loss. Falling rates raise the value of long liabilities and of variable annuity guarantees, and a stock crash makes those guarantees much more expensive. Moving out of the riskiest credit before the storm, and holding equity hedges, protects surplus.",
+      "lesson": "Credit risk has two parts: spreads widen, marking bonds down, and some borrowers default, which is a permanent loss. An insurer holding bonds to maturity can ride out much of the spread move, but not the defaults. Moving the riskiest bonds into government bonds before the storm gives up some yield: that is the price of sleeping at night.",
       "benchmark_action": {
-        "rate_hedge_pct": 90,
-        "credit_shift_pct": 30,
-        "equity_hedge_pct": 80,
+        "rate_hedge_pct": 0,
+        "credit_shift_pct": 50,
+        "equity_hedge_pct": 0,
+        "cash_buffer_pct": 5,
         "fx_hedge_pct": 0,
-        "cash_buffer_pct": 6,
         "collateralized": true,
         "dealers": 3
       },
       "glossary_terms": [
         "credit_spread",
         "default",
-        "variable_annuity_guarantee",
-        "forced_selling",
-        "put_option"
+        "investment_grade",
+        "below_investment_grade",
+        "mortgage_loan"
       ],
-      "source_note": "Stylized on Q4 2008: 10-year Treasury yields fell about 1.6 points, investment-grade spreads widened to roughly 6 points and high-yield spreads to about 20 points at the peak, and the S&P 500 fell about 22% in the quarter. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode for rates; spreads, credit losses and stocks run about 15% larger (re-tuned when currency risk was removed). A typical draw (1.0x) is about 70 to 80% of the episode.",
-      "sample_answer": "Rates fell sharply. Our liabilities and guarantees are longer than our assets, so they rose in value more than our bonds, which hurt surplus. Stocks crashed too, raising the guarantees. More rate protection with swaps would have helped most.",
+      "source_note": "Stylized on 2015-2016, when US high-yield spreads rose from about 3.5 to over 8 percentage points. A typical draw (1.0x) here widens high-yield spreads by 3 percentage points with 3% of junk bonds defaulting.",
+      "sample_answer": "Defaults were the main driver: junk-bond issuers stopped paying, which is a permanent credit loss, unlike spreads widening. Stocks dipped as the second factor, which raised our guarantee costs a bit. Moving risky bonds into government bonds before the rout would have cut the default losses.",
       "real_world": {
-        "title": "Late 2008: the credit crisis",
-        "text": "After Lehman Brothers failed, credit markets froze. Corporate bond spreads blew out, defaults rose, commercial mortgages took losses and stocks fell nearly 40% over the year. Investors fled to government bonds, pushing their yields down, and selling anything else meant accepting fire-sale prices."
+        "title": "2015-2016: the energy credit rout",
+        "text": "Oil fell from over $100 a barrel in mid-2014 to under $30 in early 2016. Dozens of heavily indebted energy companies defaulted, high-yield bond spreads more than doubled, and investors pulled money out of junk bond funds."
       }
     },
     {
-      "id": "dealer_down",
-      "quarter": 4,
-      "title": "The Dealer Goes Down",
-      "era": "Echoes September 2008",
-      "signal_text": "WIRE: Shares of a major derivatives dealer fell 40% this week on funding worries. Its CEO says it has 'ample liquidity'. Rival banks are said to be reviewing their exposure.",
-      "headline": "MAJOR DEALER FILES FOR BANKRUPTCY; SWAP CONTRACTS FROZEN",
-      "narrative": "One of the largest derivatives dealers collapsed. Every swap and option written with it is frozen: if it owed you money on those contracts and you did not hold collateral, that money is gone, and the hedges have to be replaced at today's prices. Markets fell again in the turmoil.",
-      "primary_risk": "counterparty",
+      "id": "great_depression",
+      "quarter": 5,
+      "title": "The Great Depression",
+      "era": "Echoes 1929-1933",
+      "signal_text": "WIRE: Stocks have doubled in two years, much of it on borrowed money. Banks are lending freely. Quietly, farm prices and factory orders have started to fall.",
+      "headline": "CRASH! BANKS FAIL, DEFAULTS SOAR, A DEALER GOES UNDER",
+      "narrative": "Everything broke at once. Stocks collapsed, companies stopped paying their debts, property loans went bad and investors piled into government bonds, driving yields down. One of our derivatives dealers failed, and frightened policyholders want their money back.",
+      "primary_risk": "systemic",
       "secondary_risks": [
         "equity",
-        "credit"
+        "credit",
+        "interest_rate",
+        "liquidity",
+        "counterparty"
       ],
       "base_shock": {
-        "rate_bp": -30,
-        "ig_spread_bp": 69,
-        "hy_spread_bp": 172,
-        "equity_pct": -8.05,
-        "fx_pct": 0,
-        "lapse_mult": 1.1,
+        "rate_bp": -200,
+        "ig_spread_bp": 300,
+        "hy_spread_bp": 1000,
+        "ig_loss_pct": 3,
+        "hy_default_pct": 15,
+        "mortgage_loss_pct": 2,
+        "equity_pct": -50,
+        "lapse_mult": 2,
+        "stress_liquidity": true,
         "dealer_default": true
       },
-      "lesson": "A hedge is a promise from a dealer. If the dealer fails, the promise is only as good as the collateral you hold. Daily collateral and spreading trades across several dealers cost a little every quarter and turn a potential large loss into a small one.",
+      "boss": true,
+      "lesson": "In a true crisis the risks you managed one at a time all hit together, and they feed each other: falling stocks raise guarantee costs, defaults eat capital, falling rates raise liabilities, and the scramble for cash forces sales at fire-sale prices. No single hedge saves you. Survival comes from having every defense in place before the storm, including collateral and more than one dealer.",
       "benchmark_action": {
-        "rate_hedge_pct": 90,
-        "credit_shift_pct": 30,
-        "equity_hedge_pct": 80,
+        "rate_hedge_pct": 100,
+        "credit_shift_pct": 50,
+        "equity_hedge_pct": 100,
+        "cash_buffer_pct": 12,
         "fx_hedge_pct": 0,
-        "cash_buffer_pct": 6,
         "collateralized": true,
         "dealers": 3
       },
       "glossary_terms": [
         "counterparty_risk",
         "collateral",
-        "isda_csa",
-        "replacement_cost"
+        "forced_selling",
+        "liquidity_haircut",
+        "capital_ratio"
       ],
-      "source_note": "Stylized on Lehman Brothers' bankruptcy in September 2008, when counterparties with uncollateralized derivatives faced losses and had to replace hedges in a volatile market. Base moves are set so that the highest severity (1.4x) roughly matches the historical episode for rates; spreads, credit losses and stocks run about 15% larger (re-tuned when currency risk was removed). A typical draw (1.0x) is about 70 to 80% of the episode.",
-      "sample_answer": "Stocks dropped, which raised the cost of the stock-market guarantees we owe: that was the biggest hit. Rates fell again too, and with liabilities longer than assets that hurt surplus. Because our hedges were small, the dealer failure itself cost us little; daily collateral would have protected larger hedges.",
+      "source_note": "Stylized on 1929-1933 and late 2008, compressed into one quarter. The boss round's strength is set for each company so that doing nothing all game wipes out its equity; a well-hedged company survives.",
+      "sample_answer": "Everything crashed at once. Stocks collapsed, and that was the main driver: our stock and alternative holdings fell and the market guarantees we wrote became far more expensive. Rates also plunged, the second factor, which hurt because our liabilities are longer than our assets. Defaults and a failed dealer piled on. We had no protection, so our equity was wiped out; puts, swaps and moving risky bonds to government bonds would all have helped.",
       "real_world": {
-        "title": "September 2008: Lehman Brothers collapses",
-        "text": "Lehman Brothers, one of the largest derivatives dealers, filed for bankruptcy. Firms with hedges at Lehman lost what Lehman owed them unless they had collected collateral, and had to replace those hedges at worse prices. AIG needed a government rescue after collateral calls on its own derivatives."
+        "title": "1929-1933: the Great Depression",
+        "text": "The stock market crashed in October 1929 and kept falling: by mid-1932 stocks had lost almost 90% from their peak. Thousands of banks failed, corporate defaults soared and US output fell by about a quarter. Investors fled to the safety of government bonds."
       }
     }
   ]

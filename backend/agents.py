@@ -26,7 +26,7 @@ from pydantic_ai.messages import ModelMessage, ToolCallPart
 from pydantic_ai.models.openai import OpenAIResponsesModel
 from pydantic_ai.providers.openai import OpenAIProvider
 
-from backend import audit, safety, tools
+from backend import audit, engine, safety, tools
 from backend.calibration import DISPLAY_NAMES
 from backend.env import MODEL_NAME, REPO_DIR, load_env, provider_config, redact
 from backend.pricing import cost_usd
@@ -391,7 +391,7 @@ async def ask(session, message: str, queue: asyncio.Queue, save: Callable[[Any],
             emit("system", "blocked", {"reason": "no_key", "message": OFFLINE_TEXT})
         else:
             company = DISPLAY_NAMES.get(session.ticker, session.ticker)
-            prompt = f"[Quarter {quarter} of 4 | {company} ({session.ticker}) | phase: {session.phase}]\nLearner: {message}"
+            prompt = f"[Quarter {quarter} of {engine.n_quarters()} | {company} ({session.ticker}) | phase: {session.phase}]\nLearner: {message}"
             history = [m for r in _HISTORY.get(f"{session.id}:{lead}", [])[-HISTORY_RUNS:] for m in r]
             result = await _run_agent(lead, prompt, run, history=history)
             if result is not None:

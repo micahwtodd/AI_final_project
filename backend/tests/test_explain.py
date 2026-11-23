@@ -93,9 +93,9 @@ def test_improvement_facts_rank_levers_by_dollar_effect():
 
 def test_debrief_reports_understanding_separately():
     gid = client.post("/api/game", json={"ticker": "JXN"}).json()["id"]
-    for _ in range(4):
+    for _ in range(engine.n_quarters()):
         client.post(f"/api/game/{gid}/advance")
         client.post(f"/api/game/{gid}/explain", json={"text": "", "not_sure": True})
     d = client.get(f"/api/game/{gid}/debrief").json()
-    assert d["understanding_score"] == 0 and len(d["understanding_per_quarter"]) == 4
+    assert d["understanding_score"] == 0 and len(d["understanding_per_quarter"]) == engine.n_quarters()
     assert "results_score" in d
