@@ -8,7 +8,7 @@ import { LESSON_ICON } from "../labels";
 /** Draw the end card on a canvas and download it as a PNG. */
 async function downloadCard(company: string, grade: string, title: string, collapsed: boolean, icons: string[],
   calls?: { made: number; correct: number }) {
-  try { await document.fonts?.load("700 40px 'Pixelify Sans'"); } catch { /* the fallback font is fine */ }
+  try { await document.fonts?.load("700 40px 'Atkinson Hyperlegible'"); } catch { /* the fallback font is fine */ }
   const W = 1000, H = 560, c = document.createElement("canvas");
   c.width = W; c.height = H;
   const g = c.getContext("2d");
@@ -17,7 +17,7 @@ async function downloadCard(company: string, grade: string, title: string, colla
   bg.addColorStop(0, "#001f5b"); bg.addColorStop(0.6, "#00347a"); bg.addColorStop(1, "#007ac1");
   g.fillStyle = bg; g.fillRect(0, 0, W, H);
   g.strokeStyle = "#ffc72c"; g.lineWidth = 14; g.strokeRect(7, 7, W - 14, H - 14);
-  const px = "'Pixelify Sans', 'Segoe UI', sans-serif";
+  const px = "'Atkinson Hyperlegible', 'Segoe UI', sans-serif";
   g.fillStyle = "#ffc72c"; g.font = `700 30px ${px}`; g.fillText("RISK DESK · EMPLOYEE REVIEW", 50, 70);
   g.fillStyle = "#cfe6f7"; g.font = "24px 'Segoe UI', sans-serif"; g.fillText(company, 50, 108);
   g.fillStyle = "#ffffff"; g.beginPath(); g.arc(160, 280, 95, 0, Math.PI * 2); g.fill();

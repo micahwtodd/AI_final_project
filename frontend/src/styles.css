@@ -919,10 +919,10 @@ body.shake-l .app { animation: quake 0.12s linear 9; }
 .msg-role { font-weight: 400; font-size: 0.72rem; color: var(--muted); margin-left: 0.3rem; }
 .caret { display: inline-block; margin-left: 1px; animation: blink 0.8s steps(2) infinite; color: var(--blue); }
 
-/* pixel display type for headings; pixel-style panels that let more of the office show through */
+/* Atkinson Hyperlegible headings (chosen for legibility); pixel-style panels that let more of the office show through */
 h1, h2, .q-splash-title, .q-splash-q, .lesson-title, .rc-title, .share-title, .predict-card h2, .paper-mast, .intro-kicker, .wire-tag, .grade-stamp {
-  font-family: "Pixelify Sans", "Segoe UI", system-ui, sans-serif; }
-h3 { font-family: "Pixelify Sans", "Segoe UI", system-ui, sans-serif; font-weight: 700; letter-spacing: 0.08em; }
+  font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif; }
+h3 { font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif; font-weight: 700; letter-spacing: 0.08em; }
 .newspaper h1.paper-headline { font-family: Georgia, "Times New Roman", serif; }
 .panel { background: rgba(255, 255, 255, 0.95); border: 2px solid rgba(13, 31, 60, 0.75); border-radius: 6px; box-shadow: 4px 4px 0 rgba(0, 31, 91, 0.2); }
 .gold-btn { box-shadow: 0 4px 0 #c99700, 4px 4px 0 rgba(0, 31, 91, 0.15); }
@@ -966,7 +966,7 @@ h3 { font-family: "Pixelify Sans", "Segoe UI", system-ui, sans-serif; font-weigh
 .nuke.still .nuke-cracks polyline { stroke-dashoffset: 0; }
 .nuke.still .nuke-cat { display: none; }
 
-/* the pixel font has no fl ligature: keep letters separate */
+/* headings keep letters separate (no ligatures) */
 h1, h2, h3, .q-splash-title, .q-splash-q, .lesson-title, .rc-title, .share-title, .predict-card h2, .paper-mast, .intro-kicker, .wire-tag, .grade-stamp { font-variant-ligatures: none; font-feature-settings: "liga" 0, "clig" 0; }
 
 /* round 2 desk: locked levers, new-toy intros, rule change, boss round */
