@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Nuke } from "../components/Nuke";
 import { api, type BeforeAfter, type Debrief, type GameView } from "../api";
 import { BadgeShelf } from "../components/Badges";
+import { PixelSprite } from "../components/PixelSprite";
 import { Confetti } from "../components/Fx";
 import { LESSON_ICON } from "../labels";
 
@@ -113,12 +114,26 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
   const fmt = (v: number) => `${v >= 0 ? "+" : "−"}$${Math.abs(v).toFixed(2)}bn`;
 
   return (
-    <section className="debrief-screen review">
+    <section className="debrief-screen review report-doc">
+      <header className="rc-header">
+        <div className="rc-crest" aria-hidden>🛡️</div>
+        <div className="rc-org">
+          <div className="rc-school">Risk Desk Training Program</div>
+          <div className="rc-doc">Official Report Card</div>
+        </div>
+        <dl className="rc-fields">
+          <div><dt>Analyst</dt><dd>Junior Risk Analyst</dd></div>
+          <div><dt>Company</dt><dd>{props.game.company}</dd></div>
+          <div><dt>Term</dt><dd>Q1 to Q{d.n_quarters ?? 5}</dd></div>
+          <div><dt>Issued</dt><dd>{new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}</dd></div>
+        </dl>
+      </header>
       {!d.collapsed && passing && /^[AB]/.test(rc!.grade) && <Confetti pieces={110} />}
       {replay && <Nuke company={`${props.game.company} (doing nothing)`} surplus={d.nothing_end_surplus} onDone={() => setReplay(false)} />}
 
       {/* 1. The verdict */}
-      <div className={`panel verdict ${d.collapsed ? "collapsed" : ""}`}>
+      <div className={`panel verdict rc-section ${d.collapsed ? "collapsed" : ""}`}>
+        <div className="rc-label">Final grade</div>
         <div className="verdict-head">
           {rc && <div className={`grade-stamp g-${rc.grade[0].toLowerCase()}`}
             title={`Grade = 60% results (${d.results_score.toFixed(0)}) + 40% Executive Summary (${d.understanding_score.toFixed(0)}) = ${rc.overall.toFixed(1)}`}>{rc.grade}</div>}
@@ -140,15 +155,19 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
         )}
       </div>
 
+      {/* badges right after the review */}
+      {d.badge_catalog && <div className="rc-section rc-badges"><div className="rc-label">Merit badges</div><BadgeShelf catalog={d.badge_catalog} earned={d.achievements?.earned ?? []} /></div>}
+
       {/* 2. The year at a glance */}
-      <div className="panel">
-        <h3>Your year at a glance <span className="muted small">· tap a quarter</span></h3>
+      <div className="panel rc-section">
+        <div className="rc-label">Your year at a glance <span className="muted small">· tap a quarter</span></div>
         <div className="q-tiles">
           {(d.quarters ?? []).map((t) => (
             <button key={t.quarter} className={`q-tile ${open === t.quarter ? "on" : ""} ${t.you >= t.pro - 0.005 ? "won" : ""} ${t.collapsed ? "dead" : ""}`}
               onClick={() => setOpen(open === t.quarter ? null : t.quarter)} aria-expanded={open === t.quarter}>
               <span className="q-icon">{LESSON_ICON[t.quarter] ?? "📘"}</span>
               <span className="q-name">Q{t.quarter} · {t.title}</span>
+              {t.topics && t.topics.length > 0 && <span className="q-topics">{t.topics.map((x) => <i key={x}>{x}</i>)}</span>}
               <span className="q-vs">{t.you >= t.pro - 0.005 ? "▲ matched the pro" : "▼ behind the pro"}{t.beat_pro && " 🏆"}</span>
               <span className="q-meta">Vera {t.not_sure ? "–" : t.explain.toFixed(0)}{t.breaches.length > 0 && " · ⚠ floor"}{t.collapsed && " · 💥"}{t.called && " · 🎯"}</span>
             </button>
@@ -164,8 +183,8 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
       </div>
 
       {/* 3. What you learned */}
-      <div className="panel">
-        <h3>What you learned</h3>
+      <div className="panel rc-section">
+        <div className="rc-label">Subjects: what you learned</div>
         <div className="skills">
           {(d.skills ?? []).map((s) => {
             const info = SKILL_INFO[s.concept];
@@ -185,9 +204,17 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
         </div>
       </div>
 
-      {/* 4. Next run */}
-      <div className="panel next-run">
-        {d.try_next && <p className="try-next-line"><span className="try-next-tag">TRY THIS NEXT TIME</span> {d.try_next}</p>}
+      {/* 4. The CRO's comments and the next run */}
+      <div className="panel next-run rc-section">
+        <div className="rc-label">Comments from your CRO</div>
+        <div className="rc-comment">
+          <PixelSprite name={passing ? "vera_pleased" : "vera_concerned"} size={64} title="Vera Atrisk" />
+          <div>
+            {rc && <p className="rc-why">{rc.why}</p>}
+            {d.try_next && <p className="try-next-line"><span className="try-next-tag">TRY THIS NEXT TIME</span> {d.try_next}</p>}
+            <div className="rc-sign"><span className="sig">Vera Atrisk</span><span className="sig-role">Vera Atrisk, Chief Risk Officer</span></div>
+          </div>
+        </div>
         <div className="next-buttons no-print">
           <button className="gold-btn" onClick={props.onRestart}>Play again</button>
           {d.harder && props.onPlay && (
@@ -210,7 +237,6 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
           ))}
         </div>
         <BeforeAfterPanel ba={d.before_after} />
-        {d.badge_catalog && <BadgeShelf catalog={d.badge_catalog} earned={d.achievements?.earned ?? []} />}
         {rc?.breach_detail && rc.breach_detail.length > 0 && <p className="small muted">Floor breaches: {rc.breach_detail.join(", ")}.</p>}
         <div className="no-print"><h3>Your feedback</h3><FeedbackBox gameId={props.game.id} /></div>
         <button className="ghost no-print" onClick={() => window.print()}>Print session summary</button>

@@ -601,7 +601,7 @@ def _quarter_tiles(s: Session) -> list[dict]:
         u = s.understanding.get(r.quarter) or {}
         raw = 100 * engine.quarter_score(r)
         tiles.append({
-            "quarter": r.quarter, "title": card.title, "takeaway": card.takeaway or card.lesson,
+            "quarter": r.quarter, "title": card.title, "takeaway": card.takeaway or card.lesson, "topics": card.topics,
             "you": round(r.surplus_after - r.surplus_before, 3),
             "nothing": round((r.nothing_surplus_after or 0) - r.surplus_before, 3),
             "pro": round((r.benchmark_surplus_after or 0) - r.surplus_before, 3),

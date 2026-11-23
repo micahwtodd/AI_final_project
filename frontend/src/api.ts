@@ -239,7 +239,7 @@ export type Debrief = {
   try_next?: string | null;
   verdict?: string;
   paths?: { you: number[]; nothing: number[]; pro: number[] };
-  quarters?: { quarter: number; title: string; takeaway: string; you: number; nothing: number; pro: number; results: number; beat_pro: boolean;
+  quarters?: { quarter: number; title: string; takeaway: string; topics?: string[]; you: number; nothing: number; pro: number; results: number; beat_pro: boolean;
     explain: number; not_sure: boolean; breaches: string[]; collapsed: boolean; try_next: string | null; called: boolean | null }[];
   skills?: { concept: string; quarter: number; level: "got_it" | "getting_there" | "revisit"; named_driver: boolean; explained_why: boolean;
     quiz: boolean | null; quiz_when: "before" | "after" | null }[];

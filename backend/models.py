@@ -98,6 +98,7 @@ class EventCard(BaseModel):
     sample_answer: str = ""
     real_world: dict = {}  # {"title", "text"}: the real episode this quarter echoes
     rule: dict = {}  # a surprise that changes the rules this quarter: {text, put_cost_mult, swap_cost_mult}
+    topics: list[str] = []  # what the quarter teaches, as short tags on the final page
     takeaway: str = ""  # the lesson in one line, for the final page
     concept: str = ""  # the quiz concept this quarter teaches (duration_gap, surrenders, ...)
     predict_reason: str = ""  # one line: why this quarter's answer was what hit hardest

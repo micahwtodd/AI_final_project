@@ -47,8 +47,12 @@
       },
       "predict_answer": "rates_up",
       "predict_reason": "Inflation ran hot, so the central bank hiked: rates moved most, and the cash drain came with them.",
-      "takeaway": "When rates jump, the danger is cash: surrenders and collateral calls, not the mismatch.",
-      "concept": "surrenders"
+      "takeaway": "The ALM mismatch decides the direction: with liabilities longer than assets, rising rates help surplus. The real danger is cash: surrenders and collateral calls.",
+      "concept": "surrenders",
+      "topics": [
+        "ALM mismatch",
+        "Cash and surrenders"
+      ]
     },
     {
       "id": "equity_crash",
@@ -99,7 +103,11 @@
         "put_cost_mult": 0.5
       },
       "takeaway": "Guarantees make a stock crash hurt twice; puts bought before the fall pay off.",
-      "concept": "guarantees_equity"
+      "concept": "guarantees_equity",
+      "topics": [
+        "Guarantees",
+        "Puts"
+      ]
     },
     {
       "id": "rate_fall",
@@ -150,7 +158,11 @@
         "swap_cost_mult": 2.0
       },
       "takeaway": "When rates fall, long promises grow faster than bonds; receive-fixed swaps close that gap.",
-      "concept": "duration_gap"
+      "concept": "duration_gap",
+      "topics": [
+        "ALM mismatch",
+        "Swaps"
+      ]
     },
     {
       "id": "credit_crunch",
@@ -200,7 +212,10 @@
       "predict_answer": "credit",
       "predict_reason": "Oil halved and indebted energy companies stopped paying: defaults were the story.",
       "takeaway": "Spreads mark bonds down for a while; defaults are permanent. Move risky bonds before the storm.",
-      "concept": "spread_vs_default"
+      "concept": "spread_vs_default",
+      "topics": [
+        "Spreads vs defaults"
+      ]
     },
     {
       "id": "great_depression",
@@ -257,7 +272,11 @@
       "predict_answer": "everything",
       "predict_reason": "In a true crisis everything breaks together: stocks, credit, rates, liquidity and a dealer.",
       "takeaway": "In a crisis everything hits at once: only defenses already in place, collateral included, save you.",
-      "concept": "collateral_counterparty"
+      "concept": "collateral_counterparty",
+      "topics": [
+        "Everything at once",
+        "Counterparties"
+      ]
     }
   ]
 }
