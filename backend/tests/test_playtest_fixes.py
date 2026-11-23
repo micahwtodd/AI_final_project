@@ -93,3 +93,17 @@ def test_lever_effects_and_rules():
     _, r = engine.play_quarter(s, Action(cash_buffer_pct=12, equity_hedge_pct=40, collateralized=False, dealers=1))
     assert set(r.lever_effects) == {"cash_buffer_pct", "equity_hedge_pct"}
     assert engine.card_for(2).rule.get("put_cost_mult") == 0.5 and engine.card_for(3).rule.get("swap_cost_mult") == 2.0
+
+
+def test_final_page_has_paths_tiles_skills_and_a_verdict():
+    gid = _new("PRU")
+    for q in range(1, engine.n_quarters() + 1):
+        client.post(f"/api/game/{gid}/advance")
+        client.post(f"/api/game/{gid}/explain", json={"text": "", "not_sure": True})
+    d = client.get(f"/api/game/{gid}/debrief").json()
+    n = engine.n_quarters()
+    assert len(d["paths"]["you"]) == len(d["paths"]["pro"]) == n + 1
+    assert len(d["quarters"]) == n and all(t["takeaway"] for t in d["quarters"])
+    assert {s["concept"] for s in d["skills"]} == {"surrenders", "guarantees_equity", "duration_gap", "spread_vs_default", "collateral_counterparty"}
+    assert all(s["level"] == "revisit" for s in d["skills"])  # no explanations, no quiz
+    assert "collapsed" in d["verdict"] and d["harder"]["ticker"] != "PRU"

@@ -239,7 +239,8 @@ export default function App() {
           />
         )}
         {screen.name === "debrief" && (
-          <DebriefScreen debrief={screen.debrief} game={screen.game} onRestart={() => setScreen({ name: "select" })} />
+          <DebriefScreen debrief={screen.debrief} game={screen.game} onRestart={() => setScreen({ name: "select" })}
+            onPlay={(ticker) => { setLastPick({ ticker, seed: screen.game.seed }); setScreen({ name: "select" }); }} />
         )}
       </main>
 

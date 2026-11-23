@@ -557,11 +557,74 @@ def quarter_debrief(rec: QuarterRecord) -> list[str]:
     return lines
 
 
-def _campaign(start: GameState, strategy: str) -> float:
-    s = start
+def _campaign_path(start: GameState, strategy: str) -> list[float]:
+    """Surplus after each quarter for a whole game of doing nothing, or of the pro's trades."""
+    s, out = start, []
     for q in range(1, engine.n_quarters() + 1):
         s, _ = engine.play_quarter(s, None if strategy == "nothing" else engine.card_for(q).benchmark_action)
-    return engine.surplus(s)
+        out.append(round(engine.surplus(s), 3))
+    return out
+
+
+def _campaign(start: GameState, strategy: str) -> float:
+    return _campaign_path(start, strategy)[-1]
+
+
+def _skills(s: Session) -> list[dict]:
+    """One card per concept the game teaches, rated from two kinds of evidence: the explanation for the quarter
+    that teaches it, and the quiz question on it (after the game if taken, otherwise before)."""
+    out = []
+    for r in s.state.history:
+        card = engine.card_for(r.quarter)
+        if not card.concept:
+            continue
+        att = s.explain_attempts.get(r.quarter) or []
+        first = att[0]["checks"] if att else {}
+        second = att[1]["checks"] if len(att) > 1 else {}
+        hints = s.hints.get(r.quarter, 0)
+        named = 1.0 if first.get("main_driver") and hints < 2 else 0.5 if (first.get("main_driver") or second.get("main_driver")) else 0.0
+        why = 0.5 if first.get("mechanism") or second.get("mechanism") else 0.0
+        quiz = (s.quiz.get("post") or s.quiz.get("pre") or {}).get("by_concept", {}).get(card.concept)
+        pts = named + why + (1.0 if quiz else 0.0)
+        level = "got_it" if pts >= 1.75 else "getting_there" if pts >= 0.75 else "revisit"
+        out.append({"concept": card.concept, "quarter": r.quarter, "level": level,
+                    "named_driver": named > 0, "explained_why": why > 0, "quiz": quiz,
+                    "quiz_when": "after" if s.quiz.get("post") else "before" if s.quiz.get("pre") else None})
+    return out
+
+
+def _quarter_tiles(s: Session) -> list[dict]:
+    tiles = []
+    for r in s.state.history:
+        card = engine.card_for(r.quarter)
+        key = engine.answer_key(r)
+        u = s.understanding.get(r.quarter) or {}
+        raw = 100 * engine.quarter_score(r)
+        tiles.append({
+            "quarter": r.quarter, "title": card.title, "takeaway": card.takeaway or card.lesson,
+            "you": round(r.surplus_after - r.surplus_before, 3),
+            "nothing": round((r.nothing_surplus_after or 0) - r.surplus_before, 3),
+            "pro": round((r.benchmark_surplus_after or 0) - r.surplus_before, 3),
+            "results": round(min(100.0, raw), 0), "beat_pro": raw > 100.5,
+            "explain": round(u.get("points", 0.0), 0), "not_sure": bool(u.get("not_sure")),
+            "breaches": [n for n, b in (("capital", r.capital_breach), ("liquidity", r.liquidity_breach)) if b],
+            "collapsed": r.surplus_after <= 0,
+            "try_next": key["improvement_facts"][0] if key["improvement_facts"] else None,
+            "called": (s.predictions.get(r.quarter) or {}).get("correct"),
+        })
+    return tiles
+
+
+def _harder(s: Session) -> dict | None:
+    """The company with the next-thinner equity cushion, for "try a harder company"."""
+    from backend.calibration import load_all_profiles
+    ps = sorted(load_all_profiles(), key=lambda p: p.equity_to_assets)
+    me = next((p for p in ps if p.ticker == s.ticker), None)
+    thinner = [p for p in ps if me and p.equity_to_assets < me.equity_to_assets - 1e-9]
+    if not thinner:
+        return None
+    p = thinner[-1]
+    return {"ticker": p.ticker, "name": DISPLAY_NAMES.get(p.ticker, p.name), "cushion_pct": round(100 * p.equity_to_assets, 1)}
 
 
 def debrief(s: Session) -> dict:
@@ -570,7 +633,8 @@ def debrief(s: Session) -> dict:
     hist = s.state.history
     start = engine.surplus(s.start_state)
     end = engine.surplus(s.state)
-    nothing_end, bench_end = _campaign(s.start_state, "nothing"), _campaign(s.start_state, "benchmark")
+    nothing_path, pro_path = _campaign_path(s.start_state, "nothing"), _campaign_path(s.start_state, "benchmark")
+    nothing_end, bench_end = nothing_path[-1], pro_path[-1]
     sc = engine.score(hist)
     best = max(hist, key=lambda r: engine.quarter_score(r))
     worst = min(hist, key=lambda r: engine.quarter_score(r))
@@ -599,6 +663,13 @@ def debrief(s: Session) -> dict:
         "nothing_end_surplus": round(nothing_end, 3), "benchmark_end_surplus": round(bench_end, 3),
         "collapsed": engine.collapsed(s.state), "n_quarters": engine.n_quarters(),
         "try_next": try_next,
+        "paths": {"you": [round(start, 3)] + [round(r.surplus_after, 3) for r in hist],
+                  "nothing": [round(start, 3)] + nothing_path, "pro": [round(start, 3)] + pro_path},
+        "quarters": _quarter_tiles(s), "skills": _skills(s), "harder": _harder(s),
+        "verdict": (f"{DISPLAY_NAMES.get(s.ticker, s.ticker)} "
+                    + (f"collapsed in Q{hist[-1].quarter}." if engine.collapsed(s.state) else f"survived with {money(end)} of equity ({pct(end):+.0f}%).")
+                    + f" Doing nothing {('also collapsed' if engine.collapsed(s.state) else 'would have collapsed') if nothing_end <= 0 else 'would have ended at ' + money(nothing_end)};"
+                    + f" a pro {'collapsed' if bench_end <= 0 else 'ended at ' + money(bench_end)}."),
         "predictions": {"made": len(s.predictions), "correct": sum(p["correct"] for p in s.predictions.values())},
         "text": text, "lessons": [{"quarter": r.quarter, "title": engine.card_for(r.quarter).title, "lesson": engine.card_for(r.quarter).lesson} for r in hist],
         "minutes_played": round((s.timings.get("finished", time.time()) - s.timings.get("started", s.created_at)) / 60, 1),

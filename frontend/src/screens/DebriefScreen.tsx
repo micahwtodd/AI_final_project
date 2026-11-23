@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Nuke } from "../components/Nuke";
 import { api, type BeforeAfter, type Debrief, type GameView } from "../api";
-import { BadgeShelf, ReportCardPanel } from "../components/Badges";
+import { BadgeShelf } from "../components/Badges";
 import { Confetti } from "../components/Fx";
 import { LESSON_ICON } from "../labels";
 
@@ -32,135 +32,189 @@ async function downloadCard(company: string, grade: string, title: string, colla
   a.href = c.toDataURL("image/png"); a.download = `risk-desk-${company.replace(/\s+/g, "-").toLowerCase()}.png`; a.click();
 }
 
-export function DebriefScreen(props: { debrief: Debrief; game: GameView; onRestart: () => void }) {
-  const d = props.debrief;
-  const pct = (x: number) => `${(100 * (x - d.start_surplus) / d.start_surplus).toFixed(1)}%`;
-  const paths = [
-    { label: "You", end: d.end_surplus },
-    { label: "Doing nothing", end: d.nothing_end_surplus },
-    { label: "What a pro would do", end: d.benchmark_end_surplus },
+const SKILL_INFO: Record<string, { label: string; idea: string }> = {
+  surrenders: { label: "Cash and surrenders", idea: "When rates jump, policyholders cash out and counterparties call collateral. Cash on hand pays them without selling bonds at fire-sale prices." },
+  guarantees_equity: { label: "Stock guarantees and puts", idea: "Guarantees on variable annuities cost more exactly when stocks fall. Puts bought before the fall pay off in that same fall." },
+  duration_gap: { label: "Rate mismatch (duration gap)", idea: "Long promises to policyholders gain value faster than shorter bonds when rates fall. Receive-fixed swaps close that gap." },
+  spread_vs_default: { label: "Spreads vs defaults", idea: "Wider spreads mark bonds down for a while; defaults are a permanent loss. Moving risky bonds to government bonds before the storm limits defaults." },
+  collateral_counterparty: { label: "Collateral and counterparties", idea: "In a crisis a dealer can fail. Daily collateral and more than one dealer cap what that failure costs, but only if they are in place beforehand." },
+};
+const LEVEL: Record<string, { label: string; cls: string }> = {
+  got_it: { label: "Got it", cls: "ok" }, getting_there: { label: "Getting there", cls: "mid" }, revisit: { label: "Revisit", cls: "low" },
+};
+
+/** Surplus over the year: you, doing nothing, and a pro. Hover a point for the number; 💥 where a line goes below zero. */
+function PathChart({ paths }: { paths: { you: number[]; nothing: number[]; pro: number[] } }) {
+  const [hover, setHover] = useState<number | null>(null);
+  const all = [...paths.you, ...paths.nothing, ...paths.pro];
+  const lo = Math.min(0, ...all), hi = Math.max(...all);
+  const W = 520, H = 200, L = 46, R = 12, T = 12, B = 26;
+  const n = Math.max(paths.you.length, paths.pro.length);
+  const x = (i: number) => L + (i * (W - L - R)) / (n - 1);
+  const y = (v: number) => T + ((hi - v) * (H - T - B)) / Math.max(1e-9, hi - lo);
+  const line = (vs: number[]) => vs.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const series = [
+    { key: "pro", label: "A pro", cls: "pro", vs: paths.pro },
+    { key: "nothing", label: "Doing nothing", cls: "nothing", vs: paths.nothing },
+    { key: "you", label: "You", cls: "you", vs: paths.you },
   ];
-  const max = Math.max(d.start_surplus, ...paths.map((p) => p.end));
+  const money = (v: number) => `${v < 0 ? "−" : ""}$${Math.abs(v).toFixed(1)}bn`;
+  return (
+    <div className="path-chart">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Surplus by quarter for you, doing nothing and a pro">
+        {lo < 0 && <line x1={L} x2={W - R} y1={y(0)} y2={y(0)} className="zero" />}
+        {lo < 0 && <text x={L - 6} y={y(0) + 4} className="axis" textAnchor="end">$0</text>}
+        <text x={L - 6} y={y(hi) + 4} className="axis" textAnchor="end">{money(hi)}</text>
+        {Array.from({ length: n }, (_, i) => (
+          <text key={i} x={x(i)} y={H - 6} className="axis" textAnchor="middle">{i === 0 ? "Start" : `Q${i}`}</text>
+        ))}
+        {series.map((s) => <path key={s.key} d={line(s.vs)} className={`pl ${s.cls}`} />)}
+        {series.map((s) => s.vs.map((v, i) => (
+          <g key={`${s.key}${i}`}>
+            <circle cx={x(i)} cy={y(v)} r={hover === i ? 5 : 3.5} className={`pt ${s.cls}`} />
+            {v <= 0 && <text x={x(i)} y={y(v) - 8} textAnchor="middle" className="boom">💥</text>}
+          </g>
+        )))}
+        {Array.from({ length: n }, (_, i) => (
+          <rect key={i} x={x(i) - 20} y={0} width={40} height={H} fill="transparent" onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)} />
+        ))}
+      </svg>
+      <div className="path-legend">
+        {series.slice().reverse().map((s) => (
+          <span key={s.key} className={`lg ${s.cls}`}>● {s.label}{hover !== null && s.vs[hover] !== undefined ? `: ${money(s.vs[hover])}` : `: ${money(s.vs[s.vs.length - 1])}`}</span>
+        ))}
+        {hover !== null && <span className="muted">({hover === 0 ? "start" : `after Q${hover}`})</span>}
+      </div>
+    </div>
+  );
+}
+
+export function DebriefScreen(props: { debrief: Debrief; game: GameView; onRestart: () => void; onPlay?: (ticker: string) => void }) {
+  const d = props.debrief;
+  const rc = d.report_card;
+  const [open, setOpen] = useState<number | null>(null);
+  const [skill, setSkill] = useState<string | null>(null);
   const [replay, setReplay] = useState(false);
   const [copied, setCopied] = useState(false);
   const bestKey = `riskdesk.best.${props.game.ticker}`;
   const [best] = useState<{ prev: { grade: string; overall: number } | null; isNew: boolean }>(() => {
     try {
       const prev = JSON.parse(localStorage.getItem(bestKey) ?? "null");
-      const now = d.report_card ? { grade: d.report_card.grade, overall: d.report_card.overall } : null;
+      const now = rc ? { grade: rc.grade, overall: rc.overall } : null;
       const isNew = !!now && (!prev || now.overall > prev.overall);
       if (isNew && now) localStorage.setItem(bestKey, JSON.stringify(now));
       return { prev, isNew };
     } catch { return { prev: null, isNew: false }; }
   });
-  const rc = d.report_card;
-  const shareText = rc ? `Risk Desk · ${props.game.company}: grade ${rc.grade}, "${rc.title}". `
-    + `Results ${d.results_score.toFixed(0)}, Executive Summary ${d.understanding_score.toFixed(0)}. `
-    + `${d.collapsed ? "Collapsed in the crash." : "Survived the Great Depression round."} `
-    + `Lesson cards ${d.lessons.map((l) => LESSON_ICON[l.quarter] ?? "📘").join("")}` : "";
+  const passing = !!rc && /^[ABC]/.test(rc.grade);
+  const icons = d.lessons.map((l) => LESSON_ICON[l.quarter] ?? "📘");
+  const shareText = rc ? `Risk Desk · ${props.game.company}: grade ${rc.grade}, "${rc.title}". ${d.verdict ?? ""} Lesson cards ${icons.join("")}` : "";
+  const q = open !== null ? d.quarters?.find((x) => x.quarter === open) : undefined;
+  const fmt = (v: number) => `${v >= 0 ? "+" : "−"}$${Math.abs(v).toFixed(2)}bn`;
 
   return (
-    <section className="debrief-screen">
-      {!d.collapsed && d.report_card && (d.report_card.grade.startsWith("A") || d.report_card.grade.startsWith("B")) && <Confetti pieces={110} />}
-      {d.collapsed && <div className="collapse-banner">💥 {props.game.company.toUpperCase()} COLLAPSED · THE ECONOMY IS TOAST 🍞</div>}
-      {d.report_card && <ReportCardPanel rc={d.report_card} results={d.results_score} understanding={d.understanding_score} />}
+    <section className="debrief-screen review">
+      {!d.collapsed && passing && /^[AB]/.test(rc!.grade) && <Confetti pieces={110} />}
       {replay && <Nuke company={`${props.game.company} (doing nothing)`} surplus={d.nothing_end_surplus} onDone={() => setReplay(false)} />}
-      {best.isNew && <div className="best-banner">🏅 New personal best on {props.game.company}{best.prev ? ` (was ${best.prev.grade}, ${best.prev.overall})` : ""}!</div>}
-      {!best.isNew && best.prev && <div className="best-banner quiet">Your best on {props.game.company}: {best.prev.grade} ({best.prev.overall}). Try a tougher company?</div>}
-      {d.try_next && <div className="try-next"><span className="try-next-tag">TRY THIS NEXT TIME</span> {d.try_next}</div>}
-      {!d.collapsed && d.nothing_end_surplus <= 0 && (
-        <div className="replay-row no-print">
-          <button className="gold-btn" onClick={() => setReplay(true)}>💥 Watch what doing nothing would have done</button>
-          <span className="small muted">Same markets, no trades all game: the company collapses in the crash. You kept it alive.</span>
-        </div>
-      )}
-      <div className="two-col">
-        <div className="panel center">
-          <div className="big-score">{d.results_score.toFixed(0)}<span>/100</span></div>
-          <div><b>Results score</b>: how your trades did against doing nothing and what a pro would do</div>
-          <div className="small muted">Per quarter: {d.per_quarter.map((x, i) => `Q${i + 1} ${Math.min(100, x).toFixed(0)}`).join(" · ")}
-            {d.penalties ? ` · penalties −${d.penalties}` : ""}</div>
-        </div>
-        <div className="panel center">
-          <div className="big-score">{d.understanding_score.toFixed(0)}<span>/100</span></div>
-          <div><b>Executive Summary score</b>: how well you explained each quarter to Vera</div>
-          <div className="curve" aria-label="Executive Summary score by quarter">
-            {Array.from({ length: d.n_quarters ?? 5 }, (_, i) => i + 1).map((q) => {
-              const v = d.understanding_per_quarter[String(q)] ?? 0;
-              return (
-                <div key={q} className="curve-col">
-                  <div className="curve-bar" style={{ height: `${Math.max(2, v)}%` }} title={`Q${q}: ${v}`} />
-                  <div className="small">Q{q}</div>
-                  <div className="small muted">{v.toFixed(0)}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
 
-      <div className="two-col">
-        <div className="panel">
-          <h3>Surplus at the end</h3>
-          <div className="end-bars">
-            <div className="end-bar"><div className="fill start" style={{ width: `${(100 * d.start_surplus) / max}%` }} /><span>Start ${d.start_surplus.toFixed(2)}bn</span></div>
-            {paths.map((p) => (
-              <div className="end-bar" key={p.label}>
-                <div className={`fill ${p.label === "You" ? "you" : ""}`} style={{ width: `${(100 * Math.max(0, p.end)) / max}%` }} />
-                <span>{p.label} {p.end < 0 ? "−" : ""}${Math.abs(p.end).toFixed(2)}bn ({pct(p.end)}){p.end <= 0 && <span className="boom-tag">💥 COLLAPSED</span>}</span>
-              </div>
-            ))}
-          </div>
-          <ul className="debrief">{d.text.map((t, i) => <li key={i}>{t}</li>)}</ul>
-        </div>
-        <div className="panel">
-          <h3>Your lesson cards ({d.lessons.length} of {d.n_quarters ?? 5} collected)</h3>
-          <div className="lesson-deck">
-            {d.lessons.map((l) => (
-              <div key={l.quarter} className="lesson-card mini">
-                <div className="lesson-top"><span>Q{l.quarter}</span><span>{LESSON_ICON[l.quarter] ?? "📘"}</span></div>
-                <div className="lesson-title">{l.title}</div>
-                <p className="lesson-text">{l.lesson}</p>
-              </div>
-            ))}
-          </div>
-          <button className="gold-btn wide no-print" onClick={props.onRestart}>Play again</button>
-        </div>
-      </div>
-
-      {rc && (
-        <div className="share-card">
-          <div className="share-top"><span>RISK DESK</span><span>{props.game.company}</span></div>
-          <div className="share-main">
-            <div className={`grade-stamp g-${rc.grade[0].toLowerCase()}`}>{rc.grade}</div>
-            <div>
-              <div className="share-title">“{rc.title}”</div>
-              <div className="share-sub">{d.collapsed ? "💥 Collapsed in the crash" : "🛡️ Survived the Great Depression round"}</div>
-              <div className="share-icons">{d.lessons.map((l) => <span key={l.quarter}>{LESSON_ICON[l.quarter] ?? "📘"}</span>)}</div>
-              {d.predictions && d.predictions.made > 0 && <div className="share-sub">🎯 Called {d.predictions.correct} of {d.predictions.made} quarters</div>}
+      {/* 1. The verdict */}
+      <div className={`panel verdict ${d.collapsed ? "collapsed" : ""}`}>
+        <div className="verdict-head">
+          {rc && <div className={`grade-stamp g-${rc.grade[0].toLowerCase()}`}
+            title={`Grade = 60% results (${d.results_score.toFixed(0)}) + 40% Executive Summary (${d.understanding_score.toFixed(0)}) = ${rc.overall.toFixed(1)}`}>{rc.grade}</div>}
+          <div className="verdict-text">
+            <div className="intro-kicker">Your year in review · {props.game.company}</div>
+            {rc && <h1 className="rc-title">“{rc.title}”</h1>}
+            <p className="verdict-line">{d.collapsed ? "💥 " : "🛡️ "}{d.verdict}</p>
+            <div className="verdict-scores">
+              <span title="How your trades did against doing nothing and a pro">Results <b>{d.results_score.toFixed(0)}</b></span>
+              <span title="How well you explained each quarter to Vera">Explaining <b>{d.understanding_score.toFixed(0)}</b></span>
+              {d.predictions && d.predictions.made > 0 && <span>Calls <b>{d.predictions.correct}/{d.predictions.made}</b></span>}
+              {best.isNew && passing && <span className="best-chip">🏅 Personal best</span>}
             </div>
           </div>
-          <div className="share-actions no-print">
-            <button className="ghost" onClick={() => downloadCard(props.game.company, rc.grade, rc.title, d.collapsed ?? false,
-              d.lessons.map((l) => LESSON_ICON[l.quarter] ?? "📘"), d.predictions)}>⬇ Download card (PNG)</button>
-            <button className="ghost" onClick={() => { navigator.clipboard?.writeText(shareText).then(() => setCopied(true)).catch(() => undefined); }}>
-              {copied ? "Copied ✓" : "Copy a summary"}
-            </button>
-          </div>
         </div>
-      )}
-
-      <BeforeAfterPanel ba={d.before_after} />
-
-      {d.badge_catalog && <BadgeShelf catalog={d.badge_catalog} earned={d.achievements?.earned ?? []} />}
-      <div className="panel no-print">
-        <h3>Your feedback</h3>
-        <FeedbackBox gameId={props.game.id} />
-        <button className="ghost wide" onClick={() => window.print()}>Print session summary</button>
+        {d.paths && <PathChart paths={d.paths} />}
+        {!d.collapsed && d.nothing_end_surplus <= 0 && (
+          <button className="ghost no-print" onClick={() => setReplay(true)}>💥 Watch what doing nothing would have done</button>
+        )}
       </div>
-      <details className="panel nerd-stats">
-        <summary>Nerd stats</summary>
-        <div className="small muted">{props.game.company} · seed {props.game.seed} · {d.minutes_played} minutes played · AI usage {props.game.usage?.spend_usd !== undefined ? `$${props.game.usage.spend_usd.toFixed(4)}` : "–"}</div>
+
+      {/* 2. The year at a glance */}
+      <div className="panel">
+        <h3>Your year at a glance <span className="muted small">· tap a quarter</span></h3>
+        <div className="q-tiles">
+          {(d.quarters ?? []).map((t) => (
+            <button key={t.quarter} className={`q-tile ${open === t.quarter ? "on" : ""} ${t.you >= t.pro - 0.005 ? "won" : ""} ${t.collapsed ? "dead" : ""}`}
+              onClick={() => setOpen(open === t.quarter ? null : t.quarter)} aria-expanded={open === t.quarter}>
+              <span className="q-icon">{LESSON_ICON[t.quarter] ?? "📘"}</span>
+              <span className="q-name">Q{t.quarter} · {t.title}</span>
+              <span className="q-vs">{t.you >= t.pro - 0.005 ? "▲ matched the pro" : "▼ behind the pro"}{t.beat_pro && " 🏆"}</span>
+              <span className="q-meta">Vera {t.not_sure ? "–" : t.explain.toFixed(0)}{t.breaches.length > 0 && " · ⚠ floor"}{t.collapsed && " · 💥"}{t.called && " · 🎯"}</span>
+            </button>
+          ))}
+        </div>
+        {q && (
+          <div className="q-detail">
+            <p className="q-take"><b>The lesson:</b> {q.takeaway}</p>
+            <div className="q-nums">You {fmt(q.you)} · doing nothing {fmt(q.nothing)} · a pro {fmt(q.pro)}{q.breaches.length > 0 && ` · below the ${q.breaches.join(" and ")} floor`}</div>
+            {q.try_next && <p className="q-try"><b>Try next time:</b> {q.try_next}.</p>}
+          </div>
+        )}
+      </div>
+
+      {/* 3. What you learned */}
+      <div className="panel">
+        <h3>What you learned</h3>
+        <div className="skills">
+          {(d.skills ?? []).map((s) => {
+            const info = SKILL_INFO[s.concept];
+            const lv = LEVEL[s.level];
+            return (
+              <button key={s.concept} className={`skill ${lv.cls} ${skill === s.concept ? "on" : ""}`} onClick={() => setSkill(skill === s.concept ? null : s.concept)}>
+                <span className="skill-level">{lv.label}</span>
+                <span className="skill-name">{info?.label ?? s.concept}</span>
+                <span className="skill-ev">
+                  Q{s.quarter}: {s.named_driver ? "✓ named the driver" : "✗ missed the driver"}{s.explained_why ? " · ✓ said why" : ""}
+                  {s.quiz_when && ` · quiz ${s.quiz ? "✓" : "✗"}`}
+                </span>
+                {skill === s.concept && info && <span className="skill-idea">{info.idea}</span>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 4. Next run */}
+      <div className="panel next-run">
+        {d.try_next && <p className="try-next-line"><span className="try-next-tag">TRY THIS NEXT TIME</span> {d.try_next}</p>}
+        <div className="next-buttons no-print">
+          <button className="gold-btn" onClick={props.onRestart}>Play again</button>
+          {d.harder && props.onPlay && (
+            <button className="primary" onClick={() => props.onPlay!(d.harder!.ticker)}>Try a harder company: {d.harder.name} ({d.harder.cushion_pct}% cushion)</button>
+          )}
+          {rc && <button className="ghost" onClick={() => downloadCard(props.game.company, rc.grade, rc.title, d.collapsed ?? false, icons, d.predictions)}>⬇ Share card (PNG)</button>}
+          {rc && <button className="ghost" onClick={() => { navigator.clipboard?.writeText(shareText).then(() => setCopied(true)).catch(() => undefined); }}>{copied ? "Copied ✓" : "Copy a summary"}</button>}
+        </div>
+      </div>
+
+      <details className="panel more">
+        <summary>More: lesson cards, quiz before and after, badges, feedback</summary>
+        <div className="lesson-deck">
+          {d.lessons.map((l) => (
+            <div key={l.quarter} className="lesson-card mini">
+              <div className="lesson-top"><span>Q{l.quarter}</span><span>{LESSON_ICON[l.quarter] ?? "📘"}</span></div>
+              <div className="lesson-title">{l.title}</div>
+              <p className="lesson-text">{l.lesson}</p>
+            </div>
+          ))}
+        </div>
+        <BeforeAfterPanel ba={d.before_after} />
+        {d.badge_catalog && <BadgeShelf catalog={d.badge_catalog} earned={d.achievements?.earned ?? []} />}
+        {rc?.breach_detail && rc.breach_detail.length > 0 && <p className="small muted">Floor breaches: {rc.breach_detail.join(", ")}.</p>}
+        <div className="no-print"><h3>Your feedback</h3><FeedbackBox gameId={props.game.id} /></div>
+        <button className="ghost no-print" onClick={() => window.print()}>Print session summary</button>
+        <div className="small muted">{props.game.company} · seed {props.game.seed} · {d.minutes_played} minutes · AI usage {props.game.usage?.spend_usd !== undefined ? `$${props.game.usage.spend_usd.toFixed(4)}` : "–"}</div>
       </details>
     </section>
   );

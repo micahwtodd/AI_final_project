@@ -1031,3 +1031,47 @@ h1, h2, h3, .q-splash-title, .q-splash-q, .lesson-title, .rc-title, .share-title
 .hero-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem; margin-left: auto; }
 .scale-cap { min-height: 2.6em; display: block; }
 .scale-col { justify-content: flex-end; }
+
+/* the final page: verdict, timeline, skills, next run */
+.review .panel { margin-bottom: 1rem; }
+.verdict-head { display: flex; gap: 1.2rem; align-items: center; }
+.verdict .grade-stamp { flex-shrink: 0; cursor: help; }
+.verdict.collapsed { border-color: var(--red); }
+.verdict-line { font-size: 1.1rem; margin: 0.3rem 0 0.5rem; }
+.verdict-scores { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.verdict-scores span { background: var(--panel-2); border-radius: 999px; padding: 0.2rem 0.7rem; font-size: 0.88rem; }
+.best-chip { background: #fff3c4 !important; border: 1px solid #ffc72c; }
+.path-chart { margin-top: 0.8rem; }
+.path-chart svg { width: 100%; max-width: 640px; height: auto; display: block; }
+.path-chart .axis { font-size: 10px; fill: var(--muted); }
+.path-chart .zero { stroke: var(--red); stroke-dasharray: 4 3; stroke-width: 1; }
+.path-chart .pl { fill: none; stroke-width: 3; stroke-linejoin: round; }
+.path-chart .pl.you { stroke: var(--navy); } .path-chart .pt.you { fill: var(--navy); }
+.path-chart .pl.nothing { stroke: #9aa3ad; stroke-dasharray: 6 4; } .path-chart .pt.nothing { fill: #9aa3ad; }
+.path-chart .pl.pro { stroke: #e0a800; } .path-chart .pt.pro { fill: #e0a800; }
+.path-chart .boom { font-size: 12px; }
+.path-legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.85rem; margin-top: 0.3rem; }
+.path-legend .you { color: var(--navy); font-weight: 700; } .path-legend .nothing { color: #6b7580; } .path-legend .pro { color: #b88600; font-weight: 700; }
+.q-tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; }
+.q-tile { display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem; text-align: left; padding: 0.6rem; border-radius: 8px;
+  border: 2px solid var(--line); background: #fff; transition: transform 0.12s, border-color 0.12s; }
+.q-tile:hover { transform: translateY(-2px); }
+.q-tile.won { border-color: #9bd3a7; } .q-tile.dead { border-color: var(--red); }
+.q-tile.on { border-color: #ffc72c; box-shadow: 0 0 0 3px #fff3c4; }
+.q-icon { font-size: 1.4rem; } .q-name { font-weight: 700; font-size: 0.85rem; color: var(--navy); }
+.q-vs { font-size: 0.78rem; } .q-meta { font-size: 0.72rem; color: var(--muted); }
+.q-detail { margin-top: 0.7rem; background: #f7f9fc; border-left: 4px solid #ffc72c; border-radius: 6px; padding: 0.6rem 0.8rem; animation: pop-in 0.25s ease-out both; }
+.q-take { margin: 0 0 0.3rem; } .q-nums { font-size: 0.85rem; color: var(--steel); } .q-try { margin: 0.3rem 0 0; font-size: 0.9rem; }
+.skills { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; }
+.skill { display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem; text-align: left; padding: 0.7rem; border-radius: 8px; border: 2px solid var(--line); background: #fff; }
+.skill-level { font-size: 0.7rem; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.1rem 0.45rem; border-radius: 4px; }
+.skill.ok .skill-level { background: #e7f6ea; color: #1f5f2e; } .skill.ok { border-color: #9bd3a7; }
+.skill.mid .skill-level { background: #fff3c4; color: #7a5b00; } .skill.mid { border-color: #f0d27a; }
+.skill.low .skill-level { background: #fdecee; color: #8a0f22; } .skill.low { border-color: #efb2bb; }
+.skill-name { font-weight: 700; color: var(--navy); } .skill-ev { font-size: 0.78rem; color: var(--steel); }
+.skill-idea { font-size: 0.85rem; margin-top: 0.3rem; color: var(--ink); animation: fade-in 0.25s ease-out both; }
+.next-run .try-next-line { margin: 0 0 0.7rem; }
+.next-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+.more summary { cursor: pointer; font-weight: 700; color: var(--steel); }
+.more[open] summary { margin-bottom: 0.8rem; }
+@media (max-width: 900px) { .q-tiles { grid-template-columns: 1fr 1fr; } .verdict-head { flex-direction: column; align-items: flex-start; } }

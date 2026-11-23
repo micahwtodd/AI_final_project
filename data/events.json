@@ -46,7 +46,9 @@
         "text": "Inflation hit its highest level in four decades and the Federal Reserve raised rates at the fastest pace since the early 1980s. The 10-year Treasury yield rose by more than 2 percentage points over the year. In September, UK pension funds using interest rate swaps faced collateral calls so large they had to dump government bonds, and the Bank of England stepped in. Annuity holders cashed out to chase higher rates elsewhere."
       },
       "predict_answer": "rates_up",
-      "predict_reason": "Inflation ran hot, so the central bank hiked: rates moved most, and the cash drain came with them."
+      "predict_reason": "Inflation ran hot, so the central bank hiked: rates moved most, and the cash drain came with them.",
+      "takeaway": "When rates jump, the danger is cash: surrenders and collateral calls, not the mismatch.",
+      "concept": "surrenders"
     },
     {
       "id": "equity_crash",
@@ -95,7 +97,9 @@
       "rule": {
         "text": "Fire sale on insurance: a dealer is offering stock-market puts at half price this quarter.",
         "put_cost_mult": 0.5
-      }
+      },
+      "takeaway": "Guarantees make a stock crash hurt twice; puts bought before the fall pay off.",
+      "concept": "guarantees_equity"
     },
     {
       "id": "rate_fall",
@@ -144,7 +148,9 @@
       "rule": {
         "text": "Swap desk outage: the backup dealer charges double for interest rate swaps this quarter.",
         "swap_cost_mult": 2.0
-      }
+      },
+      "takeaway": "When rates fall, long promises grow faster than bonds; receive-fixed swaps close that gap.",
+      "concept": "duration_gap"
     },
     {
       "id": "credit_crunch",
@@ -192,7 +198,9 @@
         "text": "Oil fell from over $100 a barrel in mid-2014 to under $30 in early 2016. Dozens of heavily indebted energy companies defaulted, high-yield bond spreads more than doubled, and investors pulled money out of junk bond funds."
       },
       "predict_answer": "credit",
-      "predict_reason": "Oil halved and indebted energy companies stopped paying: defaults were the story."
+      "predict_reason": "Oil halved and indebted energy companies stopped paying: defaults were the story.",
+      "takeaway": "Spreads mark bonds down for a while; defaults are permanent. Move risky bonds before the storm.",
+      "concept": "spread_vs_default"
     },
     {
       "id": "great_depression",
@@ -247,7 +255,9 @@
         "text": "The stock market crashed in October 1929 and kept falling: by mid-1932 stocks had lost almost 90% from their peak. Thousands of banks failed, corporate defaults soared and US output fell by about a quarter. Investors fled to the safety of government bonds."
       },
       "predict_answer": "everything",
-      "predict_reason": "In a true crisis everything breaks together: stocks, credit, rates, liquidity and a dealer."
+      "predict_reason": "In a true crisis everything breaks together: stocks, credit, rates, liquidity and a dealer.",
+      "takeaway": "In a crisis everything hits at once: only defenses already in place, collateral included, save you.",
+      "concept": "collateral_counterparty"
     }
   ]
 }
