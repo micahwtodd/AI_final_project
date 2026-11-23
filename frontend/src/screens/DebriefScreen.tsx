@@ -39,7 +39,7 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
         <div className="panel center">
           <div className="big-score">{d.results_score.toFixed(0)}<span>/100</span></div>
           <div><b>Results score</b>: how your trades did against doing nothing and what a pro would do</div>
-          <div className="small muted">Per quarter: {d.per_quarter.map((x, i) => `Q${i + 1} ${x.toFixed(0)}`).join(" · ")}
+          <div className="small muted">Per quarter: {d.per_quarter.map((x, i) => `Q${i + 1} ${Math.min(100, x).toFixed(0)}`).join(" · ")}
             {d.penalties ? ` · penalties −${d.penalties}` : ""}</div>
         </div>
         <div className="panel center">

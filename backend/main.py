@@ -139,6 +139,11 @@ def advance(session_id: str, body: AdvanceBody | None = None) -> dict:
     return _run(game.advance, _session(session_id), body.prediction if body else None)
 
 
+@app.post("/api/game/{session_id}/whatif")
+def whatif(session_id: str, body: ActionBody) -> dict:
+    return _run(game.whatif, _session(session_id), body.action)
+
+
 @app.post("/api/game/{session_id}/hint")
 def hint(session_id: str) -> dict:
     return _run(game.hint, _session(session_id))

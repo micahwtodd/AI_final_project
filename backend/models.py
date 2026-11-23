@@ -97,6 +97,8 @@ class EventCard(BaseModel):
     offers_prt_deal: bool = False
     sample_answer: str = ""
     real_world: dict = {}  # {"title", "text"}: the real episode this quarter echoes
+    rule: dict = {}  # a surprise that changes the rules this quarter: {text, put_cost_mult, swap_cost_mult}
+    predict_reason: str = ""  # one line: why this quarter's answer was what hit hardest
     predict_answer: str = ""  # rates_up / stocks_down / rates_down / credit / everything
     boss: bool = False  # the boss round: its strength is calibrated so doing nothing all game collapses the company
 
@@ -172,6 +174,7 @@ class QuarterRecord(BaseModel):
     liquidity_breach: bool = False
     benchmark_capital_breach: bool = False  # would the benchmark trades also have breached? (no penalty then)
     benchmark_liquidity_breach: bool = False
+    lever_effects: dict[str, float] = {}  # surplus each of your positions added vs not holding it
     lever_gains: dict[str, float] = {}  # surplus added by moving just that lever to the benchmark's setting
 
 

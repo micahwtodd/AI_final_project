@@ -234,9 +234,10 @@ def _set_cash(s: GameState, pct: float) -> GameState:
 
 def quarterly_hedge_cost(s: GameState, a: Action) -> float:
     hc = assumptions()["hedge_costs_quarterly"]
+    rule = card_for(s.quarter).rule if 1 <= s.quarter <= n_quarters() else {}
     live = 1 - s.hedges_lost_share
-    cost = abs(s.swap_dv01) * hc["swap_per_dv01"]
-    cost += a.equity_hedge_pct / 100 * live * guarantee_equity_sensitivity(s) * hc["put_premium"]
+    cost = abs(s.swap_dv01) * hc["swap_per_dv01"] * rule.get("swap_cost_mult", 1.0)
+    cost += a.equity_hedge_pct / 100 * live * guarantee_equity_sensitivity(s) * hc["put_premium"] * rule.get("put_cost_mult", 1.0)
     cost += a.fx_hedge_pct / 100 * live * foreign_assets(s) * hc["fx_forward"]
     if _hedge_on(a, s):
         A = total_assets(s)
@@ -569,23 +570,23 @@ def play_quarter(state: GameState, action: Action | None) -> tuple[GameState, Qu
         benchmark_liquidity_breach=cf["benchmark"]["liquidity_breach"],
     )
     rec.lever_gains = lever_gains(start, traded.action, card, shock, rec.surplus_after)
+    rec.lever_effects = lever_effects(start, traded.action, card, shock, rec.surplus_after)
     after_state.history = [*start.history, rec]
     after_state.quarter = start.quarter + 1
     return _sync_positions(after_state), rec
 
 
 def _sync_positions(s: GameState) -> GameState:
-    """After the market moves, re-measure what the company actually holds, so next quarter's ticket starts
-    from reality: cash as a % of today's assets, and swaps as a % of today's rate mismatch. Signing an
-    unchanged ticket then trades nothing (no phantom change on the dashboard)."""
+    """After the market moves, line the book up with the ticket: cash is re-measured as a % of today's assets,
+    and swaps are rebalanced to keep the chosen % of today's rate mismatch. Signing an unchanged ticket then
+    trades nothing (no phantom change on the dashboard)."""
     A = total_assets(s)
     upd = {}
     if A > 0:
         upd["cash_buffer_pct"] = min(15.0, max(1.0, 100 * s.assets["cash"] / A))
-    gap = asset_dv01(s) - liability_dv01(s)
-    if abs(gap) > 1e-12 and s.hedges_lost_share == 0:
-        upd["rate_hedge_pct"] = min(150.0, max(-150.0, -100 * s.swap_dv01 / gap))
     s.action = s.action.model_copy(update=upd)
+    if s.hedges_lost_share == 0:  # swaps are rebalanced to the chosen % of today's mismatch (a rolling hedge)
+        s.swap_dv01 = -s.action.rate_hedge_pct / 100 * (asset_dv01(s) - liability_dv01(s))
     return s
 
 
@@ -603,6 +604,25 @@ def lever_gains(start: GameState, action: Action, card: EventCard, shock: ShockV
         alt = action.model_copy(update={k: getattr(bench, k)})
         after, _ = apply_shock(apply_action(start, alt, card.offers_prt_deal), shock)
         out[k] = round(surplus(after) - actual_after, 4)
+    return out
+
+
+NONE_SETTING = {"rate_hedge_pct": 0.0, "credit_shift_pct": 0.0, "equity_hedge_pct": 0.0, "cash_buffer_pct": 1.0}
+
+
+def lever_effects(start: GameState, action: Action, card: EventCard, shock: ShockVector, actual_after: float) -> dict:
+    """What each position you held did this quarter: your surplus minus the surplus without that position
+    (swaps, bond moves and puts at zero, cash at the 1% minimum, no collateral and one dealer)."""
+    out = {}
+    for k, none in NONE_SETTING.items():
+        if abs(getattr(action, k) - none) > 1e-9:
+            alt = action.model_copy(update={k: none})
+            after, _ = apply_shock(apply_action(start, alt, False), shock)
+            out[k] = round(actual_after - surplus(after), 4)
+    if action.collateralized or action.dealers == 3:
+        alt = action.model_copy(update={"collateralized": False, "dealers": 1})
+        after, _ = apply_shock(apply_action(start, alt, False), shock)
+        out["counterparty"] = round(actual_after - surplus(after), 4)
     return out
 
 

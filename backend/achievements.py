@@ -97,9 +97,13 @@ def report_card(s, results: float, understanding: float) -> dict:
         title, why = "Sharp Explainer", "You read the market well; the trades can catch up with the thinking."
     elif breaches == 0:
         title, why = "Lucky Survivor", "You stayed above the floors, but left money on the table."
+    elif overall >= 70:
+        title, why = "Comeback Kid", "You slipped below a floor along the way, but finished strong."
     else:
         title, why = "Rookie on the Rise", "A rough first year. Every risk manager has one."
-    return {"grade": grade_for(overall), "overall": overall, "title": title, "why": why,
+    detail = [f"Q{r.quarter} ({' and '.join(n for n, b in (('capital', r.capital_breach), ('liquidity', r.liquidity_breach)) if b)})"
+              for r in hist if r.capital_breach or r.liquidity_breach]
+    return {"grade": grade_for(overall), "overall": overall, "title": title, "why": why, "breach_detail": detail,
             "weights": {"results": 0.6, "understanding": 0.4}, "breaches": breaches,
             "avg_hedge_pct": round(avg_hedge, 1)}
 

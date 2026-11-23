@@ -29,8 +29,8 @@
         "equity_hedge_pct": 0,
         "cash_buffer_pct": 15,
         "fx_hedge_pct": 0,
-        "collateralized": true,
-        "dealers": 3
+        "collateralized": false,
+        "dealers": 1
       },
       "glossary_terms": [
         "margin_call",
@@ -45,7 +45,8 @@
         "title": "2022: the fastest rate hikes in 40 years",
         "text": "Inflation hit its highest level in four decades and the Federal Reserve raised rates at the fastest pace since the early 1980s. The 10-year Treasury yield rose by more than 2 percentage points over the year. In September, UK pension funds using interest rate swaps faced collateral calls so large they had to dump government bonds, and the Bank of England stepped in. Annuity holders cashed out to chase higher rates elsewhere."
       },
-      "predict_answer": "rates_up"
+      "predict_answer": "rates_up",
+      "predict_reason": "Inflation ran hot, so the central bank hiked: rates moved most, and the cash drain came with them."
     },
     {
       "id": "equity_crash",
@@ -73,8 +74,8 @@
         "equity_hedge_pct": 90,
         "cash_buffer_pct": 6,
         "fx_hedge_pct": 0,
-        "collateralized": true,
-        "dealers": 3
+        "collateralized": false,
+        "dealers": 1
       },
       "glossary_terms": [
         "variable_annuity_guarantee",
@@ -89,7 +90,12 @@
         "title": "2000-2002: the dot-com bust",
         "text": "After a boom in internet stocks, the Nasdaq fell nearly 80% from its March 2000 peak and the S&P 500 lost about half its value by late 2002. Insurers that had sold variable annuities with generous guarantees saw what they owed jump just as their own stock holdings fell."
       },
-      "predict_answer": "stocks_down"
+      "predict_answer": "stocks_down",
+      "predict_reason": "Sky-high valuations met reality: stocks fell hardest, and the guarantees we wrote went with them.",
+      "rule": {
+        "text": "Fire sale on insurance: a dealer is offering stock-market puts at half price this quarter.",
+        "put_cost_mult": 0.5
+      }
     },
     {
       "id": "rate_fall",
@@ -117,8 +123,8 @@
         "equity_hedge_pct": 0,
         "cash_buffer_pct": 5,
         "fx_hedge_pct": 0,
-        "collateralized": true,
-        "dealers": 3
+        "collateralized": false,
+        "dealers": 1
       },
       "glossary_terms": [
         "duration",
@@ -133,7 +139,12 @@
         "title": "2019-2020: rates fall toward zero",
         "text": "Slowing growth in 2019 and then the pandemic pushed US interest rates to record lows: the 10-year Treasury yield fell from about 3.2% in late 2018 to near 0.5% in 2020. Long promises made at higher rates became far more expensive to back, and several large life insurers took big charges on their guaranteed products."
       },
-      "predict_answer": "rates_down"
+      "predict_answer": "rates_down",
+      "predict_reason": "Growth slowed and the central bank cut: falling rates hit long promises hardest.",
+      "rule": {
+        "text": "Swap desk outage: the backup dealer charges double for interest rate swaps this quarter.",
+        "swap_cost_mult": 2.0
+      }
     },
     {
       "id": "credit_crunch",
@@ -180,7 +191,8 @@
         "title": "2015-2016: the energy credit rout",
         "text": "Oil fell from over $100 a barrel in mid-2014 to under $30 in early 2016. Dozens of heavily indebted energy companies defaulted, high-yield bond spreads more than doubled, and investors pulled money out of junk bond funds."
       },
-      "predict_answer": "credit"
+      "predict_answer": "credit",
+      "predict_reason": "Oil halved and indebted energy companies stopped paying: defaults were the story."
     },
     {
       "id": "great_depression",
@@ -234,7 +246,8 @@
         "title": "1929-1933: the Great Depression",
         "text": "The stock market crashed in October 1929 and kept falling: by mid-1932 stocks had lost almost 90% from their peak. Thousands of banks failed, corporate defaults soared and US output fell by about a quarter. Investors fled to the safety of government bonds."
       },
-      "predict_answer": "everything"
+      "predict_answer": "everything",
+      "predict_reason": "In a true crisis everything breaks together: stocks, credit, rates, liquidity and a dealer."
     }
   ]
 }

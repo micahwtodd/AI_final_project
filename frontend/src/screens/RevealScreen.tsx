@@ -172,7 +172,7 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
           <div className="score-row">
             <div className="score-big">
               <div className="small muted">Results score</div>
-              <div className="score-num"><CountUp value={r.quarter_score} format={(v) => v.toFixed(0)} ms={1100} /><span>/100</span></div>
+              <div className="score-num"><CountUp value={Math.min(100, r.quarter_score)} format={(v) => v.toFixed(0)} ms={1100} /><span>/100</span>{r.quarter_score > 100 && <span className="boom-tag">🏆 beat the pro</span>}</div>
               <div className="stars" aria-label={`${stars} of 3 stars`}>
                 {[0, 1, 2].map((i) => <span key={i} className={i < stars ? "star on" : "star"} style={{ animationDelay: `${0.9 + i * 0.28}s` }}>★</span>)}
               </div>

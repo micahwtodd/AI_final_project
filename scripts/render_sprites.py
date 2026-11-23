@@ -1091,6 +1091,85 @@ def office(season: str = "day", storm: bool = False) -> Image.Image:
 OFFICES = [("day", False)] + [(s, st) for s in ("spring", "summer", "fall", "winter", "crash") for st in (False, True)]
 
 
+# ---------------------------------------------------------------- the collapse: a pixel mushroom cloud (160x200)
+
+def nuke_cloud() -> Image.Image:
+    W, H = 160, 200
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    px = img.load()
+    fire = [hx(c) for c in ("#fff6c8", "#ffe08a", "#ffb347", "#f08a2c", "#c8502a", "#8a3a26", "#5a2e26", "#3a2422")]
+    smoke = [hx(c) for c in ("#d8c8b8", "#a89080", "#7a6458", "#54443e", "#3a2e2c")]
+    rnd = random.Random(7)
+
+    def inside_ell(x, y, cx, cy, rx, ry):
+        return ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1
+
+    lumps = [(80, 22, 22), (56, 30, 20), (104, 30, 20), (34, 48, 18), (126, 48, 18), (68, 18, 14), (94, 18, 14),
+             (22, 66, 13), (138, 66, 13)]
+    roll = [(20 + i * 15, 88 + (3 if i % 2 else 0), 11) for i in range(9)]
+    surge = [(10 + i * 14, 184 - (4 if i % 2 else 0), 13) for i in range(11)]
+
+    def cap(x, y):
+        return inside_ell(x, y, 80, 58, 66, 36) or any((x - a) ** 2 + (y - b) ** 2 <= r * r for a, b, r in lumps)
+
+    def rolling(x, y):
+        return any((x - a) ** 2 + (y - b) ** 2 <= r * r for a, b, r in roll)
+
+    def stem(x, y):
+        if not 84 <= y <= 186:
+            return False
+        k = (y - 84) / 102
+        half = 13 + 3 * (k ** 2) * 10 + 2 * math.sin(y / 5)
+        return abs(x - 80) <= half
+
+    def ground(x, y):
+        return inside_ell(x, y, 80, 190, 80, 12) or any((x - a) ** 2 + (y - b) ** 2 <= r * r for a, b, r in surge)
+
+    def ring(x, y):
+        d = ((x - 80) / 40) ** 2 + ((y - 132) / 6) ** 2
+        return 0.72 <= d <= 1.0 and not stem(x, y) or (0.72 <= d <= 1.0 and y > 132)
+
+    for y in range(H):
+        for x in range(W):
+            dith = 0.5 if (x + y) % 2 else 0.0
+            col = None
+            if rolling(x, y) and not cap(x, y):
+                d = math.hypot(x - 80, (y - 70) * 1.6) / 80
+                col = fire[min(7, int(4 + d * 4 + dith))]
+            elif cap(x, y):
+                d = math.hypot((x - 80) / 1.2, (y - 66) * 1.25) / 70  # hottest low in the cap's middle
+                d += 0.12 * math.sin(x / 6 + y / 9)  # billows
+                col = fire[max(0, min(7, int(d * 7.5 + dith)))]
+            elif stem(x, y):
+                d = abs(x - 80) / 22 + (y - 84) / 260
+                col = fire[max(1, min(7, int(1.5 + d * 4.5 + dith)))]
+            elif ground(x, y):
+                d = math.hypot((x - 80) / 2.2, y - 180) / 40
+                col = smoke[max(0, min(4, int(1 + d * 3 + dith)))]
+            if ring(x, y) and (col is None or y > 128):
+                col = mix(smoke[0], hx("#ffffff"), 0.3) if col is None else mix(col, smoke[0], 0.65)
+            if col is not None:
+                px[x, y] = (*col, 255)
+    # a soft glow of embers in the cap and sparks around it
+    for _ in range(40):
+        x, y = rnd.randint(30, 130), rnd.randint(25, 80)
+        if px[x, y][3]:
+            px[x, y] = (*hx("#fff6c8"), 255)
+    for _ in range(26):
+        x, y = rnd.randint(4, W - 5), rnd.randint(4, 110)
+        if not px[x, y][3]:
+            px[x, y] = (*hx("#ffb347"), 255)
+    # dark outline around the whole silhouette
+    alpha = {(x, y) for y in range(H) for x in range(W) if px[x, y][3]}
+    edge = hx("#24160f")
+    for (x, y) in list(alpha):
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            q = (x + dx, y + dy)
+            if 0 <= q[0] < W and 0 <= q[1] < H and q not in alpha:
+                px[q] = (*edge, 255)
+    return img
+
+
 def office_name(season: str, storm: bool) -> str:
     return f"office_{season}" + ("_storm" if storm else "")
 
@@ -1109,6 +1188,7 @@ def build() -> None:
     offices = {office_name(s, st): office(s, st) for s, st in OFFICES}
     for name, im in offices.items():
         im.save(OUT / f"{name}.png", optimize=True)
+    nuke_cloud().save(OUT / "nuke_cloud.png", optimize=True)
     old = OUT / "office_storm.png"
     if old.exists():
         old.unlink()  # replaced by the seasonal storm scenes

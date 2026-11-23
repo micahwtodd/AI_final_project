@@ -15,7 +15,7 @@ from functools import lru_cache
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, UsageLimits
 
-from backend import agents, audit
+from backend import agents, audit, engine
 from backend.models import QuarterRecord
 
 CHECKS = ("main_driver", "mechanism", "second_factor", "improvement")
@@ -98,7 +98,12 @@ async def review_with_ai(session, rec: QuarterRecord, key: dict, text: str, mode
     if not agents.ai_available() or session.spend_usd >= session.budget_cap_usd:
         return None
     run_id = secrets.token_hex(4)
+    done = [q for q in sorted(session.explain_attempts) if q < rec.quarter and session.explain_attempts[q]]
+    named = sum(1 for q in done if session.explain_attempts[q][0]["checks"].get("main_driver"))
     prompt = [f"MODE: {mode}" + (f", attempt {attempt} of 2" if mode == "mark" else ""),
+              f"CONTEXT: quarter {rec.quarter} of {engine.n_quarters()}; the learner named the main driver first time in "
+              f"{named} of {len(done)} earlier quarters. React like a person in one short opening clause that fits this "
+              "(pleased, wry, or concerned), vary your wording from a template, then mark factually.",
               "ANSWER KEY (computed by the engine; the only source of truth):", key_text(key, rec)]
     if prior:
         p = prior[-1]

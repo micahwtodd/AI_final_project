@@ -54,6 +54,7 @@ class Session(BaseModel):
     proposed_ticket: dict | None = None
     overrides: dict[str, float] = {}  # learner edits to the game inputs (Advanced options)
     quiz_checked: dict[str, dict[str, str]] = {}  # 'pre'/'post' -> {question id: the choice that was checked}
+    quarter_start: GameState | None = None  # the book at the start of the last quarter played (for the what-if)
     hints: dict[int, int] = {}  # hints taken per quarter (the second one names the main driver: that check counts half)
     predictions: dict[int, dict] = {}  # per quarter: {pick, answer, correct}; for fun, never scored
 
@@ -118,6 +119,7 @@ def _public_card(quarter: int) -> dict | None:
         return None
     c = engine.card_for(quarter)
     return {"quarter": c.quarter, "title": c.title, "era": c.era, "signal_text": c.signal_text, "boss": c.boss,
+            "rule": c.rule.get("text") if c.rule else None,
             "offers_prt_deal": c.offers_prt_deal, "glossary_terms": c.glossary_terms}
 
 
@@ -249,6 +251,8 @@ def view(s: Session) -> dict:
         "seed": s.seed, "agent_mode": s.agent_mode, "demo": s.demo,
         "quarter": min(s.state.quarter, engine.n_quarters()) if s.phase != "explain" else s.state.quarter - 1,
         "n_quarters": engine.n_quarters(), "collapsed": engine.collapsed(s.state),
+        "unlocked": unlocked(min(s.state.quarter, engine.n_quarters())),
+        "new_unlocks": [k for k, q in UNLOCKS.items() if q == s.state.quarter],
         "phase": s.phase,
         "card": _public_card(s.state.quarter) if s.phase == "position" else None,
         "dashboard": engine.dashboard(s.state).model_dump(),
@@ -315,7 +319,7 @@ def _require(s: Session, phase: Phase) -> None:
 
 def preview(s: Session, action: Action) -> dict:
     _require(s, "position")
-    return engine.preview_action(s.state, action)
+    return engine.preview_action(s.state, _locked_to_current(s, action))
 
 
 def commit(s: Session, action: Action) -> dict:
@@ -324,10 +328,26 @@ def commit(s: Session, action: Action) -> dict:
     card = engine.card_for(s.state.quarter)
     if not card.offers_prt_deal:
         action = action.model_copy(update={"accept_prt": None})
+    action = _locked_to_current(s, action)
     s.pending = action
     s.timings[f"q{s.state.quarter}_signed"] = time.time()
     _save(s)
     return {"view": view(s), "after": engine.dashboard(engine.apply_action(s.state, action)).model_dump()}
+
+
+UNLOCKS = {"rate_hedge_pct": 2, "credit_shift_pct": 3, "collateralized": 4, "dealers": 4}
+
+
+def unlocked(quarter: int) -> list[str]:
+    """Levers available this quarter: cash and puts from Q1, swaps from Q2, bonds from Q3, counterparty terms from Q4."""
+    base = ["cash_buffer_pct", "equity_hedge_pct"]
+    return base + [k for k, q in UNLOCKS.items() if quarter >= q]
+
+
+def _locked_to_current(s: Session, action: Action) -> Action:
+    """A lever that is still locked stays where it is, whatever the ticket says."""
+    q = s.state.quarter
+    return action.model_copy(update={k: getattr(s.state.action, k) for k, uq in UNLOCKS.items() if q < uq})
 
 
 PREDICTIONS = {"rates_up": "Rates jump", "rates_down": "Rates fall", "stocks_down": "Stocks crash",
@@ -340,6 +360,7 @@ def advance(s: Session, prediction: str | None = None) -> dict:
     q = s.state.quarter
     card = engine.card_for(q)
     before_dash = engine.dashboard(engine.apply_action(s.state, s.pending) if s.pending else s.state)
+    s.quarter_start = s.state
     new_state, rec = engine.play_quarter(s.state, s.pending)
     if prediction in PREDICTIONS and card.predict_answer:
         s.predictions[q] = {"pick": prediction, "answer": card.predict_answer, "correct": prediction == card.predict_answer}
@@ -357,7 +378,8 @@ def advance(s: Session, prediction: str | None = None) -> dict:
         "sample_answer": card.sample_answer if s.demo else None,
         "real_world": card.real_world, "boss": card.boss,
         "prediction": ({**s.predictions[q], "pick_label": PREDICTIONS[s.predictions[q]["pick"]],
-                        "answer_label": PREDICTIONS[s.predictions[q]["answer"]]} if q in s.predictions else None),
+                        "answer_label": PREDICTIONS[s.predictions[q]["answer"]], "reason": card.predict_reason}
+                       if q in s.predictions else None),
         "collapsed": rec.surplus_after <= 0, "nothing_collapsed": rec.nothing_surplus_after <= 0,
         "question": f"Surplus {'fell' if rec.surplus_after < rec.surplus_before else 'rose'} "
                     f"${abs(change):.2f} billion. Name the main two drivers, why they moved surplus, "
@@ -366,6 +388,25 @@ def advance(s: Session, prediction: str | None = None) -> dict:
 
 
 MIN_WORDS = 1  # any answer is accepted; the examiner marks what is there
+
+
+def whatif(s: Session, action: Action) -> dict:
+    """Rewind the quarter just revealed and replay it with a different ticket: same market, same seed.
+    The game itself is not changed."""
+    if s.phase == "explain" or s.last_record is None or s.quarter_start is None:
+        raise GameError("The what-if opens after Vera has your explanation.")
+    start, rec = s.quarter_start, s.last_record
+    card = engine.card_for(rec.quarter)
+    locked = {k: getattr(start.action, k) for k, uq in UNLOCKS.items() if rec.quarter < uq}
+    alt = action.model_copy(update={**locked, "accept_prt": None})
+    _, shock = engine.realize_shock(card, start.seed, start.boss_severity)
+    after, _ = engine.apply_shock(engine.apply_action(start, alt, False), shock)
+    you = engine.surplus(after) - rec.surplus_before
+    return {"quarter": rec.quarter, "change": round(you, 3), "surplus_after": round(engine.surplus(after), 3),
+            "actual_change": round(rec.surplus_after - rec.surplus_before, 3),
+            "nothing_change": round(rec.nothing_surplus_after - rec.surplus_before, 3),
+            "pro_change": round(rec.benchmark_surplus_after - rec.surplus_before, 3),
+            "collapsed": engine.surplus(after) <= 0, "start_action": start.action.model_dump(), "locked": sorted(locked)}
 
 
 def hint(s: Session) -> dict:
@@ -467,7 +508,8 @@ def reveal_payload(s: Session, rec: QuarterRecord) -> dict:
         "comparison": {"you": round(you, 3), "nothing": round(nothing, 3), "benchmark": round(bench, 3)},
         "collapsed": {"you": rec.surplus_after <= 0, "nothing": rec.nothing_surplus_after <= 0,
                       "benchmark": (rec.benchmark_surplus_after or 1) <= 0},
-        "surplus_before": rec.surplus_before, "lever_gains": rec.lever_gains,
+        "surplus_before": rec.surplus_before, "lever_gains": rec.lever_gains, "lever_effects": rec.lever_effects,
+        "next_is_boss": rec.quarter < engine.n_quarters() and engine.card_for(rec.quarter + 1).boss,
         "title": card.title, "boss": card.boss, "n_quarters": engine.n_quarters(),
         "quarter_score": round(100 * engine.quarter_score(rec), 1),
         "main_driver": key["main_driver"], "second_factor": key["second_factor"],

@@ -57,3 +57,44 @@ def test_debrief_has_a_try_next_line_and_prediction_tally():
     d = client.get(f"/api/game/{gid}/debrief").json()
     assert d["predictions"]["made"] == engine.n_quarters() and d["predictions"]["correct"] == 1
     assert d["try_next"]
+
+
+# ---------------------------------------------------------------- round 2
+
+def test_levers_unlock_one_quarter_at_a_time_and_locked_levers_stay_put():
+    gid = _new()
+    v = client.get(f"/api/game/{gid}").json()
+    assert set(v["unlocked"]) == {"cash_buffer_pct", "equity_hedge_pct"}
+    c = client.post(f"/api/game/{gid}/commit", json={"actions": {"rate_hedge_pct": 80, "equity_hedge_pct": 30,
+                                                                  "cash_buffer_pct": 9, "collateralized": True, "dealers": 3}}).json()
+    p = c["view"]["pending"]
+    assert p["rate_hedge_pct"] == 0 and p["equity_hedge_pct"] == 30 and p["collateralized"] is False and p["dealers"] == 1
+    client.post(f"/api/game/{gid}/advance")
+    client.post(f"/api/game/{gid}/explain", json={"text": "", "not_sure": True})
+    v2 = client.get(f"/api/game/{gid}").json()
+    assert "rate_hedge_pct" in v2["unlocked"] and v2["new_unlocks"] == ["rate_hedge_pct"]
+
+
+def test_rate_protection_holds_the_chosen_percentage_across_quarters():
+    s = engine.build_state(load_profile("EQH"), 409)
+    s, _ = engine.play_quarter(s, Action(rate_hedge_pct=-30, cash_buffer_pct=8))
+    assert abs(s.action.rate_hedge_pct + 30) < 1e-9
+    again = engine.apply_action(s, s.action)
+    assert engine.dashboard(again).model_dump() == engine.dashboard(s).model_dump()
+
+
+def test_what_if_rewinds_the_quarter_without_changing_the_game():
+    gid = _new()
+    client.post(f"/api/game/{gid}/advance")
+    assert client.post(f"/api/game/{gid}/whatif", json={"action": {"cash_buffer_pct": 15}}).status_code == 409
+    r = client.post(f"/api/game/{gid}/explain", json={"text": "", "not_sure": True}).json()
+    w = client.post(f"/api/game/{gid}/whatif", json={"action": {"cash_buffer_pct": 15, "equity_hedge_pct": 0}}).json()
+    assert w["quarter"] == 1 and w["change"] > w["nothing_change"]  # more cash helps in the rates-up quarter
+    assert client.get(f"/api/game/{gid}").json()["quarter"] == 2  # the game moved on, untouched
+
+
+def test_lever_effects_and_rules():
+    s = engine.build_state(load_profile("JXN"), 409)
+    _, r = engine.play_quarter(s, Action(cash_buffer_pct=12, equity_hedge_pct=40, collateralized=False, dealers=1))
+    assert set(r.lever_effects) == {"cash_buffer_pct", "equity_hedge_pct"}
+    assert engine.card_for(2).rule.get("put_cost_mult") == 0.5 and engine.card_for(3).rule.get("swap_cost_mult") == 2.0
