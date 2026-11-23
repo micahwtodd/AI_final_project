@@ -605,6 +605,12 @@ def swap(mood: str) -> Image.Image:
     for a in range(200, 341, 14):
         beard |= ellipse(CX + 14 * math.cos(math.radians(a + 180)), 46 + 11 * math.sin(math.radians(a + 180)) * -1, 2.4, 2.4)
     s.region("beard", beard, hair)
+    # the tie-dye is painted as loose pixels, which sit on top of every region: clear it wherever the
+    # beard or the hair now covers the shirt, so the shirt stays behind them
+    for p in torso:
+        r = s.owner.get(p, "")
+        if r == "beard" or r.startswith("hair"):
+            s.detail.pop(p, None)
     shade_hair(s, ("beard",), deep_bottom=0.85)
     for (x, y) in s.pts_of("beard"):
         w = (x + 2 * math.sin(y / 2.4)) % 5
