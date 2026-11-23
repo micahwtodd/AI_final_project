@@ -177,6 +177,7 @@ export type Shock = {
   boss?: boolean;
   collapsed?: boolean;
   nothing_collapsed?: boolean;
+  prediction?: { pick: string; answer: string; correct: boolean; pick_label: string; answer_label: string } | null;
 };
 
 export type Reveal = {
@@ -230,6 +231,8 @@ export type Debrief = {
   benchmark_end_surplus: number;
   collapsed?: boolean;
   n_quarters?: number;
+  try_next?: string | null;
+  predictions?: { made: number; correct: number };
   text: string[];
   lessons: { quarter: number; title: string; lesson: string }[];
   minutes_played: number;
@@ -270,7 +273,8 @@ export const api = {
   game: (id: string) => call<GameView>(`/game/${id}`),
   preview: (id: string, action: Action) => call<Preview>(`/game/${id}/preview`, { action }),
   commit: (id: string, actions: Action) => call<{ view: GameView; after: Dashboard }>(`/game/${id}/commit`, { actions }),
-  advance: (id: string) => call<Shock>(`/game/${id}/advance`, {}),
+  advance: (id: string, prediction?: string | null) => call<Shock>(`/game/${id}/advance`, { prediction: prediction ?? null }),
+  hint: (id: string) => call<{ level: number; max: number; hint: string }>(`/game/${id}/hint`, {}),
   explain: (id: string, text: string, not_sure: boolean) => call<ExplainResult>(`/game/${id}/explain`, { text, not_sure }),
   debrief: (id: string) => call<Debrief>(`/game/${id}/debrief`),
   usage: (id: string) => call<Usage>(`/usage/${id}`),

@@ -47,6 +47,10 @@ class CommitBody(BaseModel):
     actions: Action
 
 
+class AdvanceBody(BaseModel):
+    prediction: str | None = None
+
+
 class ExplainBody(BaseModel):
     text: str = ""
     not_sure: bool = False
@@ -131,8 +135,13 @@ def commit(session_id: str, body: CommitBody) -> dict:
 
 
 @app.post("/api/game/{session_id}/advance")
-def advance(session_id: str) -> dict:
-    return _run(game.advance, _session(session_id))
+def advance(session_id: str, body: AdvanceBody | None = None) -> dict:
+    return _run(game.advance, _session(session_id), body.prediction if body else None)
+
+
+@app.post("/api/game/{session_id}/hint")
+def hint(session_id: str) -> dict:
+    return _run(game.hint, _session(session_id))
 
 
 @app.post("/api/game/{session_id}/explain")

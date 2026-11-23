@@ -16,6 +16,7 @@ type Turn = {
   runId?: string;
   flagged?: boolean;
   quarter: number;  // each quarter has its own chat tab
+  fresh?: boolean;  // arrived in this sitting: type it out
 };
 
 const SAMPLES = [
@@ -39,6 +40,19 @@ function fromHistory(chat: ChatMsg[]): Turn[] {
     role: m.role, text: m.text, agent: m.agent, agentName: m.agent_name, trace: [], subs: m.subs ?? [],
     stopped: m.stopped ?? null, ticket: m.proposed_ticket ?? null, runId: m.run_id, quarter: m.quarter ?? 1,
   }));
+}
+
+/** Text that types itself out (for replies that just arrived). */
+function TypeText({ text, animate }: { text: string; animate?: boolean }) {
+  const [n, setN] = useState(animate ? 0 : text.length);
+  useEffect(() => {
+    if (!animate || document.hidden) { setN(text.length); return; }
+    let i = 0;
+    const step = Math.max(2, Math.round(text.length / 90));  // about 1.5 seconds whatever the length
+    const t = window.setInterval(() => { i += step; setN(Math.min(text.length, i)); if (i >= text.length) clearInterval(t); }, 16);
+    return () => clearInterval(t);
+  }, [text, animate]);
+  return <>{text.slice(0, n)}{n < text.length && <span className="caret">▍</span>}</>;
 }
 
 function short(v: unknown): string {
@@ -164,7 +178,7 @@ export function ChatPanel(props: {
         if (e.type === "usage") props.onUsage(e.detail);
         else if (e.type === "reply") {
           play("click");
-          update((t) => ({ ...t, text: e.detail.text, pending: false, stopped: e.detail.stopped, ticket: e.detail.proposed_ticket,
+          update((t) => ({ ...t, fresh: true, text: e.detail.text, pending: false, stopped: e.detail.stopped, ticket: e.detail.proposed_ticket,
             agent: e.agent, agentName: e.agent_name ?? t.agentName, subs: e.detail.subs ?? t.subs, runId: e.run_id }));
         }
         else if (e.type === "delegation" && e.detail.from)
@@ -221,14 +235,24 @@ export function ChatPanel(props: {
         {tab !== props.quarter && <div className="muted small past-note">Your Q{tab} conversation (saved). Questions you ask now go to the Q{props.quarter} tab.</div>}
         {!turns.some((t) => t.quarter === tab) && <div className="muted small">Type your own question about this company's risks. Every number in a reply comes from the engine's tools; open Chat detail below to see who did what.</div>}
         {turns.map((t, i) => t.quarter !== tab ? null : (
-          <div key={i} className={`msg ${t.role}`} style={t.role === "agent" ? { borderLeftColor: CAST[t.agent ?? "system"]?.color } : undefined}>
+          <div key={i} className="turn">
+          {t.role === "agent" && t.subs.length > 0 && t.agent !== t.subs[0]?.agent && t.subs.map((sa, k) => (
+            <div key={k} className="msg agent specialist" style={{ borderLeftColor: CAST[sa.agent]?.color }}>
+              <div className="msg-name" style={{ color: CAST[sa.agent]?.color }}>
+                {spriteFor(sa.agent) && <PixelSprite name={spriteFor(sa.agent)!} size={28} className="msg-face arrive" />}
+                {sa.agent_name}
+              </div>
+              <div className="msg-text"><TypeText text={sa.text} animate={t.pending || t.fresh} /></div>
+            </div>
+          ))}
+          <div className={`msg ${t.role}`} style={t.role === "agent" ? { borderLeftColor: CAST[t.agent ?? "system"]?.color } : undefined}>
             {t.role === "agent" && (
               <div className="msg-name" style={{ color: CAST[t.agent ?? "system"]?.color }}>
                 {spriteFor(t.agent) && <PixelSprite name={spriteFor(t.agent, t.stopped ? "concerned" : t.ticket ? "pleased" : "neutral")!} size={28} className={`msg-face ${t.pending ? "" : "arrive"}`} />}
                 {t.agentName ?? "Colleague"}
               </div>
             )}
-            <div className="msg-text">{t.pending && !t.text ? <TypingLine t={t} /> : t.text}</div>
+            <div className="msg-text">{t.pending && !t.text ? <TypingLine t={t} /> : t.role === "agent" ? <TypeText text={t.text} animate={t.fresh} /> : t.text}</div>
             {t.role === "agent" && !t.pending && <Reactions t={t} />}
             {t.ticket && (
               <div className="proposed">
@@ -236,6 +260,7 @@ export function ChatPanel(props: {
                 <button className="chip" onClick={() => props.onLoadTicket(t.ticket!.action)}>Load into my ticket</button>
               </div>
             )}
+          </div>
           </div>
         ))}
         <div ref={endRef} />
@@ -252,11 +277,11 @@ export function ChatPanel(props: {
       </form>
       {turns.some((t) => t.quarter === tab && t.role === "agent" && (t.trace.length > 0 || t.subs.length > 0)) && (
         <details className="chat-detail">
-          <summary>Show chat detail <span className="muted small">· specialist answers, tool calls and costs</span></summary>
+          <summary>Show chat detail <span className="muted small">· who was asked what, tool calls and costs</span></summary>
           {turns.map((t, i) => t.quarter !== tab || t.role !== "agent" || (t.trace.length === 0 && t.subs.length === 0) ? null : (
             <div key={i} className="detail-turn">
               <div className="detail-q">Q: {turns[i - 1]?.role === "user" ? turns[i - 1].text : "(question)"}</div>
-              {t.subs.length > 0 && (
+              {false && t.subs.length > 0 && (
                 <div className="subs">
                   {t.subs.map((s, k) => (
                     <div key={k} className="sub-msg" style={{ borderLeftColor: CAST[s.agent]?.color }}>

@@ -7,7 +7,7 @@ import { PixelSprite } from "./PixelSprite";
 export function BadgeUnlocks(props: { badges: Badge[] }) {
   useEffect(() => {
     if (props.badges.length) {
-      const t = setTimeout(() => play("badge"), 900);
+      const t = setTimeout(() => play("badge"), 1700);
       return () => clearTimeout(t);
     }
   }, [props.badges.length]);
@@ -15,7 +15,7 @@ export function BadgeUnlocks(props: { badges: Badge[] }) {
   return (
     <div className="unlocks" role="status">
       {props.badges.map((b, i) => (
-        <div className="unlock" key={b.id} style={{ animationDelay: `${0.9 + i * 0.25}s` }}>
+        <div className="unlock" key={b.id} style={{ animationDelay: `${1.7 + i * 0.25}s` }}>
           <div className="unlock-icon" aria-hidden>{b.icon}</div>
           <div>
             <div className="unlock-kicker">Badge unlocked!</div>
@@ -54,7 +54,7 @@ export function ReportCardPanel(props: { rc: ReportCard; results: number; unders
     <div className="panel report-card">
       <div className={`grade-stamp g-${rc.grade[0].toLowerCase()}`}>{rc.grade}</div>
       <div className="rc-body">
-        <div className="intro-kicker">Year-end report card</div>
+        <div className="intro-kicker">Final report card</div>
         <h1 className="rc-title">“{rc.title}”</h1>
         <p>{rc.why}</p>
         <div className="small muted">

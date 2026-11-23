@@ -13,7 +13,9 @@ import { BalanceSheetPanel } from "../components/BalanceSheet";
 import { Term } from "../components/Term";
 import { GuideBar } from "../components/GuideBar";
 import { DeskCat } from "../components/PixelSprite";
-import { QuarterSplash } from "../components/Fx";
+import { CountUp, QuarterSplash, Typewriter } from "../components/Fx";
+import { SoundPrompt } from "../components/SoundPrompt";
+import { PredictModal, Surprise } from "../components/DeskExtras";
 import { play } from "../sound";
 import { SEASONS, SEASON_ICON, SEASON_NAME } from "../labels";
 
@@ -78,16 +80,31 @@ export function Desk(props: {
     && g.pending.collateralized === draft.collateralized && g.pending.dealers === draft.dealers
     && (g.pending.accept_prt ?? null) === (draft.accept_prt ?? null);
   const needsPrt = offersPrt && draft.accept_prt === null;
+  const [predicting, setPredicting] = useState(false);
+  const endQuarter = async (prediction: string | null) => {
+    setPredicting(false);
+    const s = await props.run(() => api.advance(g.id, prediction));
+    if (s) props.onShock(s);
+  };
+  const worst = (st: Record<string, string>) =>
+    (st.capital === "red" || st.liquidity === "red" ? "red" : st.capital === "amber" || st.liquidity === "amber" ? "amber" : "green") as "red" | "amber" | "green";
+  const holdings = [
+    `swaps ${fmtNum(pos.rate_hedge_pct)}%`, `bonds moved ${fmtNum(pos.credit_shift_pct)}%`, `puts ${fmtNum(pos.equity_hedge_pct)}%`,
+    `cash ${fmtNum(pos.cash_buffer_pct)}%`, `collateral ${pos.collateralized ? "on" : "off"}`, `${pos.dealers} dealer${pos.dealers === 3 ? "s" : ""}`,
+  ];
 
   return (
     <section className="desk">
       {g.card && <QuarterSplash id={g.id} quarter={g.card.quarter} of={g.n_quarters} boss={!!g.card.boss} title={g.card.title} era={g.card.era} />}
       {showGuide && <GuideBar step={guide} onNext={() => setGuide((x) => x + 1)} onHide={hideGuide} />}
+      {g.card && <Surprise id={g.id} quarter={g.card.quarter} />}
+      <SoundPrompt />
+      {predicting && <PredictModal quarter={g.quarter} onPick={(p) => endQuarter(p)} onCancel={() => setPredicting(false)} />}
       <div className="desk-dash">
         <div className="panel">
           <div className="dash-head">
             <h3>Risk dashboard</h3>
-            <DeskCat status={(preview?.after ?? g.dashboard).status.capital} />
+            <DeskCat status={worst((preview?.after ?? g.dashboard).status)} size={56} />
           </div>
           {preview && !signed && <div className="small muted dash-note">→ shows the effect of your draft ticket</div>}
           <Meters dashboard={g.dashboard} after={preview?.after} />
@@ -99,7 +116,7 @@ export function Desk(props: {
           <div className={`panel wire${focus(0)}${g.card.boss ? " boss-wire" : ""}`}>
             <div className="wire-tag">NEWS WIRE · Q{g.card.quarter} · {SEASON_ICON[SEASONS[g.card.quarter]]} {SEASON_NAME[SEASONS[g.card.quarter]].toUpperCase()}{g.card.boss && <span className="boss-tag">⚠ BOSS ROUND · FINAL QUARTER</span>}</div>
             <h2>{g.card.title}</h2>
-            <p className="wire-text">{g.card.signal_text}</p>
+            <p className="wire-text"><span className="new-tag">NEW</span> <Typewriter text={g.card.signal_text} /></p>
           </div>
         )}
 
@@ -112,23 +129,36 @@ export function Desk(props: {
       <div className="desk-right">
         <div className={`panel ticket${focus(2)}${focus(3)}`}>
           <h3><Term k="ticket_help" text={TICKET_TIP}>Trade ticket · Q{g.quarter}</Term></h3>
+          {g.quarter > 1 && (
+            <div className="holdings"><b>You hold</b> {holdings.join(" · ")}. <span className="muted">The sliders below are new trades on top: leave them at 0 to keep these.</span></div>
+          )}
           {LEVER_KEYS.map((k) => {
             const L = LEVERS[k];
-            // slider range: steps of L.step around zero, so the position stays inside the lever's limits
-            const lo = -L.step * Math.floor((pos[k] - L.min) / L.step + 1e-9);
-            const hi = L.step * Math.floor((L.max - pos[k]) / L.step + 1e-9);
+            // the trade can take the position exactly to the lever's limits; in between it snaps to the step
+            const lo = Math.round((L.min - pos[k]) * 100) / 100;
+            const hi = Math.round((L.max - pos[k]) * 100) / 100;
+            const snap = (v: number) => (v >= hi - L.step / 2 ? hi : v <= lo + L.step / 2 ? lo : Math.round(v / L.step) * L.step);
             const d = delta[k];
+            const zeroAt = hi > lo ? (100 * -lo) / (hi - lo) : 50;
             return (
               <div className="lever" key={k}>
                 <div className="lever-head">
                   <label htmlFor={k}><Term k={L.term} text={L.tip}>{L.label}</Term></label>
                   <span className="lever-val">{d > 0 ? "+" : d < 0 ? "−" : ""}{fmtNum(Math.abs(d))}{L.unit}</span>
                 </div>
-                <input id={k} type="range" min={lo} max={hi} step={L.step} value={d}
-                  onChange={(e) => setDelta((x) => ({ ...x, [k]: Number(e.target.value) }))} />
-                {(pos[k] !== 0 || d !== 0) && (
-                  <div className="lever-pos">holding {fmtNum(pos[k])}{L.unit}{d !== 0 && <> → <b>{fmtNum(draft[k])}{L.unit}</b></>}</div>
+                <div className="slider-wrap">
+                  <span className="now-tick" style={{ left: `${zeroAt}%` }} title="What you hold now" />
+                  <input id={k} type="range" min={lo} max={hi} step="any" value={d}
+                    onChange={(e) => {
+                      const v = snap(Number(e.target.value));
+                      if (Math.floor(v / (L.step * 2)) !== Math.floor(d / (L.step * 2))) play("click");
+                      setDelta((x) => ({ ...x, [k]: v }));
+                    }} />
+                </div>
+                {k === "rate_hedge_pct" && (
+                  <div className="rate-ends"><span>◀ pay fixed: gains if rates rise</span><span>receive fixed: gains if rates fall ▶</span></div>
                 )}
+                <div className="lever-pos">holding {fmtNum(pos[k])}{L.unit}{d !== 0 && <> → <b>{fmtNum(draft[k])}{L.unit}</b></>}</div>
               </div>
             );
           })}
@@ -159,9 +189,9 @@ export function Desk(props: {
           )}
 
           {preview && (
-            <div className="cost-row small">
-              Hedge cost per quarter <b>${preview.hedge_cost_per_quarter_usd_bn.toFixed(3)}bn</b> · Investment income
-              less costs <b>${preview.carry_per_quarter_usd_bn.toFixed(3)}bn</b>
+            <div className="cost-meter">
+              <div><span className="coin" aria-hidden>🪙</span> Hedges cost <b><CountUp value={preview.hedge_cost_per_quarter_usd_bn * 1000} format={(v) => `$${Math.round(v)}mn`} ms={400} /></b> a quarter</div>
+              <div className="muted">Investment income less costs <b>${(preview.carry_per_quarter_usd_bn * 1000).toFixed(0)}mn</b></div>
             </div>
           )}
 
@@ -178,10 +208,7 @@ export function Desk(props: {
             </div>
             <div className="btn-col">
             <button className="gold-btn" disabled={props.busy || (!signed && !!g.pending) || needsPrt}
-              onClick={async () => {
-                const s = await props.run(() => api.advance(g.id));
-                if (s) props.onShock(s);
-              }}>
+              onClick={() => setPredicting(true)}>
               End Q{g.quarter} →
             </button>
             <span className="btn-note">The market moves. No going back.</span>

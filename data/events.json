@@ -44,7 +44,8 @@
       "real_world": {
         "title": "2022: the fastest rate hikes in 40 years",
         "text": "Inflation hit its highest level in four decades and the Federal Reserve raised rates at the fastest pace since the early 1980s. The 10-year Treasury yield rose by more than 2 percentage points over the year. In September, UK pension funds using interest rate swaps faced collateral calls so large they had to dump government bonds, and the Bank of England stepped in. Annuity holders cashed out to chase higher rates elsewhere."
-      }
+      },
+      "predict_answer": "rates_up"
     },
     {
       "id": "equity_crash",
@@ -53,7 +54,7 @@
       "era": "Echoes 2000-2002",
       "signal_text": "WIRE: Tech stocks trade at record multiples of earnings. A few strategists warn the rally is running on hype; most say this time is different.",
       "headline": "STOCKS PLUNGE AS THE TECH BUBBLE BURSTS",
-      "narrative": "Stocks fell by about a fifth in a few weeks as investors gave up on sky-high valuations. Customers' variable annuity accounts shrank, so the guarantees we wrote on them are now worth much more, and our own stock and private equity holdings fell too. Bonds barely moved.",
+      "narrative": "Stocks plunged in a few weeks as investors gave up on sky-high valuations. Customers' variable annuity accounts shrank, so the guarantees we wrote on them are now worth much more, and our own stock and private equity holdings fell too. Bonds barely moved.",
       "primary_risk": "equity",
       "secondary_risks": [
         "interest_rate"
@@ -87,7 +88,8 @@
       "real_world": {
         "title": "2000-2002: the dot-com bust",
         "text": "After a boom in internet stocks, the Nasdaq fell nearly 80% from its March 2000 peak and the S&P 500 lost about half its value by late 2002. Insurers that had sold variable annuities with generous guarantees saw what they owed jump just as their own stock holdings fell."
-      }
+      },
+      "predict_answer": "stocks_down"
     },
     {
       "id": "rate_fall",
@@ -130,7 +132,8 @@
       "real_world": {
         "title": "2019-2020: rates fall toward zero",
         "text": "Slowing growth in 2019 and then the pandemic pushed US interest rates to record lows: the 10-year Treasury yield fell from about 3.2% in late 2018 to near 0.5% in 2020. Long promises made at higher rates became far more expensive to back, and several large life insurers took big charges on their guaranteed products."
-      }
+      },
+      "predict_answer": "rates_down"
     },
     {
       "id": "credit_crunch",
@@ -176,7 +179,8 @@
       "real_world": {
         "title": "2015-2016: the energy credit rout",
         "text": "Oil fell from over $100 a barrel in mid-2014 to under $30 in early 2016. Dozens of heavily indebted energy companies defaulted, high-yield bond spreads more than doubled, and investors pulled money out of junk bond funds."
-      }
+      },
+      "predict_answer": "credit"
     },
     {
       "id": "great_depression",
@@ -229,7 +233,8 @@
       "real_world": {
         "title": "1929-1933: the Great Depression",
         "text": "The stock market crashed in October 1929 and kept falling: by mid-1932 stocks had lost almost 90% from their peak. Thousands of banks failed, corporate defaults soared and US output fell by about a quarter. Investors fled to the safety of government bonds."
-      }
+      },
+      "predict_answer": "everything"
     }
   ]
 }

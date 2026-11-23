@@ -38,8 +38,12 @@ const fmtGain = (g: number | undefined) => (g === undefined || Math.abs(g) < 0.0
 /** One row per lever: your setting, the pro's, and what matching the pro on that lever alone would have added. */
 function ProTable(props: { you: Partial<Action>; pro: Partial<Action>; gains: Record<string, number> }) {
   const { you, pro, gains } = props;
-  const rows: { key: string; label: string; y: string; p: string }[] = (Object.keys(LEVERS) as LeverKey[]).map((k) => ({
-    key: k, label: LEVERS[k].label, y: `${you[k] ?? 0}${LEVERS[k].unit}`, p: `${pro[k] ?? 0}${LEVERS[k].unit}` }));
+  const num = (v: number | undefined) => { const x = v ?? 0; return Number.isInteger(x) ? String(x) : x.toFixed(1); };
+  const rows: { key: string; label: string; y: string; p: string; track?: { you: number; pro: number } }[] = (Object.keys(LEVERS) as LeverKey[]).map((k) => {
+    const L = LEVERS[k];
+    const at = (v: number | undefined) => (100 * ((v ?? 0) - L.min)) / (L.max - L.min);
+    return { key: k, label: L.label, y: `${num(you[k])}${L.unit}`, p: `${num(pro[k])}${L.unit}`, track: { you: at(you[k]), pro: at(pro[k]) } };
+  });
   rows.push({ key: "collateralized", label: "Daily collateral", y: you.collateralized ? "On" : "Off", p: pro.collateralized ? "On" : "Off" });
   rows.push({ key: "dealers", label: "Dealers", y: String(you.dealers ?? 1), p: String(pro.dealers ?? 1) });
   const best = Object.entries(gains).sort((a, b) => b[1] - a[1])[0]?.[0];
@@ -51,7 +55,16 @@ function ProTable(props: { you: Partial<Action>; pro: Partial<Action>; gains: Re
           const g = gains[r.key];
           return (
             <tr key={r.key} className={`${r.y !== r.p ? "differs" : ""} ${r.key === best && g > 0.005 ? "best" : ""}`}>
-              <td>{r.label}</td><td>{r.y}</td><td>{r.p}</td>
+              <td>
+                {r.label}
+                {r.track && (
+                  <div className="ghost-track" aria-hidden>
+                    <span className="gt-pro" style={{ left: `${r.track.pro}%` }} />
+                    <span className="gt-you" style={{ left: `${r.track.you}%` }} />
+                    {r.y !== r.p && <span className="gt-ghost" style={{ ["--from" as string]: `${r.track.you}%`, ["--to" as string]: `${r.track.pro}%` }} />}
+                  </div>
+                )}
+              </td><td>{r.y}</td><td>{r.p}</td>
               <td className={g > 0.005 ? "gain pos" : g < -0.005 ? "gain neg" : "gain"}>{fmtGain(g)}{r.key === best && g > 0.005 && " ⭐"}</td>
             </tr>
           );
@@ -181,7 +194,7 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
       {beat >= 2 && (
         <div className="panel beat beat-in" ref={(el) => { refs.current[2] = el; }}>
           <h2>How a pro would have traded</h2>
-          <p className="small muted">Highlighted rows are where you and the pro differ. The last column is what matching the pro on that lever alone would have added this quarter; ⭐ marks the one that mattered most.</p>
+          <p className="small muted"><span className="key-you">●</span> you · <span className="key-pro">●</span> a pro. Highlighted rows are where you and the pro differ. The last column is what matching the pro on that lever alone would have added this quarter; ⭐ marks the one that mattered most.</p>
           <ProTable you={r.your_action} pro={r.benchmark_action} gains={r.lever_gains ?? {}} />
           {beat === 2 && next("Collect your lesson card")}
         </div>

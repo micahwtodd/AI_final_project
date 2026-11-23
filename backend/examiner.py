@@ -161,8 +161,13 @@ def walkthrough_text(key: dict) -> str:
 
 # ---------------------------------------------------------------- scoring (code only)
 
-def quarter_points(attempts: list[dict], not_sure: bool) -> dict:
-    """25 points per check on the first try; checks first earned on the second try count half."""
+CHECK_NAMES = {"main_driver": "the main driver", "mechanism": "why it moved surplus",
+               "second_factor": "the second factor", "improvement": "what your trades did"}
+
+
+def quarter_points(attempts: list[dict], not_sure: bool, hints: int = 0) -> dict:
+    """25 points per check on the first try; checks first earned on the second try count half, and so does
+    the main-driver check after the second hint (which names it)."""
     if not_sure or not attempts:
         return {"points": 0.0, "by_check": {c: 0.0 for c in CHECKS}}
     first = attempts[0]["checks"]
@@ -175,4 +180,6 @@ def quarter_points(attempts: list[dict], not_sure: bool) -> dict:
             by[c] = POINTS_PER_CHECK / 2
         else:
             by[c] = 0.0
+    if hints >= 2 and "main_driver" in by:
+        by["main_driver"] = min(by["main_driver"], POINTS_PER_CHECK / 2)
     return {"points": sum(by.values()), "by_check": by}

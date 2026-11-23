@@ -8,12 +8,27 @@ import { SEASONS, SEASON_ICON, SEASON_NAME } from "../labels";
 
 const reduced = () => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
+/** Text that types itself out, like a teletype. */
+export function Typewriter(props: { text: string; cps?: number }) {
+  const [n, setN] = useState(reduced() ? props.text.length : 0);
+  useEffect(() => {
+    if (reduced() || document.hidden) { setN(props.text.length); return; }
+    setN(0);
+    let i = 0;
+    const t = window.setInterval(() => { i += 2; setN(Math.min(props.text.length, i)); if (i >= props.text.length) clearInterval(t); },
+      Math.round(2000 / (props.cps ?? 70)));
+    return () => clearInterval(t);
+  }, [props.text]); // eslint-disable-line react-hooks/exhaustive-deps
+  return <>{props.text.slice(0, n)}{n < props.text.length && <span className="caret">▍</span>}</>;
+}
+
 /** A number that counts up (or down) to its value. */
 export function CountUp(props: { value: number; format: (v: number) => string; ms?: number; from?: number }) {
   const [shown, setShown] = useState(props.from ?? 0);
   const last = useRef(props.from ?? 0);
   useEffect(() => {
-    if (reduced()) { setShown(props.value); last.current = props.value; return; }
+    // reduced motion, or a hidden tab (where animation frames pause): show the final number at once
+    if (reduced() || document.hidden) { setShown(props.value); last.current = props.value; return; }
     const start = last.current, end = props.value, dur = props.ms ?? 900, t0 = performance.now();
     let raf = 0;
     const tick = (t: number) => {

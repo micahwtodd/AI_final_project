@@ -173,6 +173,7 @@ export default function App() {
             key={`${screen.shock.quarter}-${screen.firstTry ? 2 : 1}`}
             shock={screen.shock}
             company={screen.game.company}
+            gameId={screen.game.id}
             busy={busy}
             firstTry={screen.firstTry}
             onSubmit={async (text, notSure) => {

@@ -97,6 +97,7 @@ class EventCard(BaseModel):
     offers_prt_deal: bool = False
     sample_answer: str = ""
     real_world: dict = {}  # {"title", "text"}: the real episode this quarter echoes
+    predict_answer: str = ""  # rates_up / stocks_down / rates_down / credit / everything
     boss: bool = False  # the boss round: its strength is calibrated so doing nothing all game collapses the company
 
 

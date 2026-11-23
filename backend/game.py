@@ -54,6 +54,8 @@ class Session(BaseModel):
     proposed_ticket: dict | None = None
     overrides: dict[str, float] = {}  # learner edits to the game inputs (Advanced options)
     quiz_checked: dict[str, dict[str, str]] = {}  # 'pre'/'post' -> {question id: the choice that was checked}
+    hints: dict[int, int] = {}  # hints taken per quarter (the second one names the main driver: that check counts half)
+    predictions: dict[int, dict] = {}  # per quarter: {pick, answer, correct}; for fun, never scored
 
 
 _SESSIONS: dict[str, Session] = {}
@@ -328,13 +330,19 @@ def commit(s: Session, action: Action) -> dict:
     return {"view": view(s), "after": engine.dashboard(engine.apply_action(s.state, action)).model_dump()}
 
 
-def advance(s: Session) -> dict:
+PREDICTIONS = {"rates_up": "Rates jump", "rates_down": "Rates fall", "stocks_down": "Stocks crash",
+               "credit": "Bonds default", "everything": "Everything at once"}
+
+
+def advance(s: Session, prediction: str | None = None) -> dict:
     """End the quarter: apply the shock. Returns only what the learner may see before explaining."""
     _require(s, "position")
     q = s.state.quarter
     card = engine.card_for(q)
     before_dash = engine.dashboard(engine.apply_action(s.state, s.pending) if s.pending else s.state)
     new_state, rec = engine.play_quarter(s.state, s.pending)
+    if prediction in PREDICTIONS and card.predict_answer:
+        s.predictions[q] = {"pick": prediction, "answer": card.predict_answer, "correct": prediction == card.predict_answer}
     s.state, s.last_record, s.pending, s.phase = new_state, rec, None, "explain"
     s.timings[f"q{q}_shock"] = time.time()
     _save(s)
@@ -348,6 +356,8 @@ def advance(s: Session) -> dict:
         "dashboard_before": before_dash.model_dump(), "dashboard_after": engine.dashboard(new_state).model_dump(),
         "sample_answer": card.sample_answer if s.demo else None,
         "real_world": card.real_world, "boss": card.boss,
+        "prediction": ({**s.predictions[q], "pick_label": PREDICTIONS[s.predictions[q]["pick"]],
+                        "answer_label": PREDICTIONS[s.predictions[q]["answer"]]} if q in s.predictions else None),
         "collapsed": rec.surplus_after <= 0, "nothing_collapsed": rec.nothing_surplus_after <= 0,
         "question": f"Surplus {'fell' if rec.surplus_after < rec.surplus_before else 'rose'} "
                     f"${abs(change):.2f} billion. Name the main two drivers, why they moved surplus, "
@@ -356,6 +366,27 @@ def advance(s: Session) -> dict:
 
 
 MIN_WORDS = 1  # any answer is accepted; the examiner marks what is there
+
+
+def hint(s: Session) -> dict:
+    """A hint ladder before answering: hint 1 says where to look; hint 2 names the main driver, and the
+    main-driver check then counts half."""
+    _require(s, "explain")
+    rec = s.last_record
+    q = rec.quarter
+    key = engine.answer_key(rec)
+    level = min(2, s.hints.get(q, 0) + 1)
+    s.hints[q] = level
+    _save(s)
+    if level == 1:
+        text = ("Start with the Capital Market Summary: which move was biggest compared with a normal quarter? "
+                "Then ask which side of our balance sheet is more exposed to it: the bonds we own, or the long "
+                "promises we made to policyholders.")
+    else:
+        verb = "helped" if key["main_driver_usd_bn"] >= 0 else "hurt"
+        text = (f"The biggest effect came from {key['main_driver_label']} ({verb} surplus). Explain why it {verb}, "
+                f"then name the second factor and what your trades did. (Using this hint, the main-driver check counts half.)")
+    return {"level": level, "max": 2, "hint": text}
 
 
 async def explain(s: Session, text: str, not_sure: bool = False) -> dict:
@@ -394,13 +425,17 @@ async def explain(s: Session, text: str, not_sure: bool = False) -> dict:
                 {"mode": mode, "attempt": attempt, "checks": review.checks.model_dump(), "marker": marker,
                  "instruction_attempt": review.instruction_attempt})
 
-    # a second try is allowed once, only when the main driver was missed
+    # a second try is allowed once, only when the main driver was missed; the reply must not give it away
+    if mode == "mark" and attempt == 1 and not review.checks.main_driver:
+        got = [examiner.CHECK_NAMES[c] for c, ok in review.checks.model_dump().items() if ok]
+        review.reply_text = ((f"You did cover: {', '.join(got)}. " if got else "")
+                             + "But you haven't named what moved surplus the most this quarter yet. One more try.")
     if mode == "mark" and attempt == 1 and not review.checks.main_driver:
         _save(s)
         return {"final": False, "attempt": 1, "review": review.model_dump(), "marker": marker,
                 "question": review.follow_up or "Look again at the market moves. Which one hit us hardest, and why?"}
 
-    pts = examiner.quarter_points(attempts, not_sure)
+    pts = examiner.quarter_points(attempts, not_sure, s.hints.get(q, 0))
     s.understanding[q] = {**pts, "not_sure": not_sure, "attempts": len(attempts)}
     s.explanations[q] = {"text": text, "not_sure": not_sure, "ts": time.time(), "review": review.model_dump(),
                          "marker": marker}
@@ -509,12 +544,16 @@ def debrief(s: Session) -> dict:
                     f"the hardest was Q{worst.quarter} ({engine.card_for(worst.quarter).title}).")
     if sc["penalties"]:
         text.append(f"{sc['penalties']} points were deducted for ending quarters below the capital or liquidity floor.")
+    facts = engine.answer_key(worst)["improvement_facts"]
+    try_next = (f"In Q{worst.quarter} ({engine.card_for(worst.quarter).title}): {facts[0]}." if facts else None)
     return {
         **{f"understanding_{k}" if k == "per_quarter" else k: v for k, v in understanding_score(s).items()},
         "results_score": sc["results_score"], "per_quarter": sc["per_quarter"], "penalties": sc["penalties"],
         "start_surplus": round(start, 3), "end_surplus": round(end, 3),
         "nothing_end_surplus": round(nothing_end, 3), "benchmark_end_surplus": round(bench_end, 3),
         "collapsed": engine.collapsed(s.state), "n_quarters": engine.n_quarters(),
+        "try_next": try_next,
+        "predictions": {"made": len(s.predictions), "correct": sum(p["correct"] for p in s.predictions.values())},
         "text": text, "lessons": [{"quarter": r.quarter, "title": engine.card_for(r.quarter).title, "lesson": engine.card_for(r.quarter).lesson} for r in hist],
         "minutes_played": round((s.timings.get("finished", time.time()) - s.timings.get("started", s.created_at)) / 60, 1),
         "history": [_history_row(r, s) for r in hist],

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Nuke } from "../components/Nuke";
 import { api, type BeforeAfter, type Debrief, type GameView } from "../api";
 import { BadgeShelf, ReportCardPanel } from "../components/Badges";
 import { Confetti } from "../components/Fx";
@@ -13,13 +14,27 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
     { label: "What a pro would do", end: d.benchmark_end_surplus },
   ];
   const max = Math.max(d.start_surplus, ...paths.map((p) => p.end));
+  const [replay, setReplay] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const rc = d.report_card;
+  const shareText = rc ? `Risk Desk · ${props.game.company}: grade ${rc.grade}, "${rc.title}". `
+    + `Results ${d.results_score.toFixed(0)}, Executive Summary ${d.understanding_score.toFixed(0)}. `
+    + `${d.collapsed ? "Collapsed in the crash." : "Survived the Great Depression round."} `
+    + `Lesson cards ${d.lessons.map((l) => LESSON_ICON[l.quarter] ?? "📘").join("")}` : "";
 
   return (
     <section className="debrief-screen">
       {!d.collapsed && d.report_card && (d.report_card.grade.startsWith("A") || d.report_card.grade.startsWith("B")) && <Confetti pieces={110} />}
       {d.collapsed && <div className="collapse-banner">💥 {props.game.company.toUpperCase()} COLLAPSED · THE ECONOMY IS TOAST 🍞</div>}
       {d.report_card && <ReportCardPanel rc={d.report_card} results={d.results_score} understanding={d.understanding_score} />}
-      <div className="muted center-text">Final debrief · {props.game.company} · seed {props.game.seed} · {d.minutes_played} minutes played</div>
+      {replay && <Nuke company={`${props.game.company} (doing nothing)`} surplus={d.nothing_end_surplus} onDone={() => setReplay(false)} />}
+      {d.try_next && <div className="try-next"><span className="try-next-tag">TRY THIS NEXT TIME</span> {d.try_next}</div>}
+      {!d.collapsed && d.nothing_end_surplus <= 0 && (
+        <div className="replay-row no-print">
+          <button className="gold-btn" onClick={() => setReplay(true)}>💥 Watch what doing nothing would have done</button>
+          <span className="small muted">Same markets, no trades all game: the company collapses in the crash. You kept it alive.</span>
+        </div>
+      )}
       <div className="two-col">
         <div className="panel center">
           <div className="big-score">{d.results_score.toFixed(0)}<span>/100</span></div>
@@ -74,6 +89,24 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
         </div>
       </div>
 
+      {rc && (
+        <div className="share-card">
+          <div className="share-top"><span>RISK DESK</span><span>{props.game.company}</span></div>
+          <div className="share-main">
+            <div className={`grade-stamp g-${rc.grade[0].toLowerCase()}`}>{rc.grade}</div>
+            <div>
+              <div className="share-title">“{rc.title}”</div>
+              <div className="share-sub">{d.collapsed ? "💥 Collapsed in the crash" : "🛡️ Survived the Great Depression round"}</div>
+              <div className="share-icons">{d.lessons.map((l) => <span key={l.quarter}>{LESSON_ICON[l.quarter] ?? "📘"}</span>)}</div>
+              {d.predictions && d.predictions.made > 0 && <div className="share-sub">🎯 Called {d.predictions.correct} of {d.predictions.made} quarters</div>}
+            </div>
+          </div>
+          <button className="ghost no-print" onClick={() => { navigator.clipboard?.writeText(shareText).then(() => setCopied(true)).catch(() => undefined); }}>
+            {copied ? "Copied ✓" : "Copy a summary to share"}
+          </button>
+        </div>
+      )}
+
       <BeforeAfterPanel ba={d.before_after} />
 
       {d.badge_catalog && <BadgeShelf catalog={d.badge_catalog} earned={d.achievements?.earned ?? []} />}
@@ -82,6 +115,10 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
         <FeedbackBox gameId={props.game.id} />
         <button className="ghost wide" onClick={() => window.print()}>Print session summary</button>
       </div>
+      <details className="panel nerd-stats">
+        <summary>Nerd stats</summary>
+        <div className="small muted">{props.game.company} · seed {props.game.seed} · {d.minutes_played} minutes played · AI usage {props.game.usage?.spend_usd !== undefined ? `$${props.game.usage.spend_usd.toFixed(4)}` : "–"}</div>
+      </details>
     </section>
   );
 }
@@ -100,8 +137,9 @@ function BeforeAfterPanel({ ba }: { ba: BeforeAfter }) {
   return (
     <div className="panel before-after">
       <h3>What you learned: before and after</h3>
+      <p className="small muted">The after-game quiz covers the same five ideas with different questions, so compare idea by idea rather than reading the score change as exact.</p>
       <div className="lab-summary">
-        <div className="stat"><b>{ba.quiz_pre.correct}/8 → {ba.quiz_post ? `${ba.quiz_post.correct}/8` : "–"}</b><span>quiz score{ba.quiz_change_pts !== null ? ` (${ba.quiz_change_pts >= 0 ? "+" : ""}${ba.quiz_change_pts} pts)` : ""}</span></div>
+        <div className="stat"><b>{ba.quiz_pre.correct}/{ba.quiz_pre.total} → {ba.quiz_post ? `${ba.quiz_post.correct}/${ba.quiz_post.total}` : "–"}</b><span>quiz score{ba.quiz_change_pts !== null ? ` (${ba.quiz_change_pts >= 0 ? "+" : ""}${ba.quiz_change_pts} pts)` : ""}</span></div>
         <div className="stat"><b>{ba.confidence_pre_avg?.toFixed(1)} → {ba.confidence_post_avg?.toFixed(1) ?? "–"}</b><span>average confidence (1 to 5)</span></div>
         <div className="stat"><b>{ba.minutes_played}</b><span>minutes played</span></div>
       </div>

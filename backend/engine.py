@@ -571,7 +571,22 @@ def play_quarter(state: GameState, action: Action | None) -> tuple[GameState, Qu
     rec.lever_gains = lever_gains(start, traded.action, card, shock, rec.surplus_after)
     after_state.history = [*start.history, rec]
     after_state.quarter = start.quarter + 1
-    return after_state, rec
+    return _sync_positions(after_state), rec
+
+
+def _sync_positions(s: GameState) -> GameState:
+    """After the market moves, re-measure what the company actually holds, so next quarter's ticket starts
+    from reality: cash as a % of today's assets, and swaps as a % of today's rate mismatch. Signing an
+    unchanged ticket then trades nothing (no phantom change on the dashboard)."""
+    A = total_assets(s)
+    upd = {}
+    if A > 0:
+        upd["cash_buffer_pct"] = min(15.0, max(1.0, 100 * s.assets["cash"] / A))
+    gap = asset_dv01(s) - liability_dv01(s)
+    if abs(gap) > 1e-12 and s.hedges_lost_share == 0:
+        upd["rate_hedge_pct"] = min(150.0, max(-150.0, -100 * s.swap_dv01 / gap))
+    s.action = s.action.model_copy(update=upd)
+    return s
 
 
 LEVERS = ["rate_hedge_pct", "credit_shift_pct", "equity_hedge_pct", "fx_hedge_pct", "cash_buffer_pct",

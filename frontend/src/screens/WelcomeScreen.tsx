@@ -13,6 +13,27 @@ const Face = (p: { name: string; who: string; role: string; line: string }) => (
   </div>
 );
 
+/** Assets on one side; liabilities plus the equity cushion on the other. A shock knocks assets down and the cushion shrinks. */
+function BalanceScale() {
+  return (
+    <div className="scale" aria-label="Assets equal liabilities plus equity; when assets fall, equity shrinks">
+      <div className="scale-col">
+        <div className="scale-stack"><div className="blk assets">Assets</div></div>
+        <span className="scale-cap">What you own</span>
+      </div>
+      <div className="scale-eq">=</div>
+      <div className="scale-col">
+        <div className="scale-stack">
+          <div className="blk equity">Equity</div>
+          <div className="blk liabs">Liabilities</div>
+        </div>
+        <span className="scale-cap">What you owe + the cushion</span>
+      </div>
+      <div className="scale-shock">⚡ shock</div>
+    </div>
+  );
+}
+
 const SLIDES: Slide[] = [
   {
     kicker: "The job", title: "You just got hired.",
@@ -23,15 +44,13 @@ const SLIDES: Slide[] = [
   {
     kicker: "How this works", title: "Assets − liabilities = equity.",
     body: <>
-      <p>Your company has <b>assets</b> (money you have or are owed), and <b>liabilities</b> (money you owe to others).
-        <b> Equity</b> is what is left over. Each component has different sensitivities to financial market risks.</p>
-      <p>You must navigate the company through tumultuous markets: success is measured by <b>how much equity you preserve
-        and grow</b>. You must rely on your elite team of experts for guidance, evaluate their feedback, recommend
-        protective trades, and explain your decisions to the CRO.</p>
-      <p className="intro-note">The underlying data is based on real financials. These simulations will teach you how
-        different companies have different exposures.</p>
+      <p><b>Assets</b> are what you own. <b>Liabilities</b> are what you owe policyholders. <b>Equity</b> is the cushion
+        in between, and every market shock hits it first. Watch: when assets drop, the cushion shrinks.</p>
+      <p>Your job is to keep that cushion alive. Rely on your elite team of experts for guidance, evaluate their feedback,
+        recommend protective trades, and explain your decisions to the CRO.</p>
+      <p className="intro-note">Built on real financials: each company has different exposures.</p>
     </>,
-    art: <PixelSprite name="cat_nap" size={150} title="Convexity the office cat, napping" />,
+    art: <BalanceScale />,
   },
   {
     kicker: "Your boss", title: "Vera Atrisk, Chief Risk Officer",

@@ -120,10 +120,11 @@ async def _delegate(ctx: RunContext[Deps], worker: str, task: str) -> dict:
     out = await _run_agent(worker, f"Question from Vera Atrisk (CRO): {task}", run)
     if out is None:
         return {"error": f"{AGENT_NAMES[worker]} could not answer ({run.stopped or 'error'})."}
-    run.emit(worker, "delegation", {"from": worker, "from_name": AGENT_NAMES[worker], "answer": out.text,
+    answer = strip_opener(out.text)  # shown to the learner as the specialist's own words
+    run.emit(worker, "delegation", {"from": worker, "from_name": AGENT_NAMES[worker], "answer": answer,
                                     "terms_used": out.terms_used})
-    run.subs.append({"agent": worker, "agent_name": AGENT_NAMES[worker], "text": out.text})
-    return {"from": AGENT_NAMES[worker], "answer": out.text}
+    run.subs.append({"agent": worker, "agent_name": AGENT_NAMES[worker], "text": answer})
+    return {"from": AGENT_NAMES[worker], "answer": answer}
 
 
 def register_tools(agent: Agent, allowed: set[str]) -> None:
