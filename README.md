@@ -85,11 +85,11 @@ See [`output/harness.md`](output/harness.md) for the agents' tools, memory, stop
 
 Run `python scripts/experiments.py` to measure again (about 10 minutes, well under $1). On the last run:
 
-- **E1 Solo vs Team** (ten fixed questions, facts marked by code): Solo 17/19 facts, $0.0004 and 7s per question; Team 19/19 facts and two views on all three decision questions, $0.0012 and 18s.
-- **E2** Asking every specialist cost more and was slower than letting Vera route, with no better facts.
-- **E3** Reading 16 chunks per search instead of 4 found the same values at 2 to 3 times the cost.
+- **E1 Solo vs Team** (ten fixed questions, facts marked by code): Solo 17/19 facts, $0.0004 and 8s per question; Team 17/19 facts and two views on all three decision questions, $0.0013 and 18s. Asking every specialist (E2) found 19/19.
+- **E2** Asking every specialist cost about 40% more and was slower than letting Vera route; it found the two facts routing missed.
+- **E3** Reading 16 chunks per search instead of 4 cost 2 to 2.5 times as much and, for Jackson, returned a different guaranteed-account figure ($174bn vs $243bn), so more text did not mean a better answer.
 - **E4** Prompt caching: 90% of input cached with a stable prefix vs 50% with it broken; cost per question about halved.
-- **Cost:** about $0.011 per session, $0.04 per learner per month on `gpt-6-luna`; the $0.25 cap bounds the worst case.
+- **Cost:** about $0.012 per session, $0.05 per learner per month on `gpt-6-luna`; the $0.25 cap bounds the worst case.
 
 ## Recalibrating the companies
 
