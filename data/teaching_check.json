@@ -1,5 +1,5 @@
 {
-  "_note": "Teaching-accuracy check: 20 concept questions, each sent to the colleague who owns the topic, who must answer with one letter. Code marks it against this key. Draft for Micah to approve. Option order shuffled with a fixed seed so correct answers are spread across A to D.",
+  "_note": "Teaching-accuracy check: 16 concept questions (four retired: three on currency, one on pension deals), each sent to the colleague who owns the topic, who must answer with one letter. Code marks it against this key. Draft for Micah to approve. Option order shuffled with a fixed seed so correct answers are spread across A to D.",
   "questions": [
     {
       "id": "T01",
@@ -50,19 +50,6 @@
         "B": "It is unaffected by markets",
         "C": "It falls, because accounts are smaller",
         "D": "It rises: we are more likely to have to pay"
-      },
-      "answer": "D"
-    },
-    {
-      "id": "T05",
-      "agent": "actuary",
-      "concept": "pension_risk_transfer",
-      "q": "We take on a pension risk transfer deal. What does it add to our balance sheet?",
-      "options": {
-        "A": "Stock-market guarantees",
-        "B": "Short liabilities and no cash",
-        "C": "Only fee income with no liabilities",
-        "D": "Long-duration liabilities, plus premium to invest"
       },
       "answer": "D"
     },
@@ -176,7 +163,7 @@
       "concept": "collateral",
       "q": "Our largest dealer fails. When does that cost us least?",
       "options": {
-        "A": "When we had no hedges with gains owed to us and no collateral",
+        "A": "When the dealer owed us a large hedge gain and we took no collateral",
         "B": "When we had daily collateral and spread trades across several dealers",
         "C": "Dealer failures never cost anything",
         "D": "When we used one dealer and no collateral"
@@ -264,6 +251,20 @@
           "D": "It is unchanged"
         },
         "answer": "C"
+      },
+      {
+        "id": "T05",
+        "agent": "actuary",
+        "concept": "pension_risk_transfer",
+        "q": "We take on a pension risk transfer deal. What does it add to our balance sheet?",
+        "options": {
+          "A": "Stock-market guarantees",
+          "B": "Short liabilities and no cash",
+          "C": "Only fee income with no liabilities",
+          "D": "Long-duration liabilities, plus premium to invest"
+        },
+        "answer": "D",
+        "retired_because": "pension risk transfer deals were removed from the game"
       }
     ]
   }

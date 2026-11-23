@@ -136,10 +136,10 @@
           "A": "The swaps are cancelled",
           "B": "Nothing until the swaps mature",
           "C": "The bank pays us",
-          "D": "We must post cash collateral now, even though the loss is only on paper"
+          "D": "We must post cash collateral now, even though the swaps have not matured"
         },
         "answer": "D",
-        "explain": "With daily collateral, whoever is losing on the swap posts cash every day. Our swaps lost value, so we must post cash now, even though nothing has been realized yet. That is a liquidity need."
+        "explain": "With daily collateral, whoever is losing on the swap posts cash every day. Our swaps lost value, so we must post cash now, even though the swaps have not matured. That is a liquidity need."
       }
     ]
   },

@@ -90,7 +90,7 @@
         "alternatives",
         "hedge_ratio"
       ],
-      "source_note": "Stylized on 2000-2002, when the S&P 500 fell about 49% from peak to trough. One quarter here compresses part of that: a typical draw (1.0x) is a stock fall of a little over 20%.",
+      "source_note": "Stylized on 2000-2002, when the S&P 500 fell about 49% from peak to trough. One quarter here compresses much of that: a typical draw (1.0x) is a stock fall of about 30%, beyond any single quarter since the 1930s (the worst modern quarters were about -23%, in late 1987 and late 2008). Harsher than history on purpose, so the lesson shows in a single quarter.",
       "sample_answer": "Stocks crashed, and that was the main driver. Falling markets shrank customers' annuity accounts, so the guarantees we wrote became more expensive for us, and our own stock and alternative holdings fell too. Rates dipped slightly as the second factor, which hurt a little because our liabilities are longer than our assets. Stock-market puts would have offset most of the guarantee loss.",
       "real_world": {
         "title": "2000-2002: the dot-com bust",
@@ -145,7 +145,7 @@
         "interest_rate_swap",
         "convexity"
       ],
-      "source_note": "Stylized on 2019-2020, when the US 10-year Treasury yield fell about 2.7 percentage points. A typical draw (1.0x) here is a 1 percentage point fall in one quarter.",
+      "source_note": "Stylized on 2019-2020, when the US 10-year Treasury yield fell about 2.7 percentage points (about 1.25 points in the first quarter of 2020 alone). A typical draw (1.0x) here is a 1.4 percentage point fall in one quarter. Harsher than history on purpose, so the lesson shows in a single quarter.",
       "sample_answer": "Interest rates fell sharply, and that was the main driver. Our liabilities are longer than our assets, so their value rose more than our bonds did and surplus fell. Stocks dipped a little as the second factor. Rate swaps that gain when rates fall would have closed most of that gap.",
       "real_world": {
         "title": "2019-2020: rates fall toward zero",
@@ -203,7 +203,7 @@
         "below_investment_grade",
         "mortgage_loan"
       ],
-      "source_note": "Stylized on 2015-2016, when US high-yield spreads rose from about 3.5 to over 8 percentage points. A typical draw (1.0x) here widens high-yield spreads by 3 percentage points with 3% of junk bonds defaulting.",
+      "source_note": "Stylized on 2015-2016, when US high-yield spreads rose from about 3.5 to over 8 percentage points. A typical draw (1.0x) here widens high-yield spreads by 4 percentage points with 10% of junk bonds defaulting and a 1.5% loss on BBB bonds in one quarter; even in the worst years, junk-bond defaults ran about 10 to 14% over a full year. Harsher than history on purpose, so the lesson shows in a single quarter.",
       "sample_answer": "Defaults were the main driver: junk-bond issuers stopped paying, which is a permanent credit loss, unlike spreads widening. Stocks dipped as the second factor, which raised our guarantee costs a bit. Moving risky bonds into government bonds before the rout would have cut the default losses.",
       "real_world": {
         "title": "2015-2016: the energy credit rout",
@@ -224,7 +224,7 @@
       "era": "Echoes 1929-1933",
       "signal_text": "WIRE: Stocks have doubled in two years, much of it on borrowed money. Banks are lending freely. Quietly, farm prices and factory orders have started to fall.",
       "headline": "CRASH! BANKS FAIL, DEFAULTS SOAR, A DEALER GOES UNDER",
-      "narrative": "Everything broke at once. Stocks collapsed, companies stopped paying their debts, property loans went bad and investors piled into government bonds, driving yields down. One of our derivatives dealers failed, and frightened policyholders want their money back.",
+      "narrative": "Everything broke at once. Stocks collapsed, companies stopped paying their debts, property loans went bad and investors fled to the safety of government bonds. One of our derivatives dealers failed, and frightened policyholders want their money back.",
       "primary_risk": "systemic",
       "secondary_risks": [
         "equity",

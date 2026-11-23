@@ -125,10 +125,13 @@ def get_guarantee_exposure(s: GameState) -> dict:
     return {
         "guaranteed_account_value_usd_bn": _r(s.guarantee_exposure),
         "guarantee_liability_value_usd_bn": _r(s.guarantee_value),
-        "cost_if_stocks_fall_10pct_usd_bn": _r(sens * 0.10),
-        "cost_if_rates_fall_100bp_usd_bn": _r(s.guarantee_exposure * g["k_rate"] * 0.01),
+        "guarantee_cost_if_stocks_fall_10pct_usd_bn": _r(sens * 0.10),
+        "guarantee_rise_if_rates_fall_100bp_usd_bn": _r(s.guarantee_exposure * g["k_rate"] * 0.01),
         "equity_puts_hedge_pct": _r(100 * h, 1),
-        "unhedged_cost_if_stocks_fall_10pct_usd_bn": _r(sens * 0.10 * (1 - h)),
+        "unhedged_guarantee_cost_if_stocks_fall_10pct_usd_bn": _r(sens * 0.10 * (1 - h)),
+        "note": ("These are the guarantees only (gross). They are NOT the change in company surplus: when rates fall, "
+                 "bonds gain too, and when stocks fall, the stocks and alternatives we own fall as well. For the "
+                 "whole-company effect use the dashboard's net rate sensitivity (surplus change per 0.01% fall) or a stress test."),
     }
 
 
@@ -174,7 +177,11 @@ def get_liquidity_ladder(s: GameState) -> dict:
                      "haircut_normal_pct": _r(100 * h, 1), "haircut_stressed_pct": _r(100 * h * mult, 1)})
     return {"sell_order": rows, "stressed_90_day_outflow_usd_bn": _r(engine.stressed_outflow(s)),
             "liquid_assets_after_stress_haircut_usd_bn": _r(engine.liquid_assets_stressed(s)),
-            "liquidity_ratio_pct": engine.dashboard(s).liquidity_ratio_pct}
+            "liquidity_ratio_pct": engine.dashboard(s).liquidity_ratio_pct,
+            "liquidity_ratio_definition": ("cash plus government bonds after stressed sale discounts, divided by the cash "
+                                           "that could be needed in a 90-day stress (surrenders plus collateral calls). Only cash "
+                                           "and government bonds count; the rest of the sell order is what we would sell next, "
+                                           "at bigger discounts, if that ran out.")}
 
 
 # ---------------------------------------------------------------- hedges (Trader)
