@@ -35,3 +35,5 @@ Thumbs.db
 
 # Fresh-clone dry runs (Project 11)
 _dryrun/
+# Raw screenshots for the report (large; embedded in deliverables/*.html)
+evidence/screens/*.png

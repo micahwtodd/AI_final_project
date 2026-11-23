@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Risk Desk · Slides</title>
+<style>{{reveal_css}}</style>
+<style>
+@font-face { font-family: "Atkinson Hyperlegible"; font-weight: 400; src: url({{font_400}}) format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible"; font-weight: 700; src: url({{font_700}}) format("woff2"); }
+:root { --navy: #001F5B; --deep: #00163f; --blue: #007AC1; --gold: #FFC72C; --sky: #6CACE4; --red: #FF6B7D; --ink: #fff; --muted: #b9c8de; }
+html, body, .reveal-viewport { background: var(--navy) !important; --r-background-color: #001F5B; }
+.reveal { font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif; font-size: 30px; color: var(--ink); }
+.reveal .slides { text-align: left; }
+.reveal .slides section { height: 100%; padding: 46px 64px 0; box-sizing: border-box; }
+.reveal h1, .reveal h2 { font-family: inherit; color: #fff; text-transform: none; letter-spacing: 0; margin: 0 0 18px; line-height: 1.12; }
+.reveal h1 { font-size: 58px; } .reveal h2 { font-size: 40px; max-width: 1120px; }
+.reveal .kick { color: var(--gold); font-size: 18px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 10px; }
+.reveal p, .reveal li { color: var(--ink); line-height: 1.35; }
+.reveal .muted { color: var(--muted); font-size: 22px; }
+.reveal em.g { color: var(--gold); font-style: normal; font-weight: 700; }
+.reveal img.shot { border: 2px solid #fff; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,.35); margin: 0; max-width: 100%; }
+.reveal .slides section::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 64px; background: url({{sprite_office_day}}) center 78% / cover; image-rendering: pixelated; opacity: .5; border-top: 3px solid var(--gold); pointer-events: none; }
+.reveal .cast { display: flex; gap: 18px; margin: 26px 0 10px; }
+.reveal .cast img { width: 84px; height: 84px; image-rendering: pixelated; border-radius: 50%; border: 3px solid #fff; background: #0a2a66; margin: 0; }
+.reveal .rail { display: flex; gap: 12px; align-items: center; font-size: 22px; font-weight: 700; margin: 0 0 22px; }
+.reveal .rail span { border: 2px solid var(--muted); color: var(--muted); padding: 4px 16px; border-radius: 30px; }
+.reveal .rail span.now { border-color: var(--gold); background: var(--gold); color: var(--navy); }
+.reveal .rail i { color: var(--muted); font-style: normal; }
+.reveal .two { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start; }
+.reveal .big { font-size: 120px; font-weight: 700; color: var(--gold); line-height: 1; }
+.reveal .nums { display: flex; gap: 46px; margin-top: 26px; }
+.reveal .nums div b { display: block; font-size: 52px; color: #fff; }
+.reveal .nums div span { font-size: 20px; color: var(--muted); }
+.reveal table { font-size: 22px; border-collapse: collapse; margin: 10px 0; }
+.reveal table th { color: var(--gold); border-bottom: 2px solid var(--gold); padding: 8px 14px; font-size: 18px; text-transform: uppercase; letter-spacing: .06em; }
+.reveal table td { padding: 8px 14px; border-bottom: 1px solid rgba(255,255,255,.18); color: #fff; }
+.reveal table td.y { color: #7fe0a0; font-weight: 700; text-align: center; } .reveal table td.n { color: var(--muted); text-align: center; }
+.reveal table tr.us td { background: rgba(255,199,44,.12); font-weight: 700; }
+.reveal .ph { background: #fff4c7; color: #6b4e00; border: 2px dashed #b98a00; padding: 0 8px; border-radius: 6px; font-size: .8em; font-weight: 700; }
+.reveal ul { margin: 6px 0 0 30px; } .reveal li { margin-bottom: 12px; }
+.reveal .quote { border-left: 6px solid var(--gold); padding: 6px 18px; font-size: 26px; font-style: italic; color: #e8eef8; }
+.reveal svg text { font-family: "Atkinson Hyperlegible", sans-serif; }
+.reveal .vera { position: absolute; right: 64px; bottom: 90px; width: 120px; image-rendering: pixelated; border-radius: 50%; border: 3px solid var(--gold); }
+.reveal .progress { color: var(--gold); }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- 1 · TITLE -->
+<section>
+  <div class="kick">MGT 409E · Final project · Micah Todd</div>
+  <h1>Risk Desk</h1>
+  <h2 style="font-weight:400;color:#e8eef8">The core of asset liability management in about <em class="g">30 minutes</em>, on balance sheets built from real 10-Ks</h2>
+  <div class="cast">
+    <img src="{{sprite_vera_neutral}}" alt="Vera"><img src="{{sprite_morty_neutral}}" alt="Morty"><img src="{{sprite_bonnie_neutral}}" alt="Bonnie"><img src="{{sprite_swap_neutral}}" alt="Swap Dogg"><img src="{{sprite_seamore_neutral}}" alt="Seamore">
+  </div>
+  <p class="muted">A training game: run a real US life insurer through five quarters of stress, ask an AI team, sign the trades, explain the result.</p>
+  <aside class="notes">One-line pitch. The cast: Vera the CRO, Morty the actuary, Bonnie the portfolio manager, Swap Dogg the trader, Seamore who reads the 10-Ks.</aside>
+</section>
+
+<!-- 2 · PROBLEM -->
+<section>
+  <div class="kick">The problem</div>
+  <h2>Analysts leave fast, and ramp-up takes <span class="ph">[MICAH: months]</span></h2>
+  <div class="rail"><span>3 weeks</span><i>→</i><span>3 days</span><i>→</i><span>3 hours</span><i>→</i><span class="now">30 minutes</span></div>
+  <svg viewBox="0 0 720 240" width="900" role="img" aria-label="Balance sheet before and after a rate fall">
+    <style>.w{font-size:13px;fill:#fff}.d{font-size:13px;fill:#001F5B;font-weight:700}.h{font-size:15px;fill:#FFC72C;font-weight:700}</style>
+    <text x="20" y="18" class="h">Today</text><text x="360" y="18" class="h">Rates 1 point lower</text>
+    <g transform="translate(20,34)">
+      <rect width="120" height="187" fill="#007AC1"/><text x="60" y="98" text-anchor="middle" class="w">Assets $74.9bn</text>
+      <rect x="140" y="31" width="120" height="156" fill="#6CACE4"/><text x="200" y="115" text-anchor="middle" class="d">Promises $62.5bn</text>
+      <rect x="140" width="120" height="31" fill="#FFC72C"/><text x="200" y="20" text-anchor="middle" class="d">Surplus $12.4bn</text>
+    </g>
+    <g transform="translate(360,23)">
+      <rect width="120" height="198" fill="#007AC1"/><text x="60" y="104" text-anchor="middle" class="w">Assets $79.3bn</text>
+      <rect x="140" y="24" width="120" height="174" fill="#6CACE4"/><text x="200" y="112" text-anchor="middle" class="d">Promises $69.6bn</text>
+      <rect x="140" width="120" height="24" fill="#FFC72C"/><text x="200" y="16" text-anchor="middle" class="d">Surplus $9.7bn</text>
+      <text x="272" y="17" style="font-size:16px;fill:#FF6B7D;font-weight:700">−$2.7bn</text>
+    </g>
+  </svg>
+  <p class="muted">Jackson Financial in the game's engine: the promises grow faster than the assets, and the thin surplus between them takes the hit.</p>
+  <aside class="notes">The SQL story: a YouTuber's "SQL in three weeks", a colleague's "three days", a manager's joke about "three hours". My company hires risk analysts from strong liberal arts colleges with no finance background; turnover is high [MICAH figure]. Today they learn by shadowing and mistakes. The chart is why ALM is hard: surplus is the small gap between two big moving numbers.</aside>
+</section>
+
+<!-- 3 · WHAT IS NEW -->
+<section>
+  <div class="kick">What is new</div>
+  <h2>None of the tools I checked combines real data, decisions and a marked explanation</h2>
+  <table>
+    <thead><tr><th style="text-align:left">Product</th><th>Real company data</th><th>Learner decides</th><th>Computed numbers</th><th>Marked against truth</th></tr></thead>
+    <tbody>
+      <tr class="us"><td>Risk Desk</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+      <tr><td>Moody's AXIS · FIS Prophet <span class="ph">verify</span></td><td class="y">✓</td><td class="n">–</td><td class="y">✓</td><td class="n">–</td></tr>
+      <tr><td>Bloomberg Market Concepts <span class="ph">verify</span></td><td class="n">–</td><td class="n">–</td><td class="n">–</td><td class="n">–</td></tr>
+      <tr><td>Capsim simulation <span class="ph">verify</span></td><td class="n">–</td><td class="y">✓</td><td class="y">✓</td><td class="n">–</td></tr>
+      <tr><td>ChatGPT <span class="ph">screenshot</span></td><td class="n">–</td><td class="n">–</td><td class="n">–</td><td class="n">–</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes">Professional ALM platforms are for experts. E-learning teaches concepts without a balance sheet to run. Simulations use fictional firms. ChatGPT explains fluently but generates its numbers and has no ground truth to mark against. All rows to be verified at each product's site.</aside>
+</section>
+
+<!-- 4 · AGENTS -->
+<section>
+  <div class="kick">How the agents work</div>
+  <h2>Vera sends each question to the one or two right specialists; the engine owns every number</h2>
+  <svg viewBox="0 0 680 290" width="1040" role="img" aria-label="Agent diagram">
+    <defs><marker id="a2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#FFC72C"/></marker></defs>
+    <style>.b{fill:#0a2a66;stroke:#fff;stroke-width:1.5}.t{font-size:13px;fill:#fff;font-weight:700}.s{font-size:10.5px;fill:#b9c8de}.l{stroke:#FFC72C;stroke-width:1.6;fill:none;marker-end:url(#a2)}</style>
+    <rect x="6" y="114" width="118" height="62" rx="8" class="b"/><text x="65" y="142" text-anchor="middle" class="t">Learner</text><text x="65" y="160" text-anchor="middle" class="s">asks · signs</text>
+    <rect x="176" y="100" width="160" height="90" rx="8" class="b"/><image href="{{sprite_vera_neutral}}" x="186" y="112" width="44" height="44"/><text x="286" y="132" text-anchor="middle" class="t">Vera</text><text x="286" y="150" text-anchor="middle" class="s">CRO · routes</text>
+    <rect x="388" y="4" width="152" height="54" rx="8" class="b"/><image href="{{sprite_morty_neutral}}" x="394" y="10" width="40" height="40"/><text x="490" y="28" text-anchor="middle" class="t">Morty</text><text x="490" y="44" text-anchor="middle" class="s">cautious · liabilities</text>
+    <rect x="388" y="118" width="152" height="54" rx="8" class="b"/><image href="{{sprite_bonnie_neutral}}" x="394" y="124" width="40" height="40"/><text x="490" y="142" text-anchor="middle" class="t">Bonnie</text><text x="490" y="158" text-anchor="middle" class="s">yield · assets</text>
+    <rect x="388" y="232" width="152" height="54" rx="8" class="b"/><image href="{{sprite_swap_neutral}}" x="394" y="238" width="40" height="40"/><text x="490" y="256" text-anchor="middle" class="t">Swap Dogg</text><text x="490" y="272" text-anchor="middle" class="s">hedges · drafts</text>
+    <rect x="586" y="36" width="88" height="220" rx="8" fill="#FFC72C"/><text x="630" y="140" text-anchor="middle" style="font-size:15px;fill:#001F5B;font-weight:700">Engine</text><text x="630" y="160" text-anchor="middle" style="font-size:11px;fill:#001F5B">every number</text>
+    <path d="M124,145 L174,145" class="l"/><path d="M336,126 L386,36" class="l"/><path d="M336,145 L386,145" class="l"/><path d="M336,164 L386,256" class="l"/>
+    <path d="M540,30 L584,66" class="l"/><path d="M540,145 L584,145" class="l"/><path d="M540,258 L584,224" class="l"/>
+  </svg>
+  <aside class="notes">Seven roles, one model (gpt-6-luna). Specialists read only their side of the balance sheet through read-only tools. Swap Dogg can draft a ticket; only the learner signs. A separate examiner marks explanations; Seamore reads 10-Ks with code-checked quotes. Team 19/19 facts vs Solo 16/19, at 3.5x the cost: kept for teaching, so learners weigh biased experts.</aside>
+</section>
+
+<!-- 5 · DEMO 1 -->
+<section>
+  <div class="kick">Demo · 1</div>
+  <h2>Make the call: ask the team, sign a ticket, then take the shock</h2>
+  <img class="shot" src="{{img_desk}}" alt="The desk" style="height:455px">
+  <aside class="notes">Dashboard on the left with floors and the rate mismatch; the team in the middle; the ticket on the right moves the gauges before you commit.</aside>
+</section>
+
+<!-- 6 · DEMO 2 -->
+<section>
+  <div class="kick">Demo · 2</div>
+  <h2>Explain it to Vera; she marks it against the engine's truth</h2>
+  <div class="two">
+    <img class="shot" src="{{img_shock}}" alt="The Market Daily">
+    <img class="shot" src="{{img_vera}}" alt="Vera's marks">
+  </div>
+  <p class="muted">Four checks: the main driver, why it moved surplus, the second factor, what your trades did.</p>
+  <aside class="notes">The Market Daily reports the quarter with a real-life echo (2022). Vera's four true/false checks are summed by code, never taken from model text.</aside>
+</section>
+
+<!-- 7 · COST -->
+<section>
+  <div class="kick">Cost to run</div>
+  <h2>Projected: about 1 cent a session; under $5 a month for 100 analysts</h2>
+  <div class="big">$0.012</div>
+  <p class="muted">per heavy session, projected (8 questions, 5 marked explanations)</p>
+  <div class="nums">
+    <div><b>$4.73</b><span>a month, 100 analysts</span></div>
+    <div><b>$1</b><span>hard cap per analyst per month</span></div>
+  </div>
+  <aside class="notes">Measured: one full demo game, 13 model calls, $0.0064. Caching cut cost per question 47% with no loss of facts; routing costs 0.64x asking every specialist. 10,000 analysts: about $473 a month. The $0.25-per-game cap bounds the worst case.</aside>
+</section>
+
+<!-- 8 · SAFETY -->
+<section>
+  <div class="kick">Safety</div>
+  <h2>All 4 tested attacks were stopped, and the model never computes a score</h2>
+  <div class="two" style="grid-template-columns: 1.35fr 1fr">
+    <img class="shot" src="{{img_safety}}" alt="Safety Lab">
+    <div>
+      <div class="big" style="font-size:96px">1 → 0</div>
+      <p class="muted">attacks that got through: defenses off → on</p>
+      <p style="font-size:24px">Pasted bond identifiers are blocked before any AI call. Scores are summed in code. Trades need the learner's signature.</p>
+    </div>
+  </div>
+  <aside class="notes">Without defenses, only the identifier leak succeeded; the other three failed by design or model refusal. Examiner agrees with the key on 8/8 samples; teaching check 16/16.</aside>
+</section>
+
+<!-- 9 · IMPACT (fallback until the user session runs) -->
+<section>
+  <div class="kick">Impact</div>
+  <h2>Next test: a real analyst, using this protocol</h2>
+  <div class="rail"><span>3 weeks</span><i>→</i><span>3 days</span><i>→</i><span>3 hours</span><i>→</i><span class="now"><span class="ph" style="border:0">[N]</span> min</span></div>
+  <div class="two">
+    <ul style="font-size:26px">
+      <li>Knowledge Check before, quiz after (parallel 5-item forms)</li>
+      <li>One full game, timed by the app</li>
+      <li>Confidence before and after; one quote</li>
+    </ul>
+    <div class="nums" style="margin-top:0;flex-direction:column;gap:18px">
+      <div><b>6 insurers</b><span>calibrated from 10-Ks, no prerequisite</span></div>
+      <div><b>$0.05</b><span>a month per analyst, projected</span></div>
+    </div>
+  </div>
+  <p><span class="ph">[MICAH: if the session runs, replace with "[N] minutes: a new analyst went from x/5 to y/5" · n = 1 · one quote]</span></p>
+  <aside class="notes">No real-user session yet. The protocol produces minutes played, before/after scores on parallel forms, confidence, Vera's marks, and a quote. Comparison: senior hours per hire today [MICAH].</aside>
+</section>
+
+<!-- 10 · NEXT -->
+<section>
+  <div class="kick">What's next</div>
+  <h2>Next: a cohort pilot on my company's risk team</h2>
+  <ul style="font-size:28px">
+    <li>Pre- and post-tests, time to first independent work, 30-day recall</li>
+    <li>A manager view across analysts; hosted behind company sign-on</li>
+    <li>More insurers, refreshed each year from new 10-Ks</li>
+  </ul>
+  <img class="vera" src="{{sprite_vera_pleased}}" alt="Vera">
+  <aside class="notes">Limits: stylized engine, hindsight pro, calibration variance, no real user yet. Close on the story: three weeks, three days, three hours, thirty minutes.</aside>
+</section>
+
+</div></div>
+<script>{{reveal_js}}</script>
+<script>Reveal.initialize({ hash: true, width: 1280, height: 720, margin: 0, center: false, transition: "fade", controls: true, progress: true, slideNumber: "c/t" });</script>
+</body>
+</html>
