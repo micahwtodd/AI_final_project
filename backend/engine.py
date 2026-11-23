@@ -1,4 +1,4 @@
-"""Risk Desk engine: deterministic, no model calls. The source of every number in the app.
+"""Surplus or Bust engine: deterministic, no model calls. The source of every number in the app.
 
 All values are in $ billions unless a name says otherwise. Rates are decimals
 inside the engine; shocks arrive in basis points and percent, as on the cards.

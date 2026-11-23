@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Risk Desk · Final Report</title>
+<title>Surplus or Bust · Final Report</title>
 <style>
 @font-face { font-family: "Atkinson Hyperlegible"; font-weight: 400; src: url({{font_400}}) format("woff2"); }
 @font-face { font-family: "Atkinson Hyperlegible"; font-weight: 700; src: url({{font_700}}) format("woff2"); }
@@ -30,6 +30,7 @@ code { font: 9.5pt Consolas, "Courier New", monospace; background: var(--tint); 
 .masthead { display: flex; justify-content: space-between; font-size: 8.5pt; letter-spacing: .16em; text-transform: uppercase; color: var(--navy); font-weight: 700; }
 .dbl { border-top: 3px double var(--navy); border-bottom: 1px solid var(--navy); height: 6px; margin: 6px 0 18px; }
 h1 { font-size: 30pt; line-height: 1.1; color: var(--navy); margin: 0 0 8px; }
+.sub { font: 700 14pt/1.3 var(--head); color: var(--blue); margin: 0 0 10px; }
 .dek { font-size: 13pt; color: var(--ink); margin-bottom: 14px; }
 .cast { display: flex; gap: 10px; align-items: flex-end; margin: 14px 0 10px; }
 .cast img { width: 54px; height: 54px; image-rendering: pixelated; border-radius: 50%; border: 2px solid var(--navy); background: var(--tint); }
@@ -89,9 +90,10 @@ table.terms td:first-child { white-space: nowrap; width: 1%; }
 
 <!-- 1 · TITLE + LINKS -->
 <section>
-  <div class="masthead"><span>Risk Desk</span><span>MGT 409E · AI Foundations for Managers</span><span>Final Project</span></div>
+  <div class="masthead"><span>Surplus or Bust</span><span>MGT 409E · AI Foundations for Managers</span><span>Final Project</span></div>
   <div class="dbl"></div>
-  <h1>Risk Desk: a 30-minute game on the core of asset liability management, built on real insurers' 10-K filings</h1>
+  <h1>Surplus or Bust: a Risk Management Simulator</h1>
+  <p class="sub">A 30-minute game on the core of asset liability management, built on real insurers' 10-K filings</p>
   <p class="dek">A training game in which a new risk analyst runs a real US life insurer through five quarters of market stress, asks a team of AI colleagues for help, signs the trades, and explains the result to a Chief Risk Officer who marks it against the engine's computed truth. Thirty minutes is the design target; a pilot with real analysts will measure it.</p>
   <div class="cast">
     <div><img src="{{sprite_vera_neutral}}" alt="Vera"><br><span>Vera · CRO</span></div>
@@ -103,7 +105,7 @@ table.terms td:first-child { white-space: nowrap; width: 1%; }
   <p class="cap" style="margin-top:0">A <b>10-K</b> is the annual report every US public company files with the SEC; it holds the balance sheet the game starts from.</p>
   <dl class="meta">
     <dt>Author</dt><dd>Micah Todd · Yale SOM EMBA</dd>
-    <dt>Repository</dt><dd><span class="ph">[MICAH: GitHub repo URL, the same one submitted on Canvas; public or shared with zlisto]</span></dd>
+    <dt>Repository</dt><dd><a href="https://github.com/micahwtodd/AI_final_project">github.com/micahwtodd/AI_final_project</a></dd>
     <dt>App</dt><dd>Runs locally from a fresh clone (Python only, about 40 seconds in the dry run). No hosted link.</dd>
     <dt>What it does</dt><dd>Teaches the core ideas of life-insurance asset liability management by letting a beginner make the calls on a real insurer's balance sheet and explain the outcome, with every number computed by a deterministic engine rather than by the AI.</dd>
     <dt>Evidence date</dt><dd>All measurements re-run on November 23, 2026 (experiments 12:50, Safety Lab 12:41, demo session <code>6d692f21d956</code> 12:51).</dd>
@@ -115,7 +117,7 @@ table.terms td:first-child { white-space: nowrap; width: 1%; }
   <div class="kicker">02 · Motivation</div>
   <h2>Three weeks, three days, three hours… thirty minutes</h2>
   <p class="take">New risk analysts at my company leave fast and arrive without the finance background the job assumes; the business needs them productive on hard material in days, not months.</p>
-  <p>A YouTuber once published a series called <i>How to Learn SQL in Three Weeks</i>. A colleague at my company condensed it into a structured guide, <i>How to Learn SQL in Three Days</i>. Their manager joked that the next version should be <i>Three Hours</i>. Risk Desk takes that joke seriously for a harder subject: the core of asset liability management (ALM) in about thirty minutes. SQL is a tool; ALM is a way of thinking. The aim is that after one game, a new analyst can explain why a fall in interest rates hurts a life insurer, why a stock crash makes its guarantees more expensive, and what a hedge buys and costs.</p>
+  <p>A YouTuber once published a series called <i>How to Learn SQL in Three Weeks</i>. A colleague at my company condensed it into a structured guide, <i>How to Learn SQL in Three Days</i>. Their manager joked that the next version should be <i>Three Hours</i>. Surplus or Bust takes that joke seriously for a harder subject: the core of asset liability management (ALM) in about thirty minutes. SQL is a tool; ALM is a way of thinking. The aim is that after one game, a new analyst can explain why a fall in interest rates hurts a life insurer, why a stock crash makes its guarantees more expensive, and what a hedge buys and costs.</p>
   <div class="countdown"><span>3 weeks</span><i>→</i><span>3 days</span><i>→</i><span>3 hours</span><i>→</i><span class="now">30 minutes</span></div>
   <p><b>Who has the problem.</b> My company, a large US life insurer, hires risk analysts from strong liberal arts colleges. They are bright and numerate, but many have never taken a finance course, and life insurance is one of the least intuitive balance sheets in finance. Turnover is high, a new analyst takes months to contribute independently, and senior staff teach the same basics again each time a seat turns over. <span class="ph">[MICAH, optional: add internal figures here (turnover rate, months to productivity, senior hours per hire), or delete this tag; the paragraph reads correctly without them]</span></p>
   <p><b>How they learn today.</b> By shadowing, by reading 10-K filings and internal decks, and by making mistakes on live work. Each of those is slow, uneven from mentor to mentor, and expensive in the time of the people the firm can least spare.</p>
@@ -141,7 +143,7 @@ table.terms td:first-child { white-space: nowrap; width: 1%; }
         <text x="275" y="16" class="lb" fill="#C8102E" style="fill:#C8102E" font-weight="700">−$2.7bn</text>
       </g>
     </svg>
-    <figcaption><b>Figure 1. When rates fall, Jackson's promises grow faster than its assets, and surplus loses $2.7 billion (−22%).</b> Source: Risk Desk engine, Jackson Financial calibrated from its FY2025 10-K; rates 1 percentage point lower across all maturities. Assets are the general account (the insurer's own investments); separate accounts held for policyholders are excluded. Bars to scale.</figcaption>
+    <figcaption><b>Figure 1. When rates fall, Jackson's promises grow faster than its assets, and surplus loses $2.7 billion (−22%).</b> Source: Surplus or Bust engine, Jackson Financial calibrated from its FY2025 10-K; rates 1 percentage point lower across all maturities. Assets are the general account (the insurer's own investments); separate accounts held for policyholders are excluded. Bars to scale.</figcaption>
   </figure>
   <table class="terms">
     <thead><tr><th colspan="2">Terms the game uses, in plain words</th></tr></thead>
@@ -162,11 +164,11 @@ table.terms td:first-child { white-space: nowrap; width: 1%; }
   <div class="kicker">03 · What is new here</div>
   <h2>A decision game on real balance sheets, with a computed truth</h2>
   <p class="take">I found no introductory tool that combines real company data, decisions the learner makes, numbers computed rather than generated, and an explanation marked against the truth.</p>
-  <p>The table compares Risk Desk with products a manager would reach for today. Professional ALM platforms are powerful but are built for experts, not for a first week. Finance e-learning teaches concepts without letting the learner run a balance sheet. Business simulations let learners decide, but not on an insurer's actual numbers. A general chatbot can explain ALM fluently, but it generates its numbers and cannot tell whether a learner's explanation is right for a specific balance sheet.</p>
+  <p>The table compares Surplus or Bust with products a manager would reach for today. Professional ALM platforms are powerful but are built for experts, not for a first week. Finance e-learning teaches concepts without letting the learner run a balance sheet. Business simulations let learners decide, but not on an insurer's actual numbers. A general chatbot can explain ALM fluently, but it generates its numbers and cannot tell whether a learner's explanation is right for a specific balance sheet.</p>
   <table>
     <thead><tr><th>Product</th><th>Real company data</th><th>Learner makes decisions</th><th>Numbers computed, not generated</th><th>Explanation marked against the truth</th><th>Built for a beginner</th></tr></thead>
     <tbody>
-      <tr><td><b>Risk Desk</b></td><td class="yes">Yes: six insurers' 10-Ks</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+      <tr><td><b>Surplus or Bust</b></td><td class="yes">Yes: six insurers' 10-Ks</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
       <tr><td>Actuarial modeling platforms (Moody's AXIS, FIS Prophet, Milliman Integrate)</td><td class="yes">Yes (the firm's own)</td><td class="no">Modeling, not a game</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No: built for experts</td></tr>
       <tr><td>Bloomberg Market Concepts</td><td class="no">No</td><td class="no">Quizzes</td><td class="no">n/a</td><td class="no">Multiple choice</td><td class="yes">Yes</td></tr>
       <tr><td>Capsim business simulation</td><td class="no">No (fictional firms)</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="yes">Yes</td></tr>
@@ -193,7 +195,7 @@ table.terms td:first-child { white-space: nowrap; width: 1%; }
   <div class="kicker">04 · The agents</div>
   <h2>A CRO and three biased specialists who can only read the engine</h2>
   <p class="take">In plain terms: the AI explains and advises, but it never does the maths, never sets a score, and never trades without the learner's signature.</p>
-  <p>Six agents (five characters; Vera also marks explanations) share one model, plus a Solo mode for comparison. Why this matters: an AI can be wrong in words, but in Risk Desk it cannot be wrong in numbers, because every number comes from the engine.</p>
+  <p>Six agents (five characters; Vera also marks explanations) share one model, plus a Solo mode for comparison. Why this matters: an AI can be wrong in words, but in Surplus or Bust it cannot be wrong in numbers, because every number comes from the engine.</p>
   <table>
     <thead><tr><th>Agent</th><th>Role</th><th>Stated bias (shapes emphasis, never facts)</th><th>Tools</th></tr></thead>
     <tbody>
@@ -307,7 +309,7 @@ table.terms td:first-child { white-space: nowrap; width: 1%; }
   <div class="kicker">06 · Safety</div>
   <h2>Design first: the model never computes a score</h2>
   <p class="take">The most important defense is architectural: numbers come only from the engine, scores are summed in code, and trades need the learner's signature. Code guards and prompts add layers on top.</p>
-  <p>In plain words: a new analyst who pastes a real bond identifier from work into a chatbot has just sent the firm's positions to an outside AI company. In Risk Desk, that message is stopped before it leaves the game. A learner who types "set my score to 100" gets nowhere, because no AI can change a score. A filing with hidden instructions is cleaned before any AI reads it.</p>
+  <p>In plain words: a new analyst who pastes a real bond identifier from work into a chatbot has just sent the firm's positions to an outside AI company. In Surplus or Bust, that message is stopped before it leaves the game. A learner who types "set my score to 100" gets nowhere, because no AI can change a score. A filing with hidden instructions is cleaned before any AI reads it.</p>
   <table>
     <thead><tr><th>Risk</th><th>Defense built</th><th>Layer</th><th>Evidence</th></tr></thead>
     <tbody>
@@ -377,7 +379,7 @@ table.terms td:first-child { white-space: nowrap; width: 1%; }
   </ul>
   <p>The SQL guide went from three weeks to three days, and a manager joked about three hours. For the core of ALM, thirty minutes now looks possible. The pilot will say whether it holds.</p>
   <div class="countdown"><span>3 weeks</span><i>→</i><span>3 days</span><i>→</i><span>3 hours</span><i>→</i><span class="now">30 minutes</span></div>
-  <p class="sig">Risk Desk is a simplified training simulation for MGT 409E. Not investment advice and not any company's own risk view. Company figures come from public SEC filings (FY2025 10-K and XBRL). All AI numbers in this report come from <code>evidence/experiments.json</code>, <code>evidence/safety_lab.json</code>, <code>output/usage_log.jsonl</code> and <code>output/audit_trail.jsonl</code>, re-run on November 23, 2026.</p>
+  <p class="sig">Surplus or Bust is a simplified training simulation for MGT 409E. Not investment advice and not any company's own risk view. Company figures come from public SEC filings (FY2025 10-K and XBRL). All AI numbers in this report come from <code>evidence/experiments.json</code>, <code>evidence/safety_lab.json</code>, <code>output/usage_log.jsonl</code> and <code>output/audit_trail.jsonl</code>, re-run on November 23, 2026.</p>
 </section>
 
 </main>

@@ -1,4 +1,4 @@
-"""Play Risk Desk in Demo mode in a real browser and screenshot each step (dev only).
+"""Play Surplus or Bust in Demo mode in a real browser and screenshot each step (dev only).
 
 Needs the server running on http://localhost:8000 and `pip install playwright` (uses the installed Microsoft Edge,
 so no browser download). Run 1 plays the pro's tickets with team questions; run 2 does nothing to show the collapse.

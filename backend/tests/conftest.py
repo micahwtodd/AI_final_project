@@ -2,4 +2,4 @@
 
 import os
 
-os.environ["RISK_DESK_OFFLINE"] = "1"
+os.environ["SURPLUS_OR_BUST_OFFLINE"] = "1"

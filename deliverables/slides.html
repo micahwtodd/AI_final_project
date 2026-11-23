@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Risk Desk · Slides</title>
+<title>Surplus or Bust · Slides</title>
 <style>/*!
 * reveal.js 5.1.0
 * https://revealjs.com
@@ -72,7 +72,8 @@ html, body, .reveal-viewport { background: var(--navy) !important; --r-backgroun
 <!-- 1 · TITLE -->
 <section>
   <div class="kick">MGT 409E · Final project · Micah Todd</div>
-  <h1>Risk Desk</h1>
+  <h1>Surplus or Bust</h1>
+  <div class="kick" style="color:#fff;letter-spacing:.12em;margin:-8px 0 14px">A Risk Management Simulator</div>
   <h2 style="font-weight:400;color:#e8eef8">A <em class="g">30-minute</em> game on the core of asset liability management, built on real insurers' annual reports</h2>
   <div class="cast">
     <figure><img src="data:image/png;base64,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" alt="Vera"><figcaption><b>Vera</b>Chief Risk Officer · marks you</figcaption></figure>
@@ -120,7 +121,7 @@ html, body, .reveal-viewport { background: var(--navy) !important; --r-backgroun
   <table>
     <thead><tr><th style="text-align:left">Product</th><th>Real company data</th><th>Learner decides</th><th>Computed numbers</th><th>Marked against truth</th></tr></thead>
     <tbody>
-      <tr class="us"><td>Risk Desk</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+      <tr class="us"><td>Surplus or Bust</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
       <tr><td>Actuarial platforms (Moody's AXIS, FIS Prophet)</td><td class="y">✓</td><td class="n">–</td><td class="y">✓</td><td class="n">–</td></tr>
       <tr><td>Bloomberg Market Concepts</td><td class="n">–</td><td class="n">–</td><td class="n">–</td><td class="n">–</td></tr>
       <tr><td>Capsim business simulation</td><td class="n">–</td><td class="y">✓</td><td class="y">✓</td><td class="n">–</td></tr>
@@ -240,7 +241,7 @@ html, body, .reveal-viewport { background: var(--navy) !important; --r-backgroun
 <section>
   <div class="kick">What's next</div>
   <h2>Next: a four-week pilot on my company's risk team</h2>
-  <div class="ask"><b>The ask:</b> the next five analyst hires play Risk Desk in week one. We measure quiz scores, time to first independent work and 30-day recall against recent hires.</div>
+  <div class="ask"><b>The ask:</b> the next five analyst hires play Surplus or Bust in week one. We measure quiz scores, time to first independent work and 30-day recall against recent hires.</div>
   <ul style="font-size:24px;margin-top:22px;max-width:960px">
     <li>Then: a manager view, hosting behind company sign-on, a monthly spend cap per analyst</li>
     <li><span style="color:var(--muted)">Limits today:</span> a simplified engine · a "pro" that uses hindsight · no real user yet</li>

@@ -19,7 +19,7 @@ async function downloadCard(company: string, grade: string, title: string, colla
   g.fillStyle = bg; g.fillRect(0, 0, W, H);
   g.strokeStyle = "#ffc72c"; g.lineWidth = 14; g.strokeRect(7, 7, W - 14, H - 14);
   const px = "'Atkinson Hyperlegible', 'Segoe UI', sans-serif";
-  g.fillStyle = "#ffc72c"; g.font = `700 30px ${px}`; g.fillText("RISK DESK · EMPLOYEE REVIEW", 50, 70);
+  g.fillStyle = "#ffc72c"; g.font = `700 30px ${px}`; g.fillText("SURPLUS OR BUST · EMPLOYEE REVIEW", 50, 70);
   g.fillStyle = "#cfe6f7"; g.font = "24px 'Segoe UI', sans-serif"; g.fillText(company, 50, 108);
   g.fillStyle = "#ffffff"; g.beginPath(); g.arc(160, 280, 95, 0, Math.PI * 2); g.fill();
   g.fillStyle = "#001f5b"; g.font = `700 96px ${px}`; g.textAlign = "center"; g.fillText(grade, 160, 312); g.textAlign = "left";
@@ -30,7 +30,7 @@ async function downloadCard(company: string, grade: string, title: string, colla
   g.font = "56px 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif"; g.fillText(icons.join(" "), 290, 440);
   g.fillStyle = "#cfe6f7"; g.font = "20px 'Segoe UI', sans-serif"; g.fillText("Lesson cards collected", 290, 480);
   const a = document.createElement("a");
-  a.href = c.toDataURL("image/png"); a.download = `risk-desk-${company.replace(/\s+/g, "-").toLowerCase()}.png`; a.click();
+  a.href = c.toDataURL("image/png"); a.download = `surplus-or-bust-${company.replace(/\s+/g, "-").toLowerCase()}.png`; a.click();
 }
 
 const SKILL_INFO: Record<string, { label: string; idea: string }> = {
@@ -109,7 +109,7 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
   });
   const passing = !!rc && /^[ABC]/.test(rc.grade);
   const icons = d.lessons.map((l) => LESSON_ICON[l.quarter] ?? "📘");
-  const shareText = rc ? `Risk Desk · ${props.game.company}: grade ${rc.grade}, "${rc.title}". ${d.verdict ?? ""} Lesson cards ${icons.join("")}` : "";
+  const shareText = rc ? `Surplus or Bust · ${props.game.company}: grade ${rc.grade}, "${rc.title}". ${d.verdict ?? ""} Lesson cards ${icons.join("")}` : "";
   const q = open !== null ? d.quarters?.find((x) => x.quarter === open) : undefined;
   const fmt = (v: number) => `${v >= 0 ? "+" : "−"}$${Math.abs(v).toFixed(2)}bn`;
 
@@ -118,7 +118,7 @@ export function DebriefScreen(props: { debrief: Debrief; game: GameView; onResta
       <header className="rc-header">
         <div className="rc-crest" aria-hidden>🛡️</div>
         <div className="rc-org">
-          <div className="rc-school">Risk Desk Training Program</div>
+          <div className="rc-school">Surplus or Bust Training Program</div>
           <div className="rc-doc">Official Report Card</div>
         </div>
         <dl className="rc-fields">

@@ -271,7 +271,7 @@ def projections(res: dict) -> dict:
 async def main(which: set[str]) -> None:
     res = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() else {}
     if not agents.ai_available():
-        sys.exit("No API key found (or RISK_DESK_OFFLINE is set): the experiments need the model.")
+        sys.exit("No API key found (or SURPLUS_OR_BUST_OFFLINE is set): the experiments need the model.")
     t0 = time.time()
     if "E1" in which:
         print("E1: Solo vs Team", flush=True)

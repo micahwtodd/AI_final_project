@@ -1,4 +1,4 @@
-# Risk Desk
+# Surplus or Bust: a Risk Management Simulator
 
 A training game that teaches junior insurance analysts asset liability management (ALM) on six real, publicly traded US life insurers. Each company's balance sheet comes from its latest 10-K on SEC EDGAR, every number in the game is computed by a deterministic engine, and a small team of AI colleagues answers questions using only tools that read that engine.
 
@@ -13,8 +13,8 @@ You need **Python 3.11 or newer** and **git**. The built web page is committed, 
 **Windows (PowerShell)**
 
 ```
-git clone <repo-url> risk-desk
-cd risk-desk
+git clone https://github.com/micahwtodd/AI_final_project.git
+cd AI_final_project
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
@@ -24,8 +24,8 @@ python run.py
 **Mac / Linux**
 
 ```
-git clone <repo-url> risk-desk
-cd risk-desk
+git clone https://github.com/micahwtodd/AI_final_project.git
+cd AI_final_project
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt

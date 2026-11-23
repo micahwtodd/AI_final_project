@@ -106,7 +106,7 @@ export default function App() {
     <div className={`app scene-${screen.name}`} style={{ ["--scene" as string]: `url("/art/${sceneArt}.png")` }}>
       <header className="topbar">
         <div className="brand" onClick={() => setScreen({ name: "select" })} title="Back to company select">
-          RISK DESK
+          SURPLUS OR BUST
         </div>
         {game && (
           <div className="topbar-info">

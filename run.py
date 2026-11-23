@@ -1,4 +1,4 @@
-"""Start Risk Desk: python run.py  ->  http://localhost:8000"""
+"""Start Surplus or Bust: python run.py  ->  http://localhost:8000"""
 
 from __future__ import annotations
 

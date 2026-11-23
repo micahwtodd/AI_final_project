@@ -49,8 +49,8 @@ WORKERS = ("actuary", "portfolio_manager", "trader")
 
 
 def ai_available() -> bool:
-    """True when a key is configured and AI is not switched off (tests set RISK_DESK_OFFLINE=1)."""
-    return load_env().key_found and not os.environ.get("RISK_DESK_OFFLINE")
+    """True when a key is configured and AI is not switched off (tests set SURPLUS_OR_BUST_OFFLINE=1)."""
+    return load_env().key_found and not os.environ.get("SURPLUS_OR_BUST_OFFLINE")
 
 
 def make_model() -> OpenAIResponsesModel:

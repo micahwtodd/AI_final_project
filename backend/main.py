@@ -16,7 +16,7 @@ from backend import agents, audit, game
 from backend.env import MODEL_NAME, REPO_DIR, load_env
 from backend.models import Action
 
-app = FastAPI(title="Risk Desk")
+app = FastAPI(title="Surplus or Bust")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
