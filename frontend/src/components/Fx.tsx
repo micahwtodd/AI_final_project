@@ -39,7 +39,8 @@ export function CountUp(props: { value: number; format: (v: number) => string; m
       else last.current = end;
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    const safety = window.setTimeout(() => { cancelAnimationFrame(raf); setShown(end); last.current = end; }, dur + 250);
+    return () => { cancelAnimationFrame(raf); clearTimeout(safety); };
   }, [props.value, props.ms]);
   return <>{props.format(shown)}</>;
 }

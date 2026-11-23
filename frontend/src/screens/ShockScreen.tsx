@@ -59,7 +59,7 @@ export function ShockScreen(props: {
       shakeT = window.setTimeout(() => document.body.classList.remove(`shake-${size}`), 900);
     }
     const t = s.collapsed ? 0 : window.setTimeout(() => play(breach || s.surplus_change < 0 ? "alarm" : "bell"), 500);
-    const v = window.setTimeout(() => setVeraIn(true), 2800);  // hold the paper, then Vera knocks
+    const v = window.setTimeout(() => setVeraIn(true), lossShare < 0.03 ? 1300 : 2800);  // hold the paper (briefly for a small move), then Vera knocks
     return () => { clearTimeout(t); clearTimeout(v); clearTimeout(shakeT); document.body.classList.remove("shake-s", "shake-m", "shake-l"); };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -81,7 +81,11 @@ export function ShockScreen(props: {
       <MarketTape moves={s.market_moves} quarter={s.quarter} boss={!!s.boss} />
       {p && (
         <div className={`call-banner ${p.correct ? "hit" : "miss"}`}>
-          {p.correct ? <>🎯 You called it: <b>{p.answer_label}</b>.</> : <>You called <b>{p.pick_label}</b>. It was <b>{p.answer_label}</b>.</>}
+          {p.correct ? <>🎯 You called it: <b>{p.answer_label}</b>.</> : (
+            <span className="miss-row"><span className="miss-pick">{p.pick_label}<span className="wrong-stamp">WRONG</span></span>
+              <span className="miss-arrow">→</span><b className="miss-answer">{p.answer_label}</b></span>
+          )}
+          {p.reason && <div className="call-reason">{p.reason}</div>}
         </div>
       )}
       <div className="newspaper paper-in">
@@ -99,7 +103,7 @@ export function ShockScreen(props: {
       <div className="shock-grid">
         <div className="panel shock-dash">
           <h3>Dashboard before → after</h3>
-          <Meters dashboard={s.dashboard_before} after={s.dashboard_after} />
+          <Meters dashboard={s.dashboard_before} after={s.dashboard_after} hits={!second && !s.collapsed} />
         </div>
 
         <div className="shock-mid">
@@ -155,7 +159,8 @@ export function ShockScreen(props: {
             <div className="explain-row">
               {s.sample_answer && !second && <button className="ghost" disabled={locked} onClick={() => setText(s.sample_answer!)}>Use a sample answer (demo)</button>}
               {!second && !hintMax && <button className="ghost" disabled={locked} onClick={askHint}>{hints.length ? "Bigger hint" : "Hint"}</button>}
-              <button className="ghost" disabled={locked} onClick={() => props.onSubmit("", true)}>I'm not sure</button>
+              <button className="ghost" disabled={locked || (!second && hints.length === 0)} title={!second && hints.length === 0 ? "Take a hint first" : undefined}
+                onClick={() => props.onSubmit("", true)}>I'm not sure</button>
               <button className="gold-btn" disabled={locked || !text.trim()} onClick={() => { props.onSubmit(text, false); setText(""); }}>
                 {props.busy ? <span className="spinner" aria-label="marking" /> : second ? "Submit second try" : "Submit explanation"}
               </button>

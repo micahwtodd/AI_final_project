@@ -57,6 +57,14 @@ export const LEVERS = {
 
 export type LeverKey = keyof typeof LEVERS;
 
+/** When each lever unlocks (cash and puts are there from the start), and who introduces it. */
+export const UNLOCK_Q: Record<string, number> = { rate_hedge_pct: 2, credit_shift_pct: 3, counterparty: 4 };
+export const UNLOCK_INTRO: Record<string, { face: string; who: string; line: string }> = {
+  rate_hedge_pct: { face: "swap_pleased", who: "Swap Dogg", line: "New toy, man: interest rate swaps. Slide right to receive fixed (gains if rates fall); slide left to pay fixed, which is a bet that rates rise, not protection." },
+  credit_shift_pct: { face: "bonnie_pleased", who: "Bonnie", line: "You can now move risky bonds into government bonds. Safer when defaults come, but we give up yield." },
+  counterparty: { face: "swap_neutral", who: "Swap Dogg", line: "Counterparty terms are yours now: daily collateral and more dealers cut what a dealer failure can cost us." },
+};
+
 export const COUNTERPARTY_TIP = "With daily collateral, dealers post cash as your hedges gain, so a dealer failure costs little; it can also demand cash from you when hedges lose. Spreading hedges across 3 dealers limits what any one failure can cost.";
 export const TICKET_TIP = "Each slider starts at zero every quarter: it is a new trade added on top of what you already hold. Your positions carry over from quarter to quarter.";
 

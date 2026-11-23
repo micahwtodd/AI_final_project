@@ -59,7 +59,7 @@ export function ReportCardPanel(props: { rc: ReportCard; results: number; unders
         <p>{rc.why}</p>
         <div className="small muted">
           Grade = 60% results ({props.results.toFixed(0)}) + 40% Executive Summary ({props.understanding.toFixed(0)}) = {rc.overall.toFixed(1)}.
-          {rc.breaches > 0 && ` ${rc.breaches} floor breach${rc.breaches > 1 ? "es" : ""}.`}
+          {rc.breaches > 0 && ` ${rc.breaches} floor breach${rc.breaches > 1 ? "es" : ""}${rc.breach_detail?.length ? `: ${rc.breach_detail.join(", ")}` : ""}.`}
         </div>
       </div>
       <PixelSprite name={good ? "vera_pleased" : "vera_concerned"} size={96} title="Vera Atrisk" />

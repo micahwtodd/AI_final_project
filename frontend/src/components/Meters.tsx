@@ -2,7 +2,7 @@ import type { Dashboard } from "../api";
 import { Term } from "./Term";
 
 type Gauge = { now: number; after?: number; min: number; max: number; floor?: number; amber?: number; center?: boolean };
-type Meter = { key: string; term?: string; label: string; value: string; status?: string; hint: string; afterValue?: string; gauge?: Gauge };
+type Meter = { key: string; term?: string; label: string; value: string; status?: string; hint: string; afterValue?: string; gauge?: Gauge; worse?: boolean };
 
 function GaugeBar({ g }: { g: Gauge }) {
   const pct = (v: number) => `${Math.max(0, Math.min(100, (100 * (v - g.min)) / (g.max - g.min)))}%`;
@@ -32,7 +32,7 @@ function meters(d: Dashboard, after?: Dashboard): Meter[] {
   });
   const a = m(d);
   const b = after ? m(after) : undefined;
-  return [
+  const rows: Meter[] = [
     { key: "surplus", term: "surplus", label: "Surplus (equity cushion)", value: a.surplus, afterValue: b?.surplus, hint: "Assets minus liabilities. What protects policyholders." },
     { key: "capital", term: "capital_ratio", label: "Capital ratio", value: a.capital, afterValue: b?.capital, status: d.status.capital,
       hint: "Surplus ÷ the capital a simplified regulator would require. The floor is 100%: below it, a real insurer faces regulators and rating downgrades, and here you lose 10 points (unless a pro would have breached too). Amber under 130%.",
@@ -47,13 +47,22 @@ function meters(d: Dashboard, after?: Dashboard): Meter[] {
     { key: "equity", term: "variable_annuity_guarantee", label: "Stock-market exposure", value: a.equity, afterValue: b?.equity, hint: "Loss if stocks fell 100%: alternatives (incl. stocks) held plus unhedged guarantees." },
     { key: "cpty", term: "counterparty_risk", label: "Owed by dealers (uncollateralized)", value: a.cpty, afterValue: b?.cpty, hint: "Hedge gains a dealer owes you without collateral. Lost if the dealer fails." },
   ];
+  if (after) {  // which tiles got worse (a hit)
+    const worse: Record<string, boolean> = {
+      surplus: after.surplus_usd_bn < d.surplus_usd_bn - 1e-6, capital: after.capital_ratio_pct < d.capital_ratio_pct - 0.05,
+      liquidity: after.liquidity_ratio_pct < d.liquidity_ratio_pct - 0.05, gap: Math.abs(after.duration_gap_years) > Math.abs(d.duration_gap_years) + 0.005,
+      equity: after.net_equity_exposure_usd_bn > d.net_equity_exposure_usd_bn + 0.005, cpty: after.counterparty_exposure_usd_bn > d.counterparty_exposure_usd_bn + 0.005,
+    };
+    rows.forEach((r) => { r.worse = !!worse[r.key]; });
+  }
+  return rows;
 }
 
-export function Meters(props: { dashboard: Dashboard; after?: Dashboard }) {
+export function Meters(props: { dashboard: Dashboard; after?: Dashboard; hits?: boolean }) {
   return (
     <div className="meters">
-      {meters(props.dashboard, props.after).map((m) => (
-        <div key={m.key} className={`meter ${m.status ?? ""}`}>
+      {meters(props.dashboard, props.after).map((m, i) => (
+        <div key={m.key} className={`meter ${m.status ?? ""} ${props.hits && m.worse ? "hit" : ""}`} style={props.hits && m.worse ? { animationDelay: `${0.9 + i * 0.22}s` } : undefined}>
           <div className="meter-label"><Term k={m.term ?? m.key} text={m.hint}>{m.label}</Term></div>
           <div className="meter-value">
             {m.value}

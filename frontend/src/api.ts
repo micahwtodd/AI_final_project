@@ -66,6 +66,7 @@ export type Card = {
   signal_text: string;
   offers_prt_deal: boolean;
   boss?: boolean;
+  rule?: string | null;
   glossary_terms: string[];
 };
 
@@ -81,7 +82,7 @@ export type HistoryRow = {
 
 export type Badge = { id: string; quarter: number; name: string; icon: string; text: string };
 export type Achievements = { earned: Badge[]; streaks: { floor: number; explain: number }; available: number };
-export type ReportCard = { grade: string; overall: number; title: string; why: string; breaches: number; avg_hedge_pct: number;
+export type ReportCard = { grade: string; overall: number; title: string; why: string; breaches: number; avg_hedge_pct: number; breach_detail?: string[];
   weights: { results: number; understanding: number } };
 
 export type GameView = {
@@ -107,6 +108,8 @@ export type GameView = {
   achievements: Achievements;
   n_quarters: number;
   collapsed: boolean;
+  unlocked?: string[];
+  new_unlocks?: string[];
 };
 
 export type Usage = {
@@ -177,7 +180,7 @@ export type Shock = {
   boss?: boolean;
   collapsed?: boolean;
   nothing_collapsed?: boolean;
-  prediction?: { pick: string; answer: string; correct: boolean; pick_label: string; answer_label: string } | null;
+  prediction?: { pick: string; answer: string; correct: boolean; pick_label: string; answer_label: string; reason?: string } | null;
 };
 
 export type Reveal = {
@@ -188,6 +191,8 @@ export type Reveal = {
   comparison: { you: number; nothing: number; benchmark: number };
   collapsed?: { you: boolean; nothing: boolean; benchmark: boolean };
   lever_gains?: Record<string, number>;
+  lever_effects?: Record<string, number>;
+  next_is_boss?: boolean;
   title?: string;
   boss?: boolean;
   n_quarters?: number;
@@ -240,6 +245,9 @@ export type Debrief = {
   before_after: BeforeAfter;
 };
 
+export type WhatIf = { quarter: number; change: number; surplus_after: number; actual_change: number; nothing_change: number;
+  pro_change: number; collapsed: boolean; start_action: Action; locked: string[] };
+
 export type Health = { ok: boolean; key_found: boolean; provider: string | null; model: string };
 
 async function call<T>(path: string, body?: unknown): Promise<T> {
@@ -274,6 +282,7 @@ export const api = {
   preview: (id: string, action: Action) => call<Preview>(`/game/${id}/preview`, { action }),
   commit: (id: string, actions: Action) => call<{ view: GameView; after: Dashboard }>(`/game/${id}/commit`, { actions }),
   advance: (id: string, prediction?: string | null) => call<Shock>(`/game/${id}/advance`, { prediction: prediction ?? null }),
+  whatif: (id: string, action: Partial<Action>) => call<WhatIf>(`/game/${id}/whatif`, { action }),
   hint: (id: string) => call<{ level: number; max: number; hint: string }>(`/game/${id}/hint`, {}),
   explain: (id: string, text: string, not_sure: boolean) => call<ExplainResult>(`/game/${id}/explain`, { text, not_sure }),
   debrief: (id: string) => call<Debrief>(`/game/${id}/debrief`),

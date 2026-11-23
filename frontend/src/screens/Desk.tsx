@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api, type Action, type GameView, type Preview, type Shock, type Usage } from "../api";
 import { ChatPanel } from "../components/ChatPanel";
-import { COUNTERPARTY_TIP, LEVERS, TICKET_TIP, type LeverKey } from "../labels";
+import { COUNTERPARTY_TIP, LEVERS, TICKET_TIP, UNLOCK_INTRO, UNLOCK_Q, type LeverKey } from "../labels";
+import { PixelSprite } from "../components/PixelSprite";
 
 const LEVER_KEYS = Object.keys(LEVERS) as LeverKey[];
 type Deltas = Record<LeverKey, number>;
@@ -81,6 +82,25 @@ export function Desk(props: {
     && (g.pending.accept_prt ?? null) === (draft.accept_prt ?? null);
   const needsPrt = offersPrt && draft.accept_prt === null;
   const [predicting, setPredicting] = useState(false);
+  const isOpen = (k: string) => !g.unlocked || g.unlocked.includes(k === "counterparty" ? "collateralized" : k);
+  const isNew = (k: string) => !!g.new_unlocks?.includes(k === "counterparty" ? "collateralized" : k);
+  const boss = !!g.card?.boss;
+  const [clock, setClock] = useState(180);
+  useEffect(() => {  // the boss round: a siren and a (cosmetic) countdown to the market open
+    if (!boss) return;
+    const s = window.setTimeout(() => play("alarm"), 1200);
+    const t = window.setInterval(() => setClock((c) => Math.max(0, c - 1)), 1000);
+    return () => { clearTimeout(s); clearInterval(t); };
+  }, [boss, g.id]);
+  const Intro = ({ k }: { k: string }) => {
+    const it = UNLOCK_INTRO[k];
+    return isNew(k) && it ? (
+      <div className="unlock-intro"><PixelSprite name={it.face} size={36} title={it.who} /><span><b>{it.who}:</b> {it.line}</span></div>
+    ) : null;
+  };
+  const Locked = ({ label, k }: { label: string; k: string }) => (
+    <div className="lever locked"><span className="lock">🔒</span> {label} <span className="muted">unlocks in Q{UNLOCK_Q[k]}</span></div>
+  );
   const endQuarter = async (prediction: string | null) => {
     setPredicting(false);
     const s = await props.run(() => api.advance(g.id, prediction));
@@ -97,14 +117,14 @@ export function Desk(props: {
     <section className="desk">
       {g.card && <QuarterSplash id={g.id} quarter={g.card.quarter} of={g.n_quarters} boss={!!g.card.boss} title={g.card.title} era={g.card.era} />}
       {showGuide && <GuideBar step={guide} onNext={() => setGuide((x) => x + 1)} onHide={hideGuide} />}
-      {g.card && <Surprise id={g.id} quarter={g.card.quarter} />}
+      {g.card && <Surprise id={g.id} quarter={g.card.quarter} rule={g.card.rule ?? undefined} />}
       <SoundPrompt />
       {predicting && <PredictModal quarter={g.quarter} onPick={(p) => endQuarter(p)} onCancel={() => setPredicting(false)} />}
       <div className="desk-dash">
         <div className="panel">
           <div className="dash-head">
             <h3>Risk dashboard</h3>
-            <DeskCat status={worst((preview?.after ?? g.dashboard).status)} size={56} />
+            <DeskCat status={worst((preview?.after ?? g.dashboard).status)} size={56} boss={boss} />
           </div>
           {preview && !signed && <div className="small muted dash-note">→ shows the effect of your draft ticket</div>}
           <Meters dashboard={g.dashboard} after={preview?.after} />
@@ -129,6 +149,8 @@ export function Desk(props: {
       <div className="desk-right">
         <div className={`panel ticket${focus(2)}${focus(3)}`}>
           <h3><Term k="ticket_help" text={TICKET_TIP}>Trade ticket · Q{g.quarter}</Term></h3>
+          {g.card?.rule && <div className="rule-banner"><b>⚡ RULE CHANGE</b> {g.card.rule}</div>}
+          {boss && <div className="boss-banner">🚨 BOSS ROUND: every lever is unlocked. This is the ticket that matters.</div>}
           {g.quarter > 1 && (
             <div className="holdings"><b>You hold</b> {holdings.join(" · ")}. <span className="muted">The sliders below are new trades on top: leave them at 0 to keep these.</span></div>
           )}
@@ -140,8 +162,11 @@ export function Desk(props: {
             const snap = (v: number) => (v >= hi - L.step / 2 ? hi : v <= lo + L.step / 2 ? lo : Math.round(v / L.step) * L.step);
             const d = delta[k];
             const zeroAt = hi > lo ? (100 * -lo) / (hi - lo) : 50;
+            if (!isOpen(k)) return <Locked key={k} label={L.label} k={k} />;
             return (
-              <div className="lever" key={k}>
+              <div className={`lever ${isNew(k) ? "new-lever" : ""}`} key={k}>
+                {isNew(k) && <span className="new-badge">NEW</span>}
+                <Intro k={k} />
                 <div className="lever-head">
                   <label htmlFor={k}><Term k={L.term} text={L.tip}>{L.label}</Term></label>
                   <span className="lever-val">{d > 0 ? "+" : d < 0 ? "−" : ""}{fmtNum(Math.abs(d))}{L.unit}</span>
@@ -163,7 +188,10 @@ export function Desk(props: {
             );
           })}
 
-          <div className="lever">
+          {!isOpen("counterparty") ? <Locked label="Counterparty terms" k="counterparty" /> : (
+          <div className={`lever ${isNew("counterparty") ? "new-lever" : ""}`}>
+            {isNew("counterparty") && <span className="new-badge">NEW</span>}
+            <Intro k="counterparty" />
             <div className="lever-head"><label><Term k="collateral" text={COUNTERPARTY_TIP}>Counterparty terms</Term></label></div>
             <div className="toggle-row">
               <label><input type="checkbox" checked={draft.collateralized} onChange={(e) => set("collateralized", e.target.checked)} /> Daily collateral</label>
@@ -176,6 +204,7 @@ export function Desk(props: {
               </label>
             </div>
           </div>
+          )}
 
           {offersPrt && (
             <div className="lever prt">
@@ -211,7 +240,7 @@ export function Desk(props: {
               onClick={() => setPredicting(true)}>
               End Q{g.quarter} →
             </button>
-            <span className="btn-note">The market moves. No going back.</span>
+            <span className="btn-note">{boss ? (clock > 0 ? <b className="countdown">Market opens in {Math.floor(clock / 60)}:{String(clock % 60).padStart(2, "0")}</b> : <b className="countdown">The market is open.</b>) : "The market moves. No going back."}</span>
             </div>
           </div>
           {!g.pending && <div className="small muted">No ticket signed yet: ending the quarter keeps your current positions.</div>}

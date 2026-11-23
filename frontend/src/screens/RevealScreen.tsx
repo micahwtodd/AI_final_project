@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { WhatIfPanel } from "../components/WhatIf";
 import type { Action, Reveal, Shock } from "../api";
 import { LEVERS, LESSON_ICON, type LeverKey } from "../labels";
 import { PixelSprite } from "../components/PixelSprite";
@@ -81,6 +82,11 @@ const CHECK_LABELS: Record<string, string> = {
   improvement: "Said what your trades did or could have done",
 };
 
+const SHIELD_LABEL: Record<string, string> = {
+  rate_hedge_pct: "Rate protection (swaps)", credit_shift_pct: "Risky bonds moved to government bonds",
+  equity_hedge_pct: "Stock-market insurance (puts)", cash_buffer_pct: "Cash on hand", counterparty: "Collateral and dealers",
+};
+
 const starsFor = (score: number) => (score >= 90 ? 3 : score >= 60 ? 2 : score >= 30 ? 1 : 0);
 const BEATS = ["Vera's feedback", "Scoreboard", "How a pro traded", "Lesson card"];
 
@@ -92,6 +98,11 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
   const u = r.understanding;
   const stars = starsFor(r.quarter_score);
   const collapsed = r.collapsed?.you;
+
+  useEffect(() => {  // Vera reacts out loud
+    const t = window.setTimeout(() => play((u?.points ?? 0) >= 75 ? "bell" : (u?.points ?? 0) >= 40 ? "click" : "whoosh"), 600);
+    return () => clearTimeout(t);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (beat === 0) return;
@@ -131,7 +142,9 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
       {/* Beat 1: Vera's trade feedback */}
       <div className="panel examiner beat" ref={(el) => { refs.current[0] = el; }}>
         <div className="examiner-head">
-          <PixelSprite name={(u?.points ?? 0) >= 50 ? "vera_pleased" : "vera_concerned"} size={96} title="Vera Atrisk" />
+          <span className={`vera-react ${(u?.points ?? 0) >= 75 ? "happy" : (u?.points ?? 0) >= 40 ? "hm" : "worried"}`}>
+            <PixelSprite name={(u?.points ?? 0) >= 75 ? "vera_pleased" : (u?.points ?? 0) >= 40 ? "vera_neutral" : "vera_concerned"} size={96} title="Vera Atrisk" />
+          </span>
           <div className="examiner-text">
             <div className="cro-name">Vera Atrisk · trade feedback</div>
             {r.review && <p className="cro-feedback big">{r.review.reply_text}</p>}
@@ -186,6 +199,13 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
               ]} />
             </div>
           </div>
+          {r.lever_effects && Object.keys(r.lever_effects).length > 0 && (
+            <div className="shields">
+              <h3>Your shields: what each position did this quarter</h3>
+              <Bars rows={Object.entries(r.lever_effects).map(([k, v]) => ({ label: SHIELD_LABEL[k] ?? k, value: v }))} />
+              <div className="small muted">Each bar compares your result with the same quarter without that position.</div>
+            </div>
+          )}
           {beat === 1 && next("How would a pro have traded?")}
         </div>
       )}
@@ -196,6 +216,7 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
           <h2>How a pro would have traded</h2>
           <p className="small muted"><span className="key-you">●</span> you · <span className="key-pro">●</span> a pro. Highlighted rows are where you and the pro differ. The last column is what matching the pro on that lever alone would have added this quarter; ⭐ marks the one that mattered most.</p>
           <ProTable you={r.your_action} pro={r.benchmark_action} gains={r.lever_gains ?? {}} />
+          <WhatIfPanel gameId={r.view.id} quarter={r.quarter} you={r.your_action} />
           {beat === 2 && next("Collect your lesson card")}
         </div>
       )}
@@ -229,9 +250,16 @@ export function RevealScreen(props: { reveal: Reveal; shock: Shock; onNext: () =
         </div>
       </details>
 
+      {r.next_is_boss && (
+        <div className="boss-warning" role="alert">
+          <div className="boss-siren">🚨</div>
+          <div><b>INTELLIGENCE BRIEFING · SOMETHING BIG IS COMING</b>
+            <div>Every lever is in your hands now. Whatever you hold when the market opens is all you'll have. Spend your last ticket wisely.</div></div>
+        </div>
+      )}
       <div className="next-bar">
         <button className="gold-btn" onClick={props.onNext}>
-          {r.finished ? "See the final debrief →" : `On to Q${r.quarter + 1} →`}
+          {r.finished ? "See the final debrief →" : r.next_is_boss ? "Prepare for the boss round →" : `On to Q${r.quarter + 1} →`}
         </button>
       </div>
     </section>

@@ -23,10 +23,10 @@ export function PixelSprite(props: { name: string; size: number; title?: string;
 }
 
 /** The Convexity cat reacts to the capital ratio: naps when healthy, sits up on a warning, hides under the desk on a breach. */
-export function DeskCat(props: { status: "green" | "amber" | "red" | undefined; size?: number }) {
-  const state = props.status === "red" ? "hide" : props.status === "amber" ? "alert" : "nap";
-  const label = { nap: "Convexity the cat is napping: capital is healthy",
-    alert: "Convexity the cat is on alert: capital is near the floor",
-    hide: "Convexity the cat is hiding: capital is below the floor" }[state];
+export function DeskCat(props: { status: "green" | "amber" | "red" | undefined; size?: number; boss?: boolean }) {
+  const state = props.boss || props.status === "red" ? "hide" : props.status === "amber" ? "alert" : "nap";
+  const label = props.boss ? "Convexity is hiding under the desk: the boss round is here" : { nap: "Convexity the cat is napping: capital and liquidity are healthy",
+    alert: "Convexity the cat is on alert: capital or liquidity is near the floor",
+    hide: "Convexity the cat is hiding: capital or liquidity is below the floor" }[state];
   return <span className={`desk-cat cat-${state}`} key={state} title={label}><PixelSprite name={`cat_${state}`} size={props.size ?? 48} title={label} /></span>;
 }

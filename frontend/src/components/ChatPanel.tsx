@@ -43,16 +43,22 @@ function fromHistory(chat: ChatMsg[]): Turn[] {
 }
 
 /** Text that types itself out (for replies that just arrived). */
-function TypeText({ text, animate }: { text: string; animate?: boolean }) {
+const NUM = /(−?-?\$?\d[\d,]*(?:\.\d+)?\s?(?:bn|mn|%|bp|x|×|yrs|years)?)/g;
+function withChips(text: string) {
+  return text.split(NUM).map((part, i) => (i % 2 === 1 && /\d/.test(part) ? <span key={i} className="numchip">{part}</span> : part));
+}
+const PACE: Record<string, number> = { trader: 2.2, portfolio_manager: 1.2, actuary: 0.7, cro: 1.0, solo: 1.0 };
+
+function TypeText({ text, animate, who }: { text: string; animate?: boolean; who?: string }) {
   const [n, setN] = useState(animate ? 0 : text.length);
   useEffect(() => {
     if (!animate || document.hidden) { setN(text.length); return; }
     let i = 0;
-    const step = Math.max(2, Math.round(text.length / 90));  // about 1.5 seconds whatever the length
+    const step = Math.max(1, Math.round((text.length / 90) * (PACE[who ?? "cro"] ?? 1)));  // Swap Dogg types fast, Morty takes his time
     const t = window.setInterval(() => { i += step; setN(Math.min(text.length, i)); if (i >= text.length) clearInterval(t); }, 16);
     return () => clearInterval(t);
   }, [text, animate]);
-  return <>{text.slice(0, n)}{n < text.length && <span className="caret">▍</span>}</>;
+  return n >= text.length ? <>{withChips(text)}</> : <>{text.slice(0, n)}<span className="caret">▍</span></>;
 }
 
 function short(v: unknown): string {
@@ -242,7 +248,7 @@ export function ChatPanel(props: {
                 {spriteFor(sa.agent) && <PixelSprite name={spriteFor(sa.agent)!} size={28} className="msg-face arrive" />}
                 {sa.agent_name}
               </div>
-              <div className="msg-text"><TypeText text={sa.text} animate={t.pending || t.fresh} /></div>
+              <div className="msg-text"><TypeText text={sa.text} animate={t.pending || t.fresh} who={sa.agent} /></div>
             </div>
           ))}
           <div className={`msg ${t.role}`} style={t.role === "agent" ? { borderLeftColor: CAST[t.agent ?? "system"]?.color } : undefined}>
@@ -252,7 +258,7 @@ export function ChatPanel(props: {
                 {t.agentName ?? "Colleague"}
               </div>
             )}
-            <div className="msg-text">{t.pending && !t.text ? <TypingLine t={t} /> : t.role === "agent" ? <TypeText text={t.text} animate={t.fresh} /> : t.text}</div>
+            <div className="msg-text">{t.pending && !t.text ? <TypingLine t={t} /> : t.role === "agent" ? <TypeText text={t.text} animate={t.fresh} who={t.agent} /> : t.text}</div>
             {t.role === "agent" && !t.pending && <Reactions t={t} />}
             {t.ticket && (
               <div className="proposed">

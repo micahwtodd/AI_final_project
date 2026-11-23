@@ -48,7 +48,7 @@ const SURPRISES: Record<number, string> = {
 const seen = new Set<string>();
 
 /** One light moment per quarter, shown once, gone after a few seconds. */
-export function Surprise(props: { id: string; quarter: number }) {
+export function Surprise(props: { id: string; quarter: number; rule?: string }) {
   const key = `${props.id}-${props.quarter}`;
   const [show, setShow] = useState(!seen.has(key) && !!SURPRISES[props.quarter]);
   useEffect(() => {
@@ -58,5 +58,5 @@ export function Surprise(props: { id: string; quarter: number }) {
     return () => clearTimeout(t);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   if (!show) return null;
-  return <div className="surprise" role="status" onClick={() => setShow(false)}>{SURPRISES[props.quarter]}</div>;
+  return <div className={`surprise ${props.rule ? "rule" : ""}`} role="status" onClick={() => setShow(false)}>{props.rule ? <>⚡ <b>Rule change:</b> {props.rule}</> : SURPRISES[props.quarter]}</div>;
 }
