@@ -220,7 +220,11 @@ export default function App() {
             when={screen.when}
             company={screen.game.company}
             demo={screen.game.demo}
-            onSkip={() => setScreen({ name: "desk", game: screen.game })}
+            onSkip={async () => {
+              if (screen.when === "pre") { setScreen({ name: "desk", game: screen.game }); return; }
+              const d = await run(() => api.debrief(screen.game.id));
+              if (d) setScreen({ name: "debrief", game: screen.game, debrief: d });
+            }}
             onBack={screen.when === "pre" ? () => setScreen({ name: "knowledge", game: screen.game }) : undefined}
             onDone={async () => {
               const g = screen.game;

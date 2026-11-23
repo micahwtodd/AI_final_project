@@ -61,25 +61,20 @@ def test_debrief_has_a_try_next_line_and_prediction_tally():
 
 # ---------------------------------------------------------------- round 2
 
-def test_levers_unlock_one_quarter_at_a_time_and_locked_levers_stay_put():
+def test_every_instrument_is_available_in_every_quarter():
     gid = _new()
-    v = client.get(f"/api/game/{gid}").json()
-    assert set(v["unlocked"]) == {"cash_buffer_pct", "equity_hedge_pct"}
     c = client.post(f"/api/game/{gid}/commit", json={"actions": {"rate_hedge_pct": 80, "equity_hedge_pct": 30,
                                                                   "cash_buffer_pct": 9, "collateralized": True, "dealers": 3}}).json()
     p = c["view"]["pending"]
-    assert p["rate_hedge_pct"] == 0 and p["equity_hedge_pct"] == 30 and p["collateralized"] is False and p["dealers"] == 1
-    client.post(f"/api/game/{gid}/advance")
-    client.post(f"/api/game/{gid}/explain", json={"text": "", "not_sure": True})
-    v2 = client.get(f"/api/game/{gid}").json()
-    assert "rate_hedge_pct" in v2["unlocked"] and v2["new_unlocks"] == ["rate_hedge_pct"]
+    assert p["rate_hedge_pct"] == 80 and p["collateralized"] is True and p["dealers"] == 3
 
 
-def test_rate_protection_holds_the_chosen_percentage_across_quarters():
+def test_hedges_are_cash_settled_and_reset_each_quarter():
     s = engine.build_state(load_profile("EQH"), 409)
-    s, _ = engine.play_quarter(s, Action(rate_hedge_pct=-30, cash_buffer_pct=8))
-    assert abs(s.action.rate_hedge_pct + 30) < 1e-9
-    again = engine.apply_action(s, s.action)
+    s, _ = engine.play_quarter(s, Action(rate_hedge_pct=-30, equity_hedge_pct=60, credit_shift_pct=20, cash_buffer_pct=8))
+    assert s.action.rate_hedge_pct == 0 and s.action.equity_hedge_pct == 0 and s.action.credit_shift_pct == 0
+    assert s.swap_dv01 == 0 and s.uncollateralized_mtm == 0
+    again = engine.apply_action(s, s.action)  # an untouched ticket trades nothing
     assert engine.dashboard(again).model_dump() == engine.dashboard(s).model_dump()
 
 

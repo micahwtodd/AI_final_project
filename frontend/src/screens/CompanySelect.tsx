@@ -44,8 +44,10 @@ export function CompanySelect(props: { companies: Company[]; busy: boolean; onSt
             <div className="hero-kicker">Six real insurers · real balance sheets · one brutal year</div>
             <h1>Pick your insurer.</h1>
           </div>
-          {props.onIntro && <button className="link hero-link" onClick={props.onIntro}>↺ Replay intro</button>}
-          <button className="demo-btn" disabled={props.busy} onClick={props.onDemo} title="Jackson Financial with sample answers for every step">▶ Demo mode</button>
+          <div className="hero-actions">
+            <button className="demo-btn" disabled={props.busy} onClick={props.onDemo} title="Jackson Financial with sample answers for every step">▶ Demo mode</button>
+            {props.onIntro && <button className="link hero-link" onClick={props.onIntro}>↺ Replay intro</button>}
+          </div>
         </div>
         <ol className="rules">
           <li><span className="rule-n">1</span><b>Read the wire.</b> A hint of what's coming. Maybe.</li>

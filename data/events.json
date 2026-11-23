@@ -29,8 +29,8 @@
         "equity_hedge_pct": 0,
         "cash_buffer_pct": 15,
         "fx_hedge_pct": 0,
-        "collateralized": false,
-        "dealers": 1
+        "collateralized": true,
+        "dealers": 3
       },
       "glossary_terms": [
         "margin_call",
@@ -74,8 +74,8 @@
         "equity_hedge_pct": 90,
         "cash_buffer_pct": 6,
         "fx_hedge_pct": 0,
-        "collateralized": false,
-        "dealers": 1
+        "collateralized": true,
+        "dealers": 3
       },
       "glossary_terms": [
         "variable_annuity_guarantee",
@@ -123,8 +123,8 @@
         "equity_hedge_pct": 0,
         "cash_buffer_pct": 5,
         "fx_hedge_pct": 0,
-        "collateralized": false,
-        "dealers": 1
+        "collateralized": true,
+        "dealers": 3
       },
       "glossary_terms": [
         "duration",

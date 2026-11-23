@@ -108,10 +108,6 @@ export function Desk(props: {
   };
   const worst = (st: Record<string, string>) =>
     (st.capital === "red" || st.liquidity === "red" ? "red" : st.capital === "amber" || st.liquidity === "amber" ? "amber" : "green") as "red" | "amber" | "green";
-  const holdings = [
-    `swaps ${fmtNum(pos.rate_hedge_pct)}%`, `bonds moved ${fmtNum(pos.credit_shift_pct)}%`, `puts ${fmtNum(pos.equity_hedge_pct)}%`,
-    `cash ${fmtNum(pos.cash_buffer_pct)}%`, `collateral ${pos.collateralized ? "on" : "off"}`, `${pos.dealers} dealer${pos.dealers === 3 ? "s" : ""}`,
-  ];
 
   return (
     <section className="desk">
@@ -152,7 +148,7 @@ export function Desk(props: {
           {g.card?.rule && <div className="rule-banner"><b>⚡ RULE CHANGE</b> {g.card.rule}</div>}
           {boss && <div className="boss-banner">🚨 BOSS ROUND: every lever is unlocked. This is the ticket that matters.</div>}
           {g.quarter > 1 && (
-            <div className="holdings"><b>You hold</b> {holdings.join(" · ")}. <span className="muted">The sliders below are new trades on top: leave them at 0 to keep these.</span></div>
+            <div className="holdings"><b>Fresh ticket.</b> Last quarter's swaps and puts were cash-settled when it ended. Your book now: cash {fmtNum(pos.cash_buffer_pct)}% of assets, collateral {pos.collateralized ? "on" : "off"}, {pos.dealers} dealer{pos.dealers === 3 ? "s" : ""}. <span className="muted">Each slider is a trade from here.</span></div>
           )}
           {LEVER_KEYS.map((k) => {
             const L = LEVERS[k];

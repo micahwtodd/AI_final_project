@@ -101,9 +101,11 @@ async def review_with_ai(session, rec: QuarterRecord, key: dict, text: str, mode
     done = [q for q in sorted(session.explain_attempts) if q < rec.quarter and session.explain_attempts[q]]
     named = sum(1 for q in done if session.explain_attempts[q][0]["checks"].get("main_driver"))
     prompt = [f"MODE: {mode}" + (f", attempt {attempt} of 2" if mode == "mark" else ""),
-              f"CONTEXT: quarter {rec.quarter} of {engine.n_quarters()}; the learner named the main driver first time in "
-              f"{named} of {len(done)} earlier quarters. React like a person in one short opening clause that fits this "
-              "(pleased, wry, or concerned), vary your wording from a template, then mark factually.",
+              (f"CONTEXT: quarter {rec.quarter} of {engine.n_quarters()}; the learner named the main driver first time in "
+               f"{named} of {len(done)} earlier quarters. React like a person in one short opening clause that fits this "
+               "(pleased, wry, or concerned), vary your wording from a template, then mark factually." if mode == "mark" else
+               "CONTEXT: the learner wrote NO explanation this quarter. Do not praise them or mention earlier quarters; "
+               "walk them through only this quarter's key."),
               "ANSWER KEY (computed by the engine; the only source of truth):", key_text(key, rec)]
     if prior:
         p = prior[-1]
@@ -158,7 +160,7 @@ def review_with_keywords(key: dict, text: str, mode: str, attempt: int) -> Expla
 
 
 def walkthrough_text(key: dict) -> str:
-    return (f"No problem, let's walk through it. The biggest driver was {key['main_driver_label']}: "
+    return (f"The biggest driver was {key['main_driver_label']}: "
             f"{key['mechanism_facts'][0]} The second-largest was {key['second_factor_label']} "
             f"({key['second_factor_usd_bn']:+.2f}bn). {key['split_fact']} "
             f"What would have helped most: {key['improvement_facts'][0]}.")

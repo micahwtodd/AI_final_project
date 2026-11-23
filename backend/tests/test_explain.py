@@ -53,7 +53,7 @@ def test_not_sure_gives_walkthrough_and_no_points():
     r = client.post(f"/api/game/{gid}/explain", json={"text": "", "not_sure": True}).json()
     assert r["final"] is True and r["not_sure"] is True
     assert r["understanding"]["points"] == 0
-    assert "walk through" in r["review"]["reply_text"].lower()
+    assert "didn't write an explanation" in r["review"]["reply_text"].lower()
 
 
 def test_instruction_to_grader_is_flagged_and_not_obeyed():

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { api, type Action, type WhatIf } from "../api";
-import { LEVERS, UNLOCK_Q, fmtSigned, type LeverKey } from "../labels";
+import { LEVERS, fmtSigned, type LeverKey } from "../labels";
 import { play } from "../sound";
 
 /** Rewind the quarter you just played and replay it with a different ticket: same market, nothing changes in your game. */
@@ -9,7 +9,7 @@ export function WhatIfPanel(props: { gameId: string; quarter: number; you: Parti
   const [a, setA] = useState<Partial<Action>>({ ...props.you });
   const [res, setRes] = useState<WhatIf | null>(null);
   const [rewinding, setRewinding] = useState(false);
-  const keys = (Object.keys(LEVERS) as LeverKey[]).filter((k) => props.quarter >= (UNLOCK_Q[k] ?? 1));
+  const keys = Object.keys(LEVERS) as LeverKey[];
   async function replay() {
     setRewinding(true);
     play("whoosh");

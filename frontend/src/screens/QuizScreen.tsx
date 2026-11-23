@@ -85,7 +85,7 @@ export function QuizScreen(props: {
               setStep(nq);
             }}>Fill sample answers (demo)</button>
           )}
-          {pre && props.onSkip && <button className="link" onClick={props.onSkip}>Skip the quiz</button>}
+          {props.onSkip && <button className="link" onClick={props.onSkip}>{pre ? "Skip the quiz" : "Skip the final quiz"}</button>}
         </div>
       </div>
 

@@ -45,17 +45,17 @@ const SLIDES: Slide[] = [
     kicker: "How this works", title: "Assets − liabilities = equity.",
     body: <>
       <p><b>Assets</b> are what you own. <b>Liabilities</b> are what you owe policyholders. <b>Equity</b> is the cushion
-        in between, and every market shock hits it first. Watch: when assets drop, the cushion shrinks.</p>
-      <p>Your job is to keep that cushion alive. Rely on your elite team of experts for guidance, evaluate their feedback,
-        recommend protective trades, and explain your decisions to the CRO.</p>
-      <p className="intro-note">Built on real financials: each company has different exposures.</p>
+        in between.</p>
+      <p>Your job is to manage assets and liabilities to protect and grow equity. Rely on your elite team of experts for
+        guidance, evaluate their feedback, recommend protective trades, and explain your decisions to the CRO.</p>
+      <p className="intro-note">Company financials reflect actual 10-K data, so each firm has different exposures.</p>
     </>,
     art: <BalanceScale />,
   },
   {
     kicker: "Your boss", title: "Vera Atrisk, Chief Risk Officer",
-    body: <>Vera runs the organization, sends your questions to the right expert, and will ask you to explain your
-      decisions after every market shock.</>,
+    body: <>Vera runs the organization and sends your questions to the right expert. She will ask you to explain your
+      trade decisions after every market shock.</>,
     art: <PixelSprite name="vera_neutral" size={150} title="Vera Atrisk" />,
   },
   {

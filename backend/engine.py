@@ -577,16 +577,21 @@ def play_quarter(state: GameState, action: Action | None) -> tuple[GameState, Qu
 
 
 def _sync_positions(s: GameState) -> GameState:
-    """After the market moves, line the book up with the ticket: cash is re-measured as a % of today's assets,
-    and swaps are rebalanced to keep the chosen % of today's rate mismatch. Signing an unchanged ticket then
-    trades nothing (no phantom change on the dashboard)."""
+    """Quarter end: swaps and puts are cash-settled and expire, so every ticket starts fresh from the book the
+    quarter left behind (including the bonds already moved). Cash is re-measured as a % of today's assets.
+    Signing an untouched ticket trades nothing."""
+    # swaps and puts are cash-settled at quarter end and expire: what dealers owe us is paid in cash
+    if s.uncollateralized_mtm:
+        s.assets["cash"] += s.uncollateralized_mtm
+        s.uncollateralized_mtm = 0.0
+    s.swap_dv01 = 0.0
+    s.hedges_lost_share = 0.0
     A = total_assets(s)
-    upd = {}
+    upd = {"rate_hedge_pct": 0.0, "equity_hedge_pct": 0.0, "fx_hedge_pct": 0.0,
+           "credit_shift_pct": 0.0}  # the bonds already moved stay moved; a new ticket moves more from here
     if A > 0:
         upd["cash_buffer_pct"] = min(15.0, max(1.0, 100 * s.assets["cash"] / A))
     s.action = s.action.model_copy(update=upd)
-    if s.hedges_lost_share == 0:  # swaps are rebalanced to the chosen % of today's mismatch (a rolling hedge)
-        s.swap_dv01 = -s.action.rate_hedge_pct / 100 * (asset_dv01(s) - liability_dv01(s))
     return s
 
 

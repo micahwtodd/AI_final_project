@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import secrets
 import threading
+import re
 import time
 from typing import Literal
 
@@ -335,13 +336,12 @@ def commit(s: Session, action: Action) -> dict:
     return {"view": view(s), "after": engine.dashboard(engine.apply_action(s.state, action)).model_dump()}
 
 
-UNLOCKS = {"rate_hedge_pct": 2, "credit_shift_pct": 3, "collateralized": 4, "dealers": 4}
+UNLOCKS: dict[str, int] = {}  # every instrument is available in every quarter (the unlock feature was removed)
 
 
 def unlocked(quarter: int) -> list[str]:
-    """Levers available this quarter: cash and puts from Q1, swaps from Q2, bonds from Q3, counterparty terms from Q4."""
-    base = ["cash_buffer_pct", "equity_hedge_pct"]
-    return base + [k for k, q in UNLOCKS.items() if quarter >= q]
+    """Levers available this quarter: all of them, always."""
+    return ["rate_hedge_pct", "credit_shift_pct", "equity_hedge_pct", "cash_buffer_pct", "collateralized", "dealers"]
 
 
 def _locked_to_current(s: Session, action: Action) -> Action:
@@ -455,6 +455,10 @@ async def explain(s: Session, text: str, not_sure: bool = False) -> dict:
     if review is None:
         review, marker = examiner.review_with_keywords(key, text, mode, attempt), "keywords"
     review.instruction_attempt = review.instruction_attempt or flagged
+    if not_sure:  # no explanation: say so first, and never open with praise
+        body = re.sub(r"^\s*(good|great|nice|well done|excellent|right)\b[^.!?]*[.!?—-]+\s*", "", review.reply_text or "", flags=re.I)
+        review.reply_text = ("You didn't write an explanation this quarter, so there are no points for it. "
+                             "Here is what happened. " + (body[:1].upper() + body[1:] if body else ""))
     if review.instruction_attempt:
         audit.event(s.id, "examiner", q, "examiner", "blocked",
                     {"reason": "instruction_attempt", "message": "Learner text tried to instruct the grader; only the content was marked."})

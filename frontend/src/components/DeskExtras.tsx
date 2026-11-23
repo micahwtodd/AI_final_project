@@ -20,7 +20,7 @@ export function PredictModal(props: { quarter: number; onPick: (p: string | null
       <div className="predict-card" role="dialog" aria-label="Make a call" onClick={(e) => e.stopPropagation()}>
         <div className="predict-kicker">BEFORE THE MARKET OPENS · Q{props.quarter}</div>
         <h2>Make the call: what hits hardest this quarter?</h2>
-        <p className="small muted">Read the news wire, then pick. It is for bragging rights only; it does not change your score.</p>
+        <p className="small muted">Based on the news wire, what do you think is most likely to happen?</p>
         <div className="predict-grid">
           {PREDICT_OPTIONS.map((o) => (
             <button key={o.key} className="predict-opt" onClick={() => props.onPick(o.key)}>

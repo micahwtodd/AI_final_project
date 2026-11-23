@@ -28,7 +28,7 @@ def test_full_game_end_to_end():
         pv = client.post(f"/api/game/{gid}/preview", json={"action": action}).json()
         assert "before" in pv and "after" in pv
         c = client.post(f"/api/game/{gid}/commit", json={"actions": action}).json()
-        assert c["view"]["pending"]["rate_hedge_pct"] == (50 if q >= 2 else 0)  # swaps unlock in Q2
+        assert c["view"]["pending"]["rate_hedge_pct"] == 50
 
         shock = client.post(f"/api/game/{gid}/advance").json()
         assert shock["quarter"] == q and shock["headline"] and shock["market_moves"]

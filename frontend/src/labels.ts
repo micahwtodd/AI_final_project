@@ -66,7 +66,7 @@ export const UNLOCK_INTRO: Record<string, { face: string; who: string; line: str
 };
 
 export const COUNTERPARTY_TIP = "With daily collateral, dealers post cash as your hedges gain, so a dealer failure costs little; it can also demand cash from you when hedges lose. Spreading hedges across 3 dealers limits what any one failure can cost.";
-export const TICKET_TIP = "Each slider starts at zero every quarter: it is a new trade added on top of what you already hold. Your positions carry over from quarter to quarter.";
+export const TICKET_TIP = "Every ticket starts fresh. Swaps and puts last one quarter and are cash-settled at its end, so each quarter starts from the book the last one left you. Moving bonds and changing cash are lasting changes to that book.";
 
 export const fmtBn = (x: number, digits = 2) => `${x < 0 ? "−" : ""}$${Math.abs(x).toFixed(digits)}bn`;
 export const fmtSigned = (x: number, digits = 2) => `${x >= 0 ? "+" : "−"}$${Math.abs(x).toFixed(digits)}bn`;
