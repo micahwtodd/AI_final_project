@@ -88,7 +88,13 @@ def glossary_lookup(term: str) -> dict:
 
 def get_liability_summary(s: GameState) -> dict:
     m = engine.assumptions()["market"]
+    d = engine.dashboard(s)
     return {
+        "rate_mismatch_duration_gap_years": d.duration_gap_years,
+        "asset_duration_years": d.asset_duration_years,
+        "surplus_change_if_rates_fall_1bp_usd_mn": d.net_dv01_usd_mn,
+        "rate_mismatch_note": ("Whole-company, net of bonds and hedges. A negative gap means liabilities are more "
+                               "rate-sensitive than assets, so falling rates cut surplus and rising rates help it."),
         "buckets": [{"name": LIABILITY_LABELS[b], "value_usd_bn": _r(s.liabilities[b]),
                      "duration_years": _r(engine.liab_duration(s, b)),
                      "surrenderable_share": engine._lb(b)["surrenderable"]} for b in LIABILITY_BUCKETS],
@@ -96,7 +102,7 @@ def get_liability_summary(s: GameState) -> dict:
         "annuity_market_value_usd_bn": _r(s.liabilities["annuities"]),
         "crediting_rate_pct": _r(100 * m["annuity_crediting_rate"]),
         "market_rate_pct": _r(100 * s.market_rate),
-        "liability_duration_years": engine.dashboard(s).liability_duration_years,
+        "liability_duration_years": d.liability_duration_years,
     }
 
 

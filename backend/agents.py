@@ -173,7 +173,8 @@ def register_tools(agent: Agent, allowed: set[str]) -> None:
     # --- liabilities (Actuary)
     @add
     async def get_liability_summary(ctx: RunContext[Deps]) -> dict:
-        """Liabilities by type with durations, surrenderable shares, crediting rate and annuity book vs market value."""
+        """Liabilities by type with durations, surrenderable shares, crediting rate and annuity book vs market value,
+        plus the company's rate mismatch (duration gap) and net surplus change per 1bp fall in rates."""
         return _done(ctx, "get_liability_summary", tools.get_liability_summary(ctx.deps.state))
 
     @add
