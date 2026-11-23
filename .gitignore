@@ -30,3 +30,6 @@ Thumbs.db
 # Local tooling
 .claude/
 *.tsbuildinfo
+
+# Fresh-clone dry runs (Project 11)
+_dryrun/
