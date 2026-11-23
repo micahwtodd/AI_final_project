@@ -350,7 +350,8 @@ def advance(s: Session) -> dict:
         "real_world": card.real_world, "boss": card.boss,
         "collapsed": rec.surplus_after <= 0, "nothing_collapsed": rec.nothing_surplus_after <= 0,
         "question": f"Surplus {'fell' if rec.surplus_after < rec.surplus_before else 'rose'} "
-                    f"${abs(change):.2f} billion. Walk me through why.",
+                    f"${abs(change):.2f} billion. Name the main two drivers, why they moved surplus, "
+                    f"and what your trades did or could have done.",
     }
 
 

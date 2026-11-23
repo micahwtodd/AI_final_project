@@ -362,10 +362,21 @@ _HISTORY: dict[str, list[list[ModelMessage]]] = {}
 _OPENER = re.compile(r"""^\s*["'“]?\s*walk me through\b[^:.!?\n]*[:.!?]["'”]?\s*""", re.IGNORECASE)
 
 
+_SENTENCE = re.compile(r"(?:[^.!?\n]|\.(?=\d))+(?:[.!?]+[\"'”)]*|$)")  # a decimal point is not a sentence end
+
+
 def strip_opener(text: str) -> str:
-    """Drop a stock "Walk me through ...:" opener from an agent reply (the persona used to encourage it)."""
+    """Tidy an agent reply: drop a stock "Walk me through ...:" opener, and drop questions put back to the
+    learner (colleagues answer factually; the prompts say so, this is the safety net)."""
     out = _OPENER.sub("", text or "", count=1)
-    return (out[:1].upper() + out[1:]) if out else text
+    lines = []
+    for line in out.split("\n"):
+        kept = [m.group(0) for m in _SENTENCE.finditer(line) if not m.group(0).rstrip(" \"'”)").endswith("?")]
+        lines.append("".join(kept).strip() if kept or not line.strip() else "")
+    cleaned = re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
+    if not cleaned:
+        return text
+    return cleaned[:1].upper() + cleaned[1:]
 
 async def ask(session, message: str, queue: asyncio.Queue, save: Callable[[Any], None], to: str | None = None,
               guard: bool = True) -> None:

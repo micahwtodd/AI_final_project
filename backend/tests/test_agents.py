@@ -155,3 +155,11 @@ def test_delegation_cap_and_budget_stop_without_model_calls():
     run.delegations, run.stopped = 0, "budget"
     out = asyncio.run(agents._delegate(Ctx(), "trader", "anything"))
     assert "budget" in out["error"] and s.tokens["requests"] == 0
+
+
+def test_replies_drop_stock_opener_and_questions_back_to_the_learner():
+    from backend.agents import strip_opener
+    out = strip_opener("Walk me through it: rates rose 77bp. Which risk would you rather carry? Cash is 7.6% of assets.")
+    assert out == "Rates rose 77bp. Cash is 7.6% of assets."
+    assert strip_opener("Liquidity is 1.5x the need. Is 1.5x enough?") == "Liquidity is 1.5x the need."
+    assert strip_opener("Is that a hedge?") == "Is that a hedge?"  # never blank a reply
