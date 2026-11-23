@@ -558,7 +558,7 @@ def play_quarter(state: GameState, action: Action | None) -> tuple[GameState, Qu
     fl = assumptions()["floors"]
     d = dashboard(after_state)
     rec = QuarterRecord(
-        quarter=card.quarter, card_id=card.id, severity=sev, shock=shock,
+        quarter=card.quarter, card_id=card.id, severity=sev, shock=shock, traded=action is not None,
         action=traded.action, surplus_before=round(before, 4),
         surplus_after=round(surplus(after_state), 4), attribution=att,
         nothing_surplus_after=cf["nothing"]["surplus_after"],
@@ -699,6 +699,9 @@ def answer_key(rec: QuarterRecord) -> dict:
         "second_factor_usd_bn": round(second[1], 3),
         "second_factor_fact": facts[second[0]],
         "hedge_effect_usd_bn": round(you - nothing, 3),
+        "market_effect_usd_bn": round(nothing, 3),
+        "traded": rec.traded,
+        "split_fact": split_fact(you, nothing, rec.traded),
         "benchmark_change_usd_bn": round(bench - you, 3),
         "surplus_change_usd_bn": round(you, 3),
         "improvement_facts": improvement_facts(rec),
@@ -719,6 +722,22 @@ def _lever_setting(k: str, a: Action) -> str:
     if k == "dealers":
         return f"{v} dealer{'s' if v == 3 else ''}"
     return f"{v:g}%"
+
+
+def split_fact(you: float, nothing: float, traded: bool) -> str:
+    """One plain sentence separating what the market did from what the learner's trades did."""
+    def bn(x: float) -> str:
+        return f"${abs(x):.2f} billion"
+    move = f"Surplus {'rose' if you >= 0 else 'fell'} {bn(you)}"
+    if not traded:
+        return (f"{move}, all of it from the market: you made no trades this quarter, "
+                f"so doing nothing would have produced exactly the same result.")
+    hedge = you - nothing
+    if abs(hedge) < 0.005:
+        return (f"{move}, all of it from the market: your positions behaved the same as doing nothing, "
+                f"which would also have {'gained' if nothing >= 0 else 'lost'} {bn(nothing)}.")
+    return (f"{move}. The market on its own (doing nothing) would have {'gained' if nothing >= 0 else 'lost'} "
+            f"{bn(nothing)}; your trades {'added' if hedge > 0 else 'cost'} {bn(hedge)} on top of that.")
 
 
 def improvement_facts(rec: QuarterRecord) -> list[str]:

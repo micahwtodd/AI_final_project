@@ -459,13 +459,12 @@ def quarter_debrief(rec: QuarterRecord) -> list[str]:
     comps = rec.attribution.components()
     you = rec.surplus_after - rec.surplus_before
     pct = 100 * you / rec.surplus_before if rec.surplus_before else 0.0
-    hedge, gap = key["hedge_effect_usd_bn"], key["benchmark_change_usd_bn"]
+    gap = key["benchmark_change_usd_bn"]
     lines = [
-        f"Surplus {'rose' if you >= 0 else 'fell'} {_bn(you)} this quarter ({pct:+.1f}% of starting surplus).",
+        key["split_fact"].replace(_bn(you), f"{_bn(you)} ({pct:+.1f}%)", 1),
         f"The biggest driver was {key['main_driver_label']} ({comps[key['main_driver']]:+.2f}bn). "
         + key["mechanism_facts"][0],
         f"The second-largest was {key['second_factor_label']} ({comps[key['second_factor']]:+.2f}bn).",
-        f"Compared with doing nothing this quarter, your trades {'added' if hedge >= 0 else 'cost'} {_bn(hedge)}.",
         (f"A pro's trades would have done {_bn(gap)} better." if gap > 0.005
          else f"You matched or beat what a pro would do (by {_bn(-gap)})."),
     ]

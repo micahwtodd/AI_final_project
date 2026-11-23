@@ -64,7 +64,9 @@ def key_text(key: dict, rec: QuarterRecord) -> str:
         f"- MAIN DRIVER: {key['main_driver_label']} ({key['main_driver_usd_bn']:+.2f}bn)",
         f"- Mechanism: {key['mechanism_facts'][0]}",
         f"- SECOND FACTOR: {key['second_factor_label']} ({key['second_factor_usd_bn']:+.2f}bn). {key['second_factor_fact']}",
-        f"- The learner's trades versus doing nothing this quarter: {key['hedge_effect_usd_bn']:+.2f}bn",
+        f"- The learner's trades versus doing nothing this quarter: {key['hedge_effect_usd_bn']:+.2f}bn"
+        + ("" if key["traded"] else " (the learner made NO trades this quarter)"),
+        f"- Market vs trades, say it this way: {key['split_fact']} Never imply the market's gain or loss came from the learner's trades.",
         f"- What a pro would do (the benchmark trades), result minus the learner's result: {key['benchmark_change_usd_bn']:+.2f}bn",
         "- What would have helped most: " + "; ".join(key["improvement_facts"]),
         "- Full breakdown by cause (bn): " + ", ".join(
@@ -153,8 +155,7 @@ def review_with_keywords(key: dict, text: str, mode: str, attempt: int) -> Expla
 def walkthrough_text(key: dict) -> str:
     return (f"No problem, let's walk through it. The biggest driver was {key['main_driver_label']}: "
             f"{key['mechanism_facts'][0]} The second-largest was {key['second_factor_label']} "
-            f"({key['second_factor_usd_bn']:+.2f}bn). Compared with doing nothing this quarter, your trades "
-            f"{'added' if key['hedge_effect_usd_bn'] >= 0 else 'cost'} {abs(key['hedge_effect_usd_bn']):.2f}bn. "
+            f"({key['second_factor_usd_bn']:+.2f}bn). {key['split_fact']} "
             f"What would have helped most: {key['improvement_facts'][0]}.")
 
 

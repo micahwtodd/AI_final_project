@@ -158,6 +158,7 @@ class Dashboard(BaseModel):
 class QuarterRecord(BaseModel):
     quarter: int
     card_id: str
+    traded: bool = True  # False when no ticket was signed this quarter (the book was exactly doing nothing)
     severity: float
     shock: ShockVector
     action: Action

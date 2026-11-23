@@ -195,3 +195,14 @@ def test_collateral_call_locks_up_cash_without_losing_it_and_comes_back():
     assert engine.surplus(b) == pytest.approx(engine.surplus(a) + att.liquidity, abs=1e-6)  # only fire-sale haircuts cost money
     c, _ = engine.apply_shock(b, calm)  # returned the next quarter
     assert c.collateral_posted == 0
+
+
+def test_market_and_trade_effects_are_said_separately():
+    s = fresh("JXN")
+    _, idle = engine.play_quarter(s, None)
+    key = engine.answer_key(idle)
+    assert not key["traded"] and "no trades" in key["split_fact"] and "all of it from the market" in key["split_fact"]
+    _, busy = engine.play_quarter(s, engine.card_for(1).benchmark_action)
+    key = engine.answer_key(busy)
+    assert key["traded"] and "your trades added" in key["split_fact"]
+    assert "positions behaved the same as doing nothing" in engine.split_fact(1.0, 1.0, True)
