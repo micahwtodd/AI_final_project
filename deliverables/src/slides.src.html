@@ -92,19 +92,17 @@ html, body, .reveal-viewport { background: var(--navy) !important; --r-backgroun
 <!-- 2 · PROBLEM -->
 <section>
   <div class="kick">The problem</div>
-  <h2>New analysts must learn, fast, how markets move an insurer's balance sheet</h2>
-  <div class="rail"><span>SQL in 3 weeks</span><i>→</i><span>3 days</span><i>→</i><span>3 hours</span><i>→</i><span class="now">ALM in 30 minutes</span></div>
+  <h2>New analysts must quickly learn how markets move an insurer's balance sheet.</h2>
   <div class="grid" style="grid-template-columns: 430px 1fr; gap: 30px">
-    <ul class="clean" style="margin-top:4px">
-      <li>Bright hires from liberal arts colleges, often with no finance background</li>
-      <li>High turnover; months to work independently</li>
-      <li>They learn by shadowing, self-service material, and general AI tools not calibrated to the business</li>
-      <li>Insurers must balance profit, capital and liquidity as markets move every day</li>
+    <ul class="clean" style="margin-top:10px">
+      <li>Insurers need to rapidly onboard new risk analysts amidst higher turnover</li>
+      <li>However, asset-liability management concepts are complex and nuanced, and managers have little time to tutor</li>
+      <li><span class="g">Solution:</span> accelerate onboarding with this interactive learning game</li>
     </ul>
     <div>
       <svg viewBox="0 0 720 250" width="700" role="img" aria-label="Jackson Financial balance sheet before and after a 1 point fall in rates">
         <style>.w{font-size:13px;fill:#fff}.d{font-size:13px;fill:#001F5B;font-weight:700}.h{font-size:15px;fill:#FFC72C;font-weight:700}</style>
-        <text x="20" y="18" class="h">Jackson Financial today</text><text x="360" y="18" class="h">Rates 1 point lower</text>
+        <text x="20" y="18" class="h">Example: Jackson Financial today</text><text x="360" y="18" class="h">Interest rates 1% lower</text>
         <g transform="translate(20,34)">
           <rect width="120" height="187" fill="#007AC1"/><text x="60" y="98" text-anchor="middle" class="w">Assets $74.9bn</text>
           <rect x="140" y="31" width="120" height="156" fill="#6CACE4"/><text x="200" y="115" text-anchor="middle" class="d">Promises $62.5bn</text>
@@ -117,11 +115,12 @@ html, body, .reveal-viewport { background: var(--navy) !important; --r-backgroun
           <text x="272" y="17" style="font-size:16px;fill:#FF6B7D;font-weight:700">−$2.7bn</text>
           <text x="272" y="37" style="font-size:16px;fill:#FF6B7D;font-weight:700">−22%</text>
         </g>
-        <text x="20" y="244" style="font-size:12px;fill:#b9c8de">Promises are paid decades out, so lower rates raise their value more than the shorter bonds rise. Source: the game's engine, FY2025 10-K.</text>
+        <text x="20" y="244" style="font-size:12px;fill:#b9c8de">An example from the game. Promises are paid decades out, so lower rates raise their value more than the shorter bonds rise.</text>
       </svg>
     </div>
   </div>
-  <aside class="notes">The SQL story: a colleague found a blog on learning SQL in three weeks, condensed it to three days, and their manager joked about three hours. This project tries the core of ALM in thirty minutes. Who has the problem: my company's risk analysts, often from strong liberal arts colleges with no finance course, in a high-turnover seat. The chart is why it matters: surplus is the small gap between two large numbers, and a one-point rate fall takes 22% of Jackson's.</aside>
+  <div class="ask" style="margin-top:14px"><b>Solution:</b> Surplus or Bust lets analysts simulate financial impacts on real companies, teaching them how to respond to realistic market stresses.</div>
+  <aside class="notes">Who has the problem: my company's risk analysts, often from strong liberal arts colleges with no finance course, in a high-turnover seat. The chart is why it matters: surplus is the small gap between two large numbers, and a one-point rate fall takes 22% of Jackson's.</aside>
 </section>
 
 <!-- 3 · WHAT IS NEW -->
@@ -164,7 +163,7 @@ html, body, .reveal-viewport { background: var(--navy) !important; --r-backgroun
 <!-- 4 · AGENTS -->
 <section>
   <div class="kick">How the agents work</div>
-  <h2>Vera routes each question to the right specialist; the engine owns every number</h2>
+  <h2>Analysts ask questions, Vera routes them to the right specialists, and the engine owns the numbers.</h2>
   <svg viewBox="0 0 680 292" width="930" role="img" aria-label="Agent diagram">
     <defs><marker id="a2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#FFC72C"/></marker></defs>
     <style>.b{fill:#0a2a66;stroke:#fff;stroke-width:1.5}.t{font-size:13px;fill:#fff;font-weight:700}.s{font-size:10.5px;fill:#b9c8de}.l{stroke:#FFC72C;stroke-width:1.6;fill:none;marker-end:url(#a2)}</style>
@@ -179,7 +178,7 @@ html, body, .reveal-viewport { background: var(--navy) !important; --r-backgroun
     <rect x="176" y="222" width="160" height="58" rx="8" class="b" style="stroke-dasharray:4 3"/><text x="256" y="246" text-anchor="middle" class="t">Vera marks you</text><text x="256" y="264" text-anchor="middle" class="s">4 checks vs the answer key</text>
     <path d="M70,176 C70,240 120,252 174,251" class="l"/><text x="34" y="232" class="s">explains</text>
   </svg>
-  <p class="muted" style="margin-top:6px">The AI can be wrong in words, never in numbers: it cannot set a score, and no trade happens without the learner's signature. &nbsp;<b style="color:#fff">Team 19/19 engine facts vs Solo 17/19.</b></p>
+  <p class="muted" style="margin-top:6px">The AI cannot set trades without the learner's signature but provides the educational guidance needed to establish trade positions.</p>
   <aside class="notes">Five agents share one model, gpt-6-luna, through PydanticAI. Vera has two jobs: she routes each question to one or two specialists and sums up, and at the end of each quarter she marks the learner's explanation on four true/false checks; code adds up the score. Specialists read only their side of the balance sheet through read-only engine tools; Swap Dogg can draft a ticket but only the learner signs. Seamore reads 10-K filings, and code checks every quote. Measured on ten fixed questions: Team found 19/19 engine facts, Solo 17/19, at about 3.3 times the cost; the team is the default because the learner hears biased experts disagree.</aside>
 </section>
 
@@ -281,9 +280,9 @@ html, body, .reveal-viewport { background: var(--navy) !important; --r-backgroun
   <div class="quote"><img src="{{sprite_cat_alert}}" alt=""><div><q>I didn't realize it was this easy to blow up an insurance company!</q><small>The Tester, after playing the game</small></div></div>
   <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 40px">
     <ul class="clean">
-      <li>Tester: strong design and structure; real data on real competitors; first principles</li>
-      <li>One week off onboarding ≈ <span class="g">$1,900</span> per analyst, $11,500 for a team of six</li>
-      <li>Scale to 100+ analysts in Actuarial, Finance, Investment and Treasury, with a league table</li>
+      <li>Tester feedback: strong design and structure; real data on real competitors; first principles</li>
+      <li>Reduces one week off onboarding ≈ <span class="g">$1,900</span> per analyst, $11,500 for a team of six</li>
+      <li>Could scale to 100+ analysts in Actuarial, Finance, Investment and Treasury, with a competitive league or rankings table</li>
     </ul>
     <table class="cost">
       <thead><tr><th>Six analysts, one year</th><th class="r">Cost</th></tr></thead>
