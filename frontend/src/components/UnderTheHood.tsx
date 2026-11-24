@@ -59,7 +59,7 @@ export function UnderTheHood(props: {
             </div>
           </div>
           <div className="hood-row small muted">
-            <b>Budget cap</b> {props.capUsd !== null ? `$${props.capUsd}` : "set once a game starts"}: click the token meter to change it.
+            <b>AI cap</b> {props.capUsd !== null ? `$${props.capUsd.toFixed(2)} per game, fixed` : "$0.25 per game, fixed"}: click the token meter to see spend by agent.
           </div>
           {!g && <div className="hood-row small muted">Start a game to see its trace and switch modes.</div>}
         </div>

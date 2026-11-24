@@ -24,12 +24,13 @@ from pydantic import BaseModel, Field
 from pydantic_ai import Agent, RunContext, UsageLimits
 from pydantic_ai.exceptions import UsageLimitExceeded
 from pydantic_ai.messages import ModelMessage, ToolCallPart
+from pydantic_ai.models.fallback import FallbackModel
 from pydantic_ai.models.openai import OpenAIResponsesModel
 from pydantic_ai.providers.openai import OpenAIProvider
 
 from backend import audit, engine, safety, tools
 from backend.calibration import DISPLAY_NAMES
-from backend.env import MODEL_NAME, REPO_DIR, load_env, provider_config, redact
+from backend.env import MODEL_NAME, REPO_DIR, fallback_config, load_env, provider_config, redact
 from backend.pricing import cost_usd
 
 PROMPTS = REPO_DIR / "backend" / "prompts"
@@ -53,13 +54,19 @@ def ai_available() -> bool:
     return load_env().key_found and not os.environ.get("SURPLUS_OR_BUST_OFFLINE")
 
 
-def make_model() -> OpenAIResponsesModel:
-    """The one model the app uses. Raises if no key is configured."""
+def make_model() -> OpenAIResponsesModel | FallbackModel:
+    """The one model the app uses. Raises if no key is configured.
+    With both keys set, Portkey is tried first and any failed request is retried on OpenAI."""
     cfg = provider_config()
     if cfg is None:
         raise RuntimeError("No API key found. Set PORTKEY_API_KEY or OPENAI_API_KEY in ./.env or ../.env")
     _, base_url, key = cfg
-    return OpenAIResponsesModel(MODEL_NAME, provider=OpenAIProvider(base_url=base_url, api_key=key))
+    primary = OpenAIResponsesModel(MODEL_NAME, provider=OpenAIProvider(base_url=base_url, api_key=key))
+    fb = fallback_config()
+    if fb is None:
+        return primary
+    backup = OpenAIResponsesModel(MODEL_NAME, provider=OpenAIProvider(base_url=fb[0], api_key=fb[1]))
+    return FallbackModel(primary, backup)
 
 
 # ---------------------------------------------------------------- types
@@ -302,7 +309,8 @@ def _record_usage(session, agent: str, run_id: str, resp) -> dict:
     rec = {"session_id": session.id, "run_id": run_id, "agent": agent, "model": MODEL_NAME,
            "input_tokens": u.input_tokens, "cache_read_tokens": u.cache_read_tokens,
            "cache_write_tokens": u.cache_write_tokens, "output_tokens": u.output_tokens,
-           "reasoning_tokens": reasoning, "cost_usd": round(cost, 6)}
+           "reasoning_tokens": reasoning, "cost_usd": round(cost, 6),
+           "provider": "portkey" if "portkey" in str(getattr(resp, "provider_url", "") or "") else "openai"}
     audit.usage(rec)
     return rec
 
@@ -310,8 +318,8 @@ def _record_usage(session, agent: str, run_id: str, resp) -> dict:
 OFFLINE_TEXT = ("My colleagues and I are offline for this session, so I can't answer questions right now. "
                 "The game still works: every number on the dashboard comes from the engine, "
                 "and the trade ticket preview shows the effect of each lever.")
-BUDGET_TEXT = ("We've hit this session's AI budget cap, so the colleagues are offline. "
-               "The game continues: use the dashboard and the ticket preview, or raise the cap in Under the hood.")
+BUDGET_TEXT = ("We've hit this game's $0.25 AI budget cap, so the colleagues are offline. "
+               "The game continues: use the dashboard and the ticket preview.")
 
 
 def _block_budget(run: RunCtx) -> None:

@@ -303,7 +303,6 @@ export const api = {
   summary: (id: string) => call<Record<string, unknown>>(`/game/${id}/summary`),
   flag: (event_id: string, session_id: string, note: string, text: string) => call<{ ok: boolean }>("/flag", { event_id, session_id, note, text }),
   safety: () => call<SafetyLab>("/safety"),
-  runSafety: () => call<SafetyLab>("/safety/run", {}),
 };
 
 export type QuizForm = {

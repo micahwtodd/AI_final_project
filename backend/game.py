@@ -43,7 +43,7 @@ class Session(BaseModel):
     understanding: dict[int, dict] = {}  # Understanding points per quarter, summed in code
     timings: dict[str, float] = {}
     # AI usage and budget (Project 3)
-    budget_cap_usd: float = 0.25
+    budget_cap_usd: float = 0.25  # see MAX_CAP_USD: the app can lower it but never raise it
     spend_usd: float = 0.0
     tokens: dict[str, int] = {"input": 0, "cached": 0, "cache_write": 0, "output": 0, "reasoning": 0, "requests": 0}
     by_agent: dict[str, dict] = {}
@@ -275,8 +275,11 @@ def usage_view(s: Session) -> dict:
             "blocked": s.spend_usd >= s.budget_cap_usd, "tokens": s.tokens, "by_agent": s.by_agent}
 
 
+MAX_CAP_USD = 0.25  # hard cap per game; nothing in the app can raise it
+
+
 def set_budget(s: Session, cap_usd: float) -> dict:
-    s.budget_cap_usd = max(0.0, min(5.0, float(cap_usd)))
+    s.budget_cap_usd = max(0.0, min(MAX_CAP_USD, float(cap_usd)))
     _save(s)
     return usage_view(s)
 

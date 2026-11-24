@@ -84,7 +84,7 @@ def test_flag_route_appends():
 def test_safety_routes_without_ai():
     r = client.get("/api/safety").json()
     assert "generated" in r
-    assert client.post("/api/safety/run").status_code == 409  # tests run offline
+    assert client.post("/api/safety/run").status_code == 403  # locked: re-run only from scripts/safety_lab.py
 
 
 def test_saved_safety_lab_evidence_is_complete():

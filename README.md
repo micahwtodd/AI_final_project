@@ -32,17 +32,17 @@ pip install -r requirements.txt
 python run.py
 ```
 
-`python run.py` opens http://localhost:8000 in your browser. Stop it with Ctrl+C.
+`python run.py` opens http://localhost:8000 in your browser (if port 8000 is busy, it uses the next free port up to 8010 and says which). Stop it with Ctrl+C. To choose a port: `python run.py --port 8001`.
 
 ### The AI key (optional)
 
 The game plays without a key; only the AI colleagues and Vera's AI marking go offline (a keyword checker marks explanations instead). To turn them on, create a file called `.env` **in the repo folder or one folder up** (the app checks both, this folder first), using `.env.example` as the template:
 
 ```
-OPENAI_API_KEY=sk-...        # or PORTKEY_API_KEY=... (used first if both are set)
+OPENAI_API_KEY=sk-...        # or PORTKEY_API_KEY=... (used first if both are set; if a Portkey call fails, it is retried on OpenAI)
 ```
 
-The app never prints the key; `run.py` says only whether a key was found and where. Each game has a **$0.25 AI spending cap** (adjustable under *Under the hood*); a typical session measures about **$0.01**.
+The app never prints the key; `run.py` says only whether a key was found and where. Each game has a fixed **$0.25 AI spending cap** that nothing in the app can raise; a typical session measures about **$0.01**.
 
 ## A five-minute tour (Demo mode)
 
@@ -62,10 +62,10 @@ The app never prints the key; `run.py` says only whether a key was found and whe
 ### Under the hood (top-right menu)
 
 - **Trace:** every agent step of the current game: delegations, tool calls and results, tokens and cost per model call.
-- **Safety Lab:** prompt-injection attacks (blocked), clean inputs (passed) and teaching-accuracy checks, with pass rates.
+- **Safety Lab:** prompt-injection attacks (blocked), clean inputs (passed) and teaching-accuracy checks, with pass rates. It shows the last saved run; re-run it with `python scripts/safety_lab.py`.
 - **Experiments:** Solo vs Team, routing vs asking every specialist, 10-K retrieval size, prompt caching, and cost projections (see below).
 - **Team / Solo:** Solo mode has Vera answer alone with every tool, for comparison.
-- **Budget cap:** change this game's AI spending cap.
+- **AI cap:** $0.25 per game, fixed; click the token meter for spend by agent.
 
 ## How it works
 
@@ -105,7 +105,7 @@ This downloads the filings from SEC EDGAR (cached in `data/cache/`, git-ignored)
 
 ```
 pip install -r requirements-dev.txt
-python -m pytest -q                                   # 133 tests: engine, API, agents (offline), safety
+python -m pytest -q                                   # 137 tests: engine, API, agents (offline), safety
 uvicorn backend.main:app --reload --port 8000         # API with reload
 cd frontend && npm install && npm run dev             # UI on http://localhost:5173 (proxies /api)
 cd frontend && npm run build                          # rebuild frontend/dist (commit it)
@@ -117,7 +117,7 @@ python scripts/experiments.py                         # rerun E1 to E4 (needs a 
 
 ## Troubleshooting
 
-- **Port 8000 in use (Windows):** `netstat -ano | findstr :8000`, then `taskkill /PID <pid> /F`. Mac: `lsof -i :8000`, then `kill <pid>`.
+- **Port 8000 in use:** `python run.py` moves to the next free port automatically, or choose one with `python run.py --port 8001`.
 - **"AI colleagues offline":** no key was found. Check the `.env` file is in the repo folder or one folder up, then restart `python run.py`.
 - **A blank page after updating:** hard-refresh the browser (Ctrl+F5 / Cmd+Shift+R).
 - **`python` not found on Mac:** use `python3`.

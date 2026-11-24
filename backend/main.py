@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from backend import agents, audit, game
-from backend.env import MODEL_NAME, REPO_DIR, load_env
+from backend.env import MODEL_NAME, REPO_DIR, fallback_config, load_env
 from backend.models import Action
 
 app = FastAPI(title="Surplus or Bust")
@@ -81,6 +81,7 @@ def health() -> dict:
         "provider": status.provider,
         "key_name": status.key_name,
         "key_source": status.key_source,
+        "fallback": "openai" if fallback_config() else None,
         "model": MODEL_NAME,
     }
 
@@ -171,7 +172,7 @@ class AskBody(BaseModel):
 
 
 class BudgetBody(BaseModel):
-    cap_usd: float = Field(ge=0, le=5)
+    cap_usd: float = Field(ge=0, le=0.25)  # the per-game cap can be lowered, never raised
 
 
 @app.post("/api/game/{session_id}/ask")
@@ -293,11 +294,9 @@ def safety_latest() -> dict:
 
 @app.post("/api/safety/run")
 async def safety_run() -> dict:
-    """Runs all three Safety Lab tables live (about 40 seconds and $0.01)."""
-    from backend import safety_lab
-    if not agents.ai_available():
-        raise HTTPException(409, "The Safety Lab needs an API key. The last saved results are still shown.")
-    return await safety_lab.run_all()
+    """Locked: the Safety Lab spends AI budget outside any game's cap, so it is not run from the app.
+    Re-run it from the command line with `python scripts/safety_lab.py`; the saved results are shown here."""
+    raise HTTPException(403, "The Safety Lab is not run from the app. Re-run it with: python scripts/safety_lab.py")
 
 
 @app.get("/api/audit/{session_id}")

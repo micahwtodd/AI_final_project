@@ -194,3 +194,54 @@ def test_loop_guard_stops_an_agent_that_never_answers(monkeypatch):
     assert any(e["type"] == "stop" and e["detail"]["reason"] == "request_limit" for e in events)
     reply = next(e for e in events if e["type"] == "reply")
     assert reply["detail"]["stopped"] == "request_limit"
+
+
+def test_portkey_falls_back_to_openai_when_both_keys_are_set(monkeypatch):
+    """With both keys, the model is a FallbackModel: Portkey first, OpenAI second. No API call is made."""
+    from pydantic_ai.models.fallback import FallbackModel
+    from backend import env
+
+    monkeypatch.setenv("PORTKEY_API_KEY", "test-portkey-value-not-real")
+    monkeypatch.setenv("OPENAI_API_KEY", "test-openai-value-not-real")
+    monkeypatch.setattr(env, "_status", env.EnvStatus(True, "portkey", "PORTKEY_API_KEY", "environment"))
+    assert env.fallback_config()[0] == "https://api.openai.com/v1"
+    assert isinstance(agents.make_model(), FallbackModel)
+    monkeypatch.delenv("OPENAI_API_KEY")
+    assert env.fallback_config() is None
+    assert not isinstance(agents.make_model(), FallbackModel)
+
+
+def test_fallback_model_answers_when_the_first_provider_fails():
+    """A failed first request (as a bad Portkey key would cause) is retried on the second model."""
+    from pydantic_ai import Agent
+    from pydantic_ai.exceptions import ModelHTTPError
+    from pydantic_ai.messages import ModelResponse, TextPart
+    from pydantic_ai.models.fallback import FallbackModel
+    from pydantic_ai.models.function import FunctionModel
+
+    def portkey_down(messages, info):
+        raise ModelHTTPError(status_code=401, model_name="gpt-6-luna", body="bad key")
+
+    def openai_ok(messages, info):
+        return ModelResponse(parts=[TextPart("answered by the fallback")])
+
+    out = Agent(FallbackModel(FunctionModel(portkey_down), FunctionModel(openai_ok))).run_sync("hi").output
+    assert out == "answered by the fallback"
+
+
+def test_budget_cap_is_locked_at_25_cents():
+    gid = client.post("/api/game", json={"ticker": "MET", "seed": 409}).json()["id"]
+    assert client.post(f"/api/budget/{gid}", json={"cap_usd": 1.0}).status_code == 422
+    s = game.new_game("MET", 409)
+    assert game.set_budget(s, 5.0)["budget_cap_usd"] == 0.25
+
+
+def test_run_py_moves_to_the_next_free_port():
+    import socket
+    import run
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as busy:
+        busy.bind(("127.0.0.1", 0))
+        port = busy.getsockname()[1]
+        assert run.port_free(port) is False
+    assert run.pick_port(8123) == 8123

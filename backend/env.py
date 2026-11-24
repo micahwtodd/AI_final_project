@@ -6,6 +6,7 @@ teaching staff keep theirs). The first value found wins.
 Two keys are supported, with these exact names:
   PORTKEY_API_KEY  -> Yale Portkey gateway (used when present)
   OPENAI_API_KEY   -> OpenAI directly (used when there is no Portkey key)
+With both keys, a request that fails on Portkey is retried on OpenAI (see fallback_config).
 
 Keys are never printed or logged. Only "found / not found" and the source
 folder are ever reported.
@@ -96,3 +97,13 @@ def provider_config() -> tuple[str, str, str] | None:
         return None
     key_name, base_url = PROVIDERS[status.provider]
     return status.provider, base_url, os.environ[key_name]
+
+
+def fallback_config() -> tuple[str, str] | None:
+    """(base_url, api_key) for OpenAI when Portkey is the primary provider and an OpenAI key is also set.
+    A request that fails on Portkey (bad key, gateway error, outage) is then retried on OpenAI."""
+    status = load_env()
+    key_name, base_url = PROVIDERS["openai"]
+    if status.provider == "portkey" and os.environ.get(key_name):
+        return base_url, os.environ[key_name]
+    return None

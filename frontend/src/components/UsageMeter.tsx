@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { api, type Usage } from "../api";
+import type { Usage } from "../api";
 
 const NAMES: Record<string, string> = { solo: "Vera (Solo)", cro: "Vera (CRO)", actuary: "Morty (Actuary)",
   portfolio_manager: "Bonnie (Portfolio Mgr)", trader: "Swap Dogg (Trader)", examiner: "Vera (Examiner)", calibration: "Seamore (Calibration)" };
 
 export function UsageMeter(props: { gameId: string; usage: Usage; onUsage: (u: Usage) => void }) {
   const [open, setOpen] = useState(false);
-  const [cap, setCap] = useState(String(props.usage.budget_cap_usd));
   const u = props.usage;
   const total = u.tokens.input + u.tokens.output;
   const pct = Math.min(100, (100 * u.spend_usd) / Math.max(u.budget_cap_usd, 1e-9));
@@ -31,15 +30,8 @@ export function UsageMeter(props: { gameId: string; usage: Usage; onUsage: (u: U
             </tbody>
           </table>
           <div className="small muted">Token counts are reported by the API. Prices: gpt-6-luna $0.10 input, $0.01 cached, $0.50 output per million tokens.</div>
-          <form className="cap-row" onSubmit={async (e) => {
-            e.preventDefault();
-            const v = Number(cap);
-            if (Number.isFinite(v) && v >= 0) props.onUsage(await api.setBudget(props.gameId, v));
-          }}>
-            <label>Budget cap $ <input type="number" step="any" min="0" max="5" value={cap} onChange={(e) => setCap(e.target.value)} /></label>
-            <button className="primary">Set cap</button>
-          </form>
-          {u.blocked && <div className="warn small">Cap reached: questions are blocked until the cap is raised.</div>}
+          <div className="small muted">AI cap: ${u.budget_cap_usd.toFixed(2)} per game, fixed. When it is reached, the AI colleagues go offline and the game continues.</div>
+          {u.blocked && <div className="warn small">Cap reached: the AI colleagues are offline for the rest of this game.</div>}
         </div>
       )}
     </div>

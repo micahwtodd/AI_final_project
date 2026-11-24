@@ -11,24 +11,11 @@ const CHECKS = ["main_driver", "mechanism", "second_factor", "improvement"];
 
 export function SafetyLab(props: { onBack: () => void }) {
   const [lab, setLab] = useState<Lab | null>(null);
-  const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
     api.safety().then(setLab).catch((e) => setErr(String(e)));
   }, []);
-
-  async function run() {
-    setBusy(true);
-    setErr(null);
-    try {
-      setLab(await api.runSafety());
-    } catch (e) {
-      setErr(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy(false);
-    }
-  }
 
   const a = lab?.attacks, t = lab?.teaching, x = lab?.examiner;
 
@@ -39,11 +26,10 @@ export function SafetyLab(props: { onBack: () => void }) {
           <div>
             <h1>Safety Lab</h1>
             <p className="muted">Every row is a live run. Attacks run twice: with the defenses off, then on. Clean inputs must still work.</p>
-            {lab?.generated && <div className="small muted">Last run {lab.generated} · {lab.seconds}s · ${lab.total_cost_usd?.toFixed(4)} in AI calls</div>}
+            {lab?.generated && <div className="small muted">Last run {lab.generated} · {lab.seconds}s · ${lab.total_cost_usd?.toFixed(4)} in AI calls · re-run with <code>python scripts/safety_lab.py</code></div>}
           </div>
           <div className="lab-actions">
             <button className="ghost" onClick={props.onBack}>← Back</button>
-            <button className="primary" onClick={run} disabled={busy}>{busy ? <><span className="spinner" /> Running (about 40s)…</> : "Run all three tests again"}</button>
           </div>
         </div>
         {err && <div className="flag small">{err}</div>}

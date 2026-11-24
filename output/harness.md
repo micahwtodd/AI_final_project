@@ -1,6 +1,6 @@
 # The agent harness: tools, memory, stopping rules, guardrails and audit trail
 
-Plain-language description of how Surplus or Bust's AI agents are wired, matching the code in `backend/`. One model is used for every agent: `gpt-6-luna` (through Portkey or OpenAI, whichever key is present), via PydanticAI. **The model never computes a number the learner is scored on**: the deterministic engine (`backend/engine.py`) owns every figure, and agents can only read it through tools.
+Plain-language description of how Surplus or Bust's AI agents are wired, matching the code in `backend/`. One model is used for every agent: `gpt-6-luna` (through Portkey or OpenAI, whichever key is present; with both keys, a request that fails on Portkey is retried on OpenAI), via PydanticAI. **The model never computes a number the learner is scored on**: the deterministic engine (`backend/engine.py`) owns every figure, and agents can only read it through tools.
 
 ## The agents
 
@@ -48,7 +48,7 @@ No tool reveals the coming shock, what a pro would do, or the answer key: those 
 |---|---|---|
 | Model requests per agent run | 6 (`REQUEST_LIMIT`) | The run stops; the learner sees "Stopped after 6 model requests" and the event is logged |
 | Delegations per question | 3 (`MAX_DELEGATIONS`) | Further `ask_*` calls return "Delegation limit reached; answer with what you have" |
-| AI spend per game | $0.25 cap (`budget_cap_usd`, adjustable 0 to $5 under *Under the hood*) | Checked before every model call; when reached, the colleagues go offline with a banner and the game continues |
+| AI spend per game | $0.25 cap (`budget_cap_usd`, fixed: the app can lower it but never raise it; the Safety Lab is re-run only from `scripts/safety_lab.py`) | Checked before every model call; when reached, the colleagues go offline with a banner and the game continues |
 | Examiner requests per explanation | 3 | Falls back to the keyword marker |
 | Calibration (Seamore) | 20 model requests, 16 searches or reads, $0.10 per company | Reports what it has; missing fields fall back to labelled defaults |
 | No key, or a provider error | n/a | Offline text or a plain error message; the game never blocks on the model |
