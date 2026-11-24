@@ -38,5 +38,7 @@ Thumbs.db
 _dryrun/
 # Raw screenshots for the report (large; embedded in deliverables/*.html)
 evidence/screens/*.png
+
+# Pre-submit review and dry-run logs (planning only, never shipped)
 Presubmit_review.md
 _dryrun_*.log

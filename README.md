@@ -6,9 +6,11 @@ You run one insurer through five quarters of market stress (rates up, a stock cr
 
 *A simplified training simulation for MGT 409E (Yale SOM). Not investment advice and not any company's own risk view.*
 
+**Report and slides:** [`deliverables/report.html`](deliverables/report.html) and [`deliverables/slides.html`](deliverables/slides.html). Both are single self-contained files; open them by double-clicking.
+
 ## Quick start (Python only, about 5 minutes, no Node needed)
 
-You need **Python 3.11 or newer** and **git**. The built web page is committed, so Python is all you need.
+You need **Python 3.11 or newer** (check with `python --version`, or `python3 --version` on a Mac) and **git**. The built web page is committed, so Python is all you need.
 
 **Windows (PowerShell)**
 
@@ -51,7 +53,7 @@ The app never prints the key; `run.py` says only whether a key was found and whe
 3. **Knowledge Check:** take it (five questions, one at a time, with explanations) or *Skip for now*. The same ideas are asked again at the end.
 4. **The desk (Q1):**
    - The **risk dashboard** (left) shows surplus, capital and liquidity ratios with their 100% floors, and the rate mismatch. Hover any underlined label for a plain-English explanation.
-   - **Ask your team** (middle): try a demo question. Morty (actuary), Bonnie (portfolio manager) and Swap Dogg (trader) answer in their own bubbles; Vera, the CRO, sums up. *Show chat detail* shows who was asked what, every tool call and its cost.
+   - **Ask your team** (middle): try a demo question. Vera, the CRO, sends it to the one or two right specialists (Morty the actuary, Bonnie the portfolio manager, Swap Dogg the trader), who answer in their own bubbles; then Vera sums up. *Show chat detail* shows who was asked what, every tool call and its cost.
    - **Trade ticket** (right): drag a slider and watch the dashboard gauges move before you commit. Swaps and puts last one quarter and are cash-settled at its end, so every ticket starts fresh.
 5. **Sign trade ticket**, then **End Q1**: make your call on what will hit hardest.
 6. **The shock:** the newspaper lands, the dashboard takes its hits, and Vera asks you to name the main two drivers, why they moved surplus, and what your trades did. Click *Use a sample answer (demo)* and submit. The four chips light up as an answer touches each part; *Hint* helps before *I'm not sure*.
@@ -79,7 +81,7 @@ The app never prints the key; `run.py` says only whether a key was found and whe
 | `backend/game.py`, `main.py` | Game sessions and the API (FastAPI). |
 | `frontend/` | React + Vite + TypeScript. `frontend/dist` is committed so no Node is needed to play. |
 
-See [`output/harness.md`](output/harness.md) for the agents' tools, memory, stopping rules, guardrails and audit trail. Every model call is logged with its provider-reported tokens and cost in `output/usage_log.jsonl`; every agent step in `output/audit_trail.jsonl` (both git-ignored).
+See [`output/harness.md`](output/harness.md) for the agents' tools, memory, stopping rules, guardrails and audit trail. Every model call is logged with its provider-reported tokens and its cost (computed from those tokens at `gpt-6-luna` prices) in `output/usage_log.jsonl`; every agent step in `output/audit_trail.jsonl` (both git-ignored).
 
 ## Measured results (`evidence/experiments.json`)
 
@@ -89,7 +91,7 @@ Run `python scripts/experiments.py` to measure again (about 10 minutes, well und
 - **E2** Asking every specialist cost about 1.35 times as much as letting Vera route, with no better facts (19/19 both).
 - **E3** Reading 16 chunks per search instead of 4 cost about twice as much and was less reliable: for Jackson the large read did not find the guaranteed-account value at all, and the value the targeted read finds has varied between runs ($174bn and $243bn). Lincoln's values were close.
 - **E4** Prompt caching: 92% of input cached with a stable prefix vs 53% with it broken; cost per question cut 50%, facts unchanged.
-- **Cost:** a measured full demo game cost $0.0063; a heavier projected session (8 questions) about $0.012, or $0.05 per learner per month on `gpt-6-luna`; the $0.25 cap bounds the worst case.
+- **Cost:** a measured full demo game cost $0.0063; a heavier projected session (8 questions) about $0.012, or $0.05 per learner per month on `gpt-6-luna`; the fixed $0.25 cap bounds the worst case for any one game.
 
 ## Recalibrating the companies
 
