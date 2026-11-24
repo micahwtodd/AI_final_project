@@ -85,6 +85,7 @@ def main():
     assets["font_700"] = b64(font / "atkinson-hyperlegible-latin-700-normal.woff2", "font/woff2")
     assets["reveal_css"] = (nm / "reveal.js/dist/reveal.css").read_text(encoding="utf-8")
     assets["reveal_js"] = (nm / "reveal.js/dist/reveal.js").read_text(encoding="utf-8").replace("</script", "<\\/script")
+    assets["reveal_notes_js"] = (nm / "reveal.js/plugin/notes/notes.js").read_text(encoding="utf-8").replace("</script", "<\\/script")
     for name in ("report", "slides"):
         html = fill((SRC / f"{name}.src.html").read_text(encoding="utf-8"), assets)
         out = OUT / f"{name}.html"
