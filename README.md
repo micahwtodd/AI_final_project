@@ -105,7 +105,7 @@ This downloads the filings from SEC EDGAR (cached in `data/cache/`, git-ignored)
 
 ```
 pip install -r requirements-dev.txt
-python -m pytest -q                                   # 132 tests: engine, API, agents (offline), safety
+python -m pytest -q                                   # 133 tests: engine, API, agents (offline), safety
 uvicorn backend.main:app --reload --port 8000         # API with reload
 cd frontend && npm install && npm run dev             # UI on http://localhost:5173 (proxies /api)
 cd frontend && npm run build                          # rebuild frontend/dist (commit it)

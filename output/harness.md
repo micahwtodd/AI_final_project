@@ -1,6 +1,6 @@
 # The agent harness: tools, memory, stopping rules, guardrails and audit trail
 
-Plain-language description of how Risk Desk's AI agents are wired, matching the code in `backend/`. One model is used for every agent: `gpt-6-luna` (through Portkey or OpenAI, whichever key is present), via PydanticAI. **The model never computes a number the learner is scored on**: the deterministic engine (`backend/engine.py`) owns every figure, and agents can only read it through tools.
+Plain-language description of how Surplus or Bust's AI agents are wired, matching the code in `backend/`. One model is used for every agent: `gpt-6-luna` (through Portkey or OpenAI, whichever key is present), via PydanticAI. **The model never computes a number the learner is scored on**: the deterministic engine (`backend/engine.py`) owns every figure, and agents can only read it through tools.
 
 ## The agents
 
