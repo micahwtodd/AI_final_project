@@ -39,10 +39,17 @@ def settle(page: Page, s: float = 1.2):
     time.sleep(s)
 
 
-def shot(page: Page, name: str, full: bool = False, el: str | None = None):
+UNCLAMP = "(on) => document.querySelectorAll('.chat-log').forEach(e => { e.style.maxHeight = on ? 'none' : ''; })"
+
+
+def shot(page: Page, name: str, full: bool = False, el: str | None = None, expand_chat: bool = False):
     path = OUT / f"{name}.png"
     if el and page.locator(el).count():
+        if expand_chat:  # show the whole conversation, not just the chat log's scroll window
+            page.evaluate(UNCLAMP, True)
         page.locator(el).first.screenshot(path=str(path))
+        if expand_chat:
+            page.evaluate(UNCLAMP, False)
     else:
         page.screenshot(path=str(path), full_page=full)
     print("  shot", path.name)
@@ -94,7 +101,7 @@ def play_quarter(page: Page, gid: str, q: int, trade: bool, first_run: bool):
     click(page, "Hide guide", optional=True, timeout=2000)
     if first_run and q == 1:
         ask(page, QUESTION)
-        shot(page, "05_team_answer", el=".chat-panel, .panel.chat")
+        shot(page, "05_team_answer", el=".chat-panel, .panel.chat", expand_chat=True)
         ask(page, ISIN)
         shot(page, "06_isin_blocked", el=".chat-panel, .panel.chat")
     if trade:

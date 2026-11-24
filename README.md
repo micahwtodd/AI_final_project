@@ -85,11 +85,11 @@ See [`output/harness.md`](output/harness.md) for the agents' tools, memory, stop
 
 Run `python scripts/experiments.py` to measure again (about 10 minutes, well under $1). On the last run:
 
-- **E1 Solo vs Team** (ten fixed questions, facts marked by code): Solo 16/19 facts, $0.0004 and 8s per question; Team 19/19 facts and two views on all three decision questions, $0.0013 and 23s.
-- **E2** Asking every specialist cost about 1.6 times as much as letting Vera route, with no better facts (19/19 both).
-- **E3** Reading 16 chunks per search instead of 4 cost about twice as much and was less reliable: for Jackson the large read returned an implausible guaranteed-account value ($3.1bn vs $174bn), and that value has varied between runs. Lincoln's values matched.
-- **E4** Prompt caching: 92% of input cached with a stable prefix vs 57% with it broken; cost per question cut 47%, facts unchanged.
-- **Cost:** a measured full demo game cost $0.0064; a heavier projected session (8 questions) about $0.012, or $0.05 per learner per month on `gpt-6-luna`; the $0.25 cap bounds the worst case.
+- **E1 Solo vs Team** (ten fixed questions, facts marked by code): Solo 17/19 facts, $0.0004 and 7s per question; Team 19/19 facts and two views on all three decision questions, $0.0012 and 16s.
+- **E2** Asking every specialist cost about 1.35 times as much as letting Vera route, with no better facts (19/19 both).
+- **E3** Reading 16 chunks per search instead of 4 cost about twice as much and was less reliable: for Jackson the large read did not find the guaranteed-account value at all, and the value the targeted read finds has varied between runs ($174bn and $243bn). Lincoln's values were close.
+- **E4** Prompt caching: 92% of input cached with a stable prefix vs 53% with it broken; cost per question cut 50%, facts unchanged.
+- **Cost:** a measured full demo game cost $0.0063; a heavier projected session (8 questions) about $0.012, or $0.05 per learner per month on `gpt-6-luna`; the $0.25 cap bounds the worst case.
 
 ## Recalibrating the companies
 
