@@ -15,7 +15,7 @@
 }
 * { box-sizing: border-box; }
 html { background: #e9eef5; }
-body { margin: 0; color: var(--ink); font: 11pt/1.5 var(--body); }
+body { margin: 0; color: var(--ink); font: 10.5pt/1.5 var(--body); }
 .page { max-width: 8.5in; margin: 24px auto; background: #fff; padding: 0.9in; box-shadow: 0 2px 18px rgba(0,31,91,.12); }
 h1, h2, h3, .kicker, .masthead, th, .cap, .aside b, .ph, .pill, .stat b { font-family: var(--head); }
 h2 { color: var(--navy); font-size: 19pt; margin: 0 0 6px; line-height: 1.2; border-bottom: 2px solid var(--gold); padding-bottom: 6px; }
@@ -118,7 +118,7 @@ section > p.sub, section > p.take { text-align: left; }
   <div class="kicker">02 · Motivation</div>
   <h2>Three weeks, three days, three hours… thirty minutes</h2>
   <p class="take">New risk analysts at my company leave fast and arrive without the finance background the job assumes; the business needs them productive on hard material in days, not months.</p>
-  <p>A colleague at my company once came across a blog that showed how to learn SQL in three weeks. They condensed it into a structured guide, <i>How to Learn SQL in Three Days</i>, and their manager joked that the next version should be <i>Three Hours</i>. Surplus or Bust takes that joke seriously for a harder subject. Its goal is to teach the core principles of asset liability management (ALM) by stress-testing real life insurers: the learner runs an actual company's balance sheet through market shocks and sees what holds and what breaks. The aim is that after one game, a new analyst can explain why a fall in interest rates hurts a life insurer, why a stock crash makes its guarantees more expensive, and what a hedge buys and costs.</p>
+  <p>A colleague at my company once came across a blog that showed how to learn SQL in three weeks. They condensed it into a structured guide, <i>How to Learn SQL in Three Days</i>, and their manager joked that the next version should be <i>How to Learn SQL in Three Hours</i>. Surplus or Bust takes that joke seriously for a harder subject. Its goal is to teach the core principles of asset liability management (ALM) by stress-testing real life insurers: the learner runs an actual company's balance sheet through market shocks and sees what holds and what breaks. The aim is that after one game, a new analyst can explain why a fall in interest rates hurts a life insurer, why a stock crash makes its guarantees more expensive, and what a hedge buys and costs.</p>
   <div class="countdown"><span>3 weeks</span><i>→</i><span>3 days</span><i>→</i><span>3 hours</span><i>→</i><span class="now">30 minutes</span></div>
   <p><b>Who has the problem.</b> My company, a large US life insurer, hires risk analysts from strong liberal arts colleges. They are bright, but many have never taken a finance course, and life insurance is one of the least intuitive balance sheets in finance. Turnover is high, a new analyst takes months to contribute independently, and senior staff teach the same basics again each time a seat turns over.</p>
   <p><b>How they learn today.</b> Mostly by shadowing senior colleagues, by working through self-service resources such as 10-K filings, internal decks and online courses, or by asking general AI tools that are not calibrated to our subject matter. Shadowing is slow and uneven from mentor to mentor. Self-service material explains concepts without showing how they play out on an insurer's balance sheet. A general chatbot answers confidently without knowing the business, so the analyst cannot tell a good answer from a plausible one.</p>
@@ -365,7 +365,7 @@ section > p.sub, section > p.take { text-align: left; }
   <h2>Ultra-low cost, lasting value</h2>
   <p class="take">The benefits are mostly qualitative and hard to measure, but the economics are lopsided: a year of the game costs a few dollars for a whole team, and a single week saved in onboarding is worth thousands.</p>
   <h3>The first real user</h3>
-  <p>The Tester played the game and reviewed it (n = 1, unnamed, quoted with permission). The review was positive on the design and structure. The Tester valued that the game uses real data on real competitors and explains ALM from first principles, and judged that the visuals carry a lot of data but that all of it is needed to draw the right conclusions.</p>
+  <p>The Tester played the game and reviewed it (quoted with permission). The review was positive on the design and structure. The Tester valued that the game uses real data on real competitors and explains ALM from first principles, and judged that the visuals carry a lot of data but that all of it is needed to draw the right conclusions.</p>
   <div class="aside"><img src="{{sprite_cat_alert}}" alt=""><div><q>I didn't realize it was this easy to blow up an insurance company!</q><span class="who">Tester</span></div></div>
   <p>The Tester recommended three improvements for after the project:</p>
   <ol class="steps">
@@ -385,6 +385,7 @@ section > p.sub, section > p.take { text-align: left; }
     </tbody>
   </table>
   <p class="cap">List prices from each vendor's site or published pricing, November 2026. These tools do different jobs, and none of them teaches ALM on real balance sheets; the comparison is about the order of magnitude. Surplus or Bust needs no subscription or license, only a small amount of AI spend per game.</p>
+  <p><b>Scaling up, and making it a competition.</b> The same game could serve the 100-plus analysts across the Actuarial, Finance, Investment and Treasury organizations. At the projected cost, all of them together would spend about $5–6 a month, or roughly $75 a year, against about $36,000 a year for 100 seats of Udemy Business or Copilot. Because every player who picks the same company faces the same five quarters, scores are directly comparable, which makes a friendly competition easy to run: a quarterly league with a leaderboard by organization, ranked on the report card's results and explaining scores. Actuarial against Investment against Treasury would push each team to learn the other side of the balance sheet, which is exactly the knowledge ALM depends on. A leaderboard needs the web version with logins described in Section 8.</p>
   <p><b>Education value.</b> Anyone with a laptop can play, with no finance prerequisite. Six real insurers are calibrated, and a new one can be added from its 10-K for less than a cent of AI spend. Explanations are marked against a computed truth rather than a mentor's judgment, so every analyst is held to the same standard, and the report card at the end of each game names the subjects to revisit.</p>
 </section>
 
@@ -404,9 +405,8 @@ section > p.sub, section > p.take { text-align: left; }
   <ul>
     <li>Move the game onto a web server, with logins and saved profiles, so each analyst can track progress over time and managers can see how their team is developing. Accounts also allow a monthly spend cap per analyst.</li>
     <li>A cohort pilot on my company's risk team: before and after tests, time to first independent work, and a 30-day recall check.</li>
-    <li>The Tester's recommendations: an Economist and a Treasurer agent for broader terms, and statutory filings alongside GAAP.</li>
     <li>Test lower reasoning effort for Vera's marking, the largest cost.</li>
-    <li>More insurers and an annual refresh from new 10-Ks; save-and-resume and a slower "explain mode", since a real game takes a few hours.</li>
+    <li>The Tester's recommendations (Economist and Treasurer agents, statutory filings), more insurers refreshed each year, and save-and-resume, since a real game takes a few hours.</li>
   </ul>
   <p>The SQL guide went from three weeks to three days, and a manager joked about three hours. For the core of ALM, one game takes thirty minutes to play; the Tester says a few hours to absorb. Either way, it is far faster than the weeks it replaces.</p>
   <p class="sig">Surplus or Bust is a simplified training simulation for MGT 409E. Not investment advice and not any company's own risk view. Company figures come from public SEC filings (FY2025 10-K and XBRL). All AI numbers in this report come from <code>evidence/experiments.json</code>, <code>evidence/safety_lab.json</code>, <code>output/usage_log.jsonl</code> and <code>output/audit_trail.jsonl</code>, re-run on November 23, 2026.</p>
